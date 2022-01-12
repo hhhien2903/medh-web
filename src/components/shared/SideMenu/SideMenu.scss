@@ -1,0 +1,23 @@
+.expert-sidemenu-container {
+  // .logo {
+
+  //   display: flex;
+
+  //   padding: 16px;
+  //   align-items: center;
+  // }
+  // background-color: #fff;
+  &.ant-layout-sider-collapsed {
+    width: 0px !important;
+    flex: 0px !important;
+    min-width: 0px !important;
+    max-width: 0px !important;
+  }
+  .logo {
+    height: 64px;
+    background: #000;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+  }
+}
