@@ -11,23 +11,23 @@ export default function AuthProvider({ children }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // const unsubscribed = firebaseAuth.onAuthStateChanged(async (firebaseUser) => {
-    //   if (!firebaseUser) {
-    //     setCurrentUser({});
-    //     setIsLoading(false);
-    //     history.push('/logout');
-    //     return;
-    //   }
-    //   setCurrentUser({ role: 'expert' });
-    //   console.log(currentUser);
-    //   setIsLoading(false);
-    //   localStorage.setItem('isLoggedIn', true);
-    //   history.push('/');
-    // });
-    // return () => {
-    //   unsubscribed();
-    // };
-    setIsLoading(false);
+    const unsubscribed = firebaseAuth.onAuthStateChanged(async (firebaseUser) => {
+      if (!firebaseUser) {
+        setCurrentUser({});
+        setIsLoading(false);
+        history.push('/logout');
+        return;
+      }
+      setCurrentUser({ role: 'expert' });
+      console.log(firebaseUser);
+      setIsLoading(false);
+      localStorage.setItem('isLoggedIn', true);
+      history.push('/expert');
+    });
+    return () => {
+      unsubscribed();
+    };
+    // setIsLoading(false);
     // history.push('/register');
   }, [history]);
 
