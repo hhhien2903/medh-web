@@ -1,0 +1,11 @@
+version: "3"
+
+services:
+  ui:
+    container_name: medh-web
+    restart: always
+    build: .
+    ports:
+      - "6060:80"
+volumes:
+  medh-web:
