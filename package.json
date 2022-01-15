@@ -18,6 +18,9 @@
     "sass": "^1.45.2"
   },
 
+  "resolutions": {
+    "mini-css-extract-plugin": "2.4.5"
+  },
   "scripts": {
     "start:dev": "env-cmd -f ./src/config/envs/development.env react-scripts start",
     "start:prod": "env-cmd -f ./src/config/envs/production.env react-scripts start",
