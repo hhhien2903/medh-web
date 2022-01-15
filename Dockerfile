@@ -5,11 +5,11 @@ WORKDIR /app
 # Cache and Install dependencies
 COPY package.json .
 COPY yarn.lock .
-RUN npm install --only=production
+RUN yarn install --production --network-timeout 1000000
 # Copy app files
 COPY . .
 # Build the app
-RUN npm run build:prod
+RUN yarn build:prod
 
 # Bundle static assets with nginx
 FROM nginx:1.21.0-alpine as production
