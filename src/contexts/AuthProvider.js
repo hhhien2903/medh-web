@@ -1,8 +1,8 @@
+import { Row, Spin } from 'antd';
 import React, { useEffect, useState } from 'react';
-import { firebaseAuth } from '../config/firebase';
 import { useHistory } from 'react-router-dom';
-import { Spin, Row, notification } from 'antd';
-
+import expertAPI from '../api/expertAPI';
+import { firebaseAuth } from '../config/firebase';
 export const AuthContext = React.createContext();
 
 export default function AuthProvider({ children }) {
@@ -18,11 +18,30 @@ export default function AuthProvider({ children }) {
         history.push('/logout');
         return;
       }
-      setCurrentUser({ role: 'expert' });
-      console.log(firebaseUser);
-      setIsLoading(false);
-      localStorage.setItem('isLoggedIn', true);
-      history.push('/expert');
+
+      try {
+        let { phoneNumber, email } = firebaseUser;
+        if (phoneNumber) {
+          phoneNumber = '0' + phoneNumber.substring(3);
+        }
+
+        const expertData = await expertAPI.checkAccountRegistered(phoneNumber, email);
+        setCurrentUser(expertData);
+        console.log(expertData);
+        localStorage.setItem('isLoggedIn', true);
+        history.push('/expert');
+        setIsLoading(false);
+      } catch (error) {
+        console.log(error);
+        setIsLoading(false);
+        history.push('/register');
+      }
+
+      // setCurrentUser({ role: 'expert' });
+      // console.log(firebaseUser);
+
+      // localStorage.setItem('isLoggedIn', true);
+      // history.push('/expert');
     });
     return () => {
       unsubscribed();

@@ -19,7 +19,7 @@ function App() {
             <Route exact path="/register" component={Register} />
             <Route exact path="/logout" component={Logout} />
             <Route path="/expert" component={ExpertHome} />
-            {/* <ProtectedRoute exact path="/" component={Home} /> */}
+            <ProtectedRoute exact path="/" component={Home} />
             <Route exact path="/404" component={NotFound} />
             <Route path="*" component={NotFound} />
           </Switch>
