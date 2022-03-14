@@ -18,3 +18,52 @@
     align-items: center;
   }
 }
+
+.modal-user {
+  .form-name {
+    display: flex;
+    flex-direction: column;
+    width: 200px;
+    align-content: center;
+    margin-left: 1000px;
+  }
+  .name-user {
+    font-weight: bold;
+  }
+  .form-header {
+    margin-bottom: 38px;
+  }
+  .avatar-container-profile {
+    height: 150px;
+    // background: linear-gradient(to left, #b066fe, #63e2ff);
+    background: linear-gradient(to right, #457fca, #5691c8);
+  }
+  .upload-avatar {
+    transform: translate(130px, 103px);
+  }
+  .btn-upload-avatar {
+    transform: translate(190px, 83px);
+    cursor: pointer;
+    .ant-upload-list {
+      display: none;
+    }
+  }
+
+  .input-edit-name {
+    margin-top: 50px;
+    height: 10px;
+    background: white;
+    text-align: center;
+    font-family: sans-serif;
+  }
+  .input-edit-name h3 {
+    font-weight: bold;
+    margin-left: 140px;
+  }
+
+  .ant-form-item {
+    margin-bottom: 10px;
+    padding: 0 2px;
+    border-radius: '5px';
+  }
+}

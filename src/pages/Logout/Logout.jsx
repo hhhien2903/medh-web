@@ -5,6 +5,7 @@ import { AuthContext } from '../../contexts/AuthProvider';
 const Logout = () => {
   const { setCurrentUser } = useContext(AuthContext);
   useEffect(() => {
+    console.log('hehe log out ne');
     localStorage.removeItem('isLoggedIn');
     localStorage.removeItem('role');
     setCurrentUser({});
