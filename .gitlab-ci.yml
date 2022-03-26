@@ -1,0 +1,14 @@
+stages:
+  - deploy
+
+production:
+  stage: deploy
+
+  script:
+    - docker-compose up --build -d
+
+  only:
+    - master
+
+  tags:
+    - medh-web
