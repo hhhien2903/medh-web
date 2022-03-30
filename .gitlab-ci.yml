@@ -5,7 +5,7 @@ production:
   stage: deploy
 
   script:
-    - docker-compose up --build -d
+    - sudo docker-compose up --build -d
 
   only:
     - master
