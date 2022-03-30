@@ -166,7 +166,11 @@ const Register = () => {
             },
           ]}
         >
-          <Input readOnly={isReadOnlyPhoneNumberField} placeholder="Số Điện Thoại" />
+          <Input
+            readOnly={isReadOnlyPhoneNumberField}
+            style={{ backgroundColor: isReadOnlyPhoneNumberField ? '#DCDCDC' : '#FFFFFF' }}
+            placeholder="Số Điện Thoại"
+          />
         </Form.Item>
         <Form.Item
           name="email"
@@ -182,7 +186,11 @@ const Register = () => {
             },
           ]}
         >
-          <Input readOnly={isReadOnlyEmailField} placeholder="Email" />
+          <Input
+            readOnly={isReadOnlyEmailField}
+            placeholder="Email"
+            style={{ backgroundColor: isReadOnlyEmailField ? '#DCDCDC' : '#FFFFFF' }}
+          />
         </Form.Item>
         {/* <Form.Item
           name="hospital"

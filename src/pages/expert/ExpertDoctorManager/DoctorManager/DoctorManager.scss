@@ -1,0 +1,36 @@
+.doctor-manager-container {
+  margin: 10px 10px;
+  .tool-container {
+    display: flex;
+    justify-content: space-between;
+  }
+  .doctor-table {
+    .index-row {
+      // background-color: #fafafa;
+    }
+  }
+}
+.add-doctor-modal-container {
+  top: 20px;
+  .add-doctor-form {
+    margin-top: -10px;
+    .ant-form-item {
+      margin-bottom: 7px;
+    }
+  }
+  .avatar-container-profile {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .upload-avatar {
+      .btn-upload-avatar {
+        font-size: 16;
+        transform: translate(75px, -22px);
+        cursor: pointer;
+        .ant-upload-list {
+          display: none;
+        }
+      }
+    }
+  }
+}

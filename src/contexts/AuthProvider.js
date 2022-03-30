@@ -31,10 +31,15 @@ export default function AuthProvider({ children }) {
         localStorage.setItem('isLoggedIn', true);
         history.push('/expert');
         setIsLoading(false);
+        console.log(firebaseUser);
       } catch (error) {
         console.log(error);
         setIsLoading(false);
         history.push('/register');
+        //when server down
+        // setIsLoading(false);
+        // setCurrentUser({});
+        // history.push('/expert');
       }
 
       // setCurrentUser({ role: 'expert' });

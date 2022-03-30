@@ -1,11 +1,10 @@
-import { Form, Input, Button, Image, Tabs, Space, notification } from 'antd';
-import { GoogleOutlined, MobileOutlined, LockOutlined, MobileFilled } from '@ant-design/icons';
-import './Login.scss';
-import medHLogo from '../../assets/images/med-h-logo.png';
-import backgroundImage from '../../assets/images/background-1.jpg';
-import authApi from '../../api/auth-api';
+import { Button, Form, Image, Input, notification, Space, Tabs } from 'antd';
 import { useState } from 'react';
-import { firebaseAuth, providers, firebase } from '../../config/firebase';
+import { AiFillMobile, AiOutlineGoogle, AiOutlineLock, AiOutlineMobile } from 'react-icons/ai';
+import backgroundImage from '../../assets/images/background-1.jpg';
+import medHLogo from '../../assets/images/med-h-logo.png';
+import { firebase, firebaseAuth, providers } from '../../config/firebase';
+import './Login.scss';
 const Login = () => {
   const [formLoginPhone] = Form.useForm();
   const [activeLoginTab, setActiveLoginTab] = useState('1');
@@ -109,7 +108,9 @@ const Login = () => {
           <Space direction="vertical">
             <Button
               size={'large'}
-              icon={<GoogleOutlined />}
+              icon={
+                <AiOutlineGoogle style={{ verticalAlign: 'sub', marginRight: '5px' }} size={22} />
+              }
               block
               type="primary"
               onClick={handleGoogleLogin}
@@ -118,7 +119,7 @@ const Login = () => {
             </Button>
             <Button
               size={'large'}
-              icon={<MobileFilled />}
+              icon={<AiFillMobile style={{ verticalAlign: 'sub', marginRight: '5px' }} size={20} />}
               onClick={() => setActiveLoginTab('2')}
               block
               type="primary"
@@ -140,7 +141,7 @@ const Login = () => {
               ]}
               name="phoneNumber"
             >
-              <Input prefix={<MobileOutlined />} placeholder="Số Điện Thoại" />
+              <Input prefix={<AiOutlineMobile size={18} />} placeholder="Số Điện Thoại" />
             </Form.Item>
 
             <Form.Item style={{ marginBottom: '10px' }}>
@@ -156,7 +157,7 @@ const Login = () => {
                 ]}
                 style={{ display: 'inline-block', width: 'calc(55% - 8px)' }}
               >
-                <Input prefix={<LockOutlined />} placeholder="Mã Xác Nhận" />
+                <Input prefix={<AiOutlineLock size={18} />} placeholder="Mã Xác Nhận" />
               </Form.Item>
               <Form.Item style={{ display: 'inline-block', width: 'calc(45%)', marginLeft: '8px' }}>
                 <Button onClick={handleReceiveOTP} block type="primary">

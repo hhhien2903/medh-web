@@ -1,0 +1,15 @@
+.hospital-manager-container {
+  margin: 10px 10px;
+  .tool-container {
+    display: flex;
+    justify-content: space-between;
+  }
+}
+.add-edit-hospital-modal-container {
+  top: 50px;
+  .add-edit-hospital-form {
+    .ant-form-item {
+      margin-bottom: 7px;
+    }
+  }
+}

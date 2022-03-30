@@ -8,6 +8,7 @@ const Home = () => {
     if (currentUser.role === 'expert') {
       history.push('/expert');
     } else {
+      console.log('chay ne');
       history.push('/register');
     }
   }, []);
