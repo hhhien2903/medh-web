@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Image, Layout, Menu } from 'antd';
 import './SideMenu.scss';
 import fullLogo from '../../../assets/images/full-logo-1.png';
+import onlyLogo from '../../../assets/images/med-h-only-logo.png';
 import { AppContext } from '../../../contexts/AppProvider';
 const SideMenu = (props) => {
   const { sideMenuItems } = props;
@@ -12,9 +13,14 @@ const SideMenu = (props) => {
       trigger={null}
       collapsed={menuToggleCollapsed}
       className="expert-sidemenu-container"
+      width={230}
     >
       <div className="logo">
-        <Image src={fullLogo} preview={false} height={50} />
+        <Image
+          src={menuToggleCollapsed ? onlyLogo : fullLogo}
+          preview={false}
+          height={menuToggleCollapsed ? 45 : 50}
+        />
       </div>
       <Menu theme="dark" mode="inline" defaultSelectedKeys={sideMenuItems[0].title}>
         {sideMenuItems.map((sideMenuItem) => {
@@ -28,7 +34,7 @@ const SideMenu = (props) => {
                 {sideMenuItem.subMenuItems.map((subMenuItem) => {
                   return (
                     <Menu.Item key={subMenuItem.title} icon={subMenuItem.icon}>
-                      <Link to={subMenuItem.url}>{subMenuItem.title}</Link>
+                      <Link to={subMenuItem?.url}>{subMenuItem.title}</Link>
                     </Menu.Item>
                   );
                 })}
@@ -37,7 +43,7 @@ const SideMenu = (props) => {
           } else {
             return (
               <Menu.Item key={sideMenuItem.title} icon={sideMenuItem.icon}>
-                <Link to={sideMenuItem.url}>{sideMenuItem.title}</Link>
+                <Link to={sideMenuItem?.url}>{sideMenuItem.title}</Link>
               </Menu.Item>
             );
           }

@@ -15,7 +15,6 @@ import {
   message,
 } from 'antd';
 import '../Header/Header.scss';
-import { MenuUnfoldOutlined, MenuFoldOutlined, CameraFilled } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom';
 import { AppContext } from '../../../contexts/AppProvider';
 import { AuthContext } from '../../../contexts/AuthProvider';
@@ -25,6 +24,7 @@ import ImgCrop from 'antd-img-crop';
 import localeVN from 'antd/es/date-picker/locale/vi_VN';
 import moment from 'moment';
 import { phoneNumberRegex } from '../../../utils/regex';
+import { AiOutlineMenuUnfold, AiFillCamera, AiOutlineMenuFold } from 'react-icons/ai';
 const Header = () => {
   const { menuToggleCollapsed, setMenuToggleCollapsed } = useContext(AppContext);
   const { currentUser, setCurrentUser } = useContext(AuthContext);
@@ -34,9 +34,28 @@ const Header = () => {
 
   const getPageTitle = () => {
     const title = history.location.pathname;
+    // if (title.match(new RegExp(/\/expert\/patient\/[0-9]+/))) {
+    //   return 'Chi Tiết Bệnh Nhân';
+    // }
     switch (title) {
       case '/expert/dashboard':
         return 'Dashboard';
+      case '/expert/doctor':
+        return 'Quản Lý Bác Sĩ';
+      case '/expert/doctor/pending':
+        return 'Quản Lý Bác Sĩ Chờ Duyệt';
+      case '/expert/patient':
+        return 'Quản Lý Bệnh Nhân';
+      case '/expert/device':
+        return 'Quản Lý Thiết Bị';
+      case '/expert/disease':
+        return 'Quản Lý Mầm Bệnh';
+      case '/expert/rule':
+        return 'Quản Lý Tập Luật Y Tế';
+      case '/expert/rule-condition':
+        return 'Quản Lý Luật Y Tế';
+      case '/expert/hospital':
+        return 'Quản Lý Bệnh Viện';
       default:
         return '';
     }
@@ -85,20 +104,22 @@ const Header = () => {
     if (phoneNumber) {
       phoneNumber = '0' + phoneNumber.substring(3);
     }
-
-    const expertData = await expertAPI.checkAccountRegistered(phoneNumber, email);
-    setCurrentUser(expertData);
-    console.log(currentUser);
-    formUpdateCurrentUserInfo.setFieldsValue({
-      id: currentUser.id,
-      name: currentUser.name,
-      gender: currentUser.gender,
-      dateOfBirth: moment(currentUser.dateOfBirth),
-      mobile: currentUser.mobile,
-      email: currentUser.email,
-    });
-    // console.log(moment(currentUser.dateOfBirth).format('DD/MM/YYYY'));
-    setIsModalVisible(true);
+    try {
+      const expertData = await expertAPI.checkAccountRegistered(phoneNumber, email);
+      setCurrentUser(expertData);
+      console.log(currentUser);
+      formUpdateCurrentUserInfo.setFieldsValue({
+        id: currentUser.id,
+        name: currentUser.name,
+        gender: currentUser.gender,
+        dateOfBirth: moment(currentUser.dateOfBirth),
+        mobile: currentUser.mobile,
+        email: currentUser.email,
+      });
+      setIsModalVisible(true);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const handleClickUpdateInfoCurrentUser = () => {
@@ -143,9 +164,9 @@ const Header = () => {
     <Layout.Header className="site-layout-background header-container">
       <div>
         {menuToggleCollapsed ? (
-          <MenuUnfoldOutlined className="toggle-menu" onClick={handleClickToggleMenu} />
+          <AiOutlineMenuUnfold className="toggle-menu" onClick={handleClickToggleMenu} />
         ) : (
-          <MenuFoldOutlined className="toggle-menu" onClick={handleClickToggleMenu} />
+          <AiOutlineMenuFold className="toggle-menu" onClick={handleClickToggleMenu} />
         )}
         <h2 style={{ display: 'inline', marginLeft: 10 }}>{getPageTitle()}</h2>
       </div>
@@ -201,7 +222,7 @@ const Header = () => {
                         //  customRequest={handleUploadAvatar}
                         progress={false}
                       >
-                        {<CameraFilled />}
+                        {<AiFillCamera />}
                       </Upload>
                     </ImgCrop>
                   </Tooltip>
