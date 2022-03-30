@@ -1,0 +1,15 @@
+.device-manager-container {
+  margin: 10px 10px;
+  .tool-container {
+    display: flex;
+    justify-content: space-between;
+  }
+}
+.add-device-modal-container {
+  top: 50px;
+  .add-device-form {
+    .ant-form-item {
+      margin-bottom: 7px;
+    }
+  }
+}

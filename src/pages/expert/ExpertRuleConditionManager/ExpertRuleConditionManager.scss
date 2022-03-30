@@ -1,0 +1,28 @@
+.rule-manager-container {
+  margin: 10px 10px;
+  .tool-container {
+    display: flex;
+    justify-content: space-between;
+  }
+}
+.add-rule-modal-container {
+  top: 50px;
+  .add-rule-form {
+    .ant-form-item {
+      margin-bottom: 7px;
+    }
+    #tempHigh {
+      text-align: center;
+    }
+    #tempLow {
+      text-align: center;
+    }
+    .timepicker {
+      .ant-picker-input {
+        input {
+          text-align: center;
+        }
+      }
+    }
+  }
+}
