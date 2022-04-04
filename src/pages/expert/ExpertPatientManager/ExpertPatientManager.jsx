@@ -22,6 +22,8 @@ import patientAPI from '../../../api/patientAPI';
 import useFormItemHospital from '../../../components/shared/FormItemHospital/useFormItemHospital';
 import useFormItemDoctor from '../../../components/shared/FormItemDoctor/useFormItemDoctor';
 import useFormItemDevice from '../../../components/shared/FormItemDevice/useFormItemDevice';
+import useLoadingSkeleton from '../../../components/shared/LoadingSkeleton/useLoadingSkeleton';
+
 const ExpertPatientManager = () => {
   const [patientSource, setPatientSource] = useState([]);
   const [isAddEditPatientModalVisible, setIsAddEditPatientModalVisible] = useState(false);
@@ -35,6 +37,7 @@ const ExpertPatientManager = () => {
     useFormItemAddress(formAddEditPatient);
   const { renderFormItemDoctor } = useFormItemDoctor();
   const { renderFormItemDevice } = useFormItemDevice();
+  const { renderLoadingSkeleton, setIsLoadingSkeleton, isLoadingSkeleton } = useLoadingSkeleton();
   const dataSourceTest = [
     {
       id: 16,
@@ -129,13 +132,17 @@ const ExpertPatientManager = () => {
     },
     {
       title: 'Bệnh Viện',
-      dataIndex: 'hospital',
       key: 'hospital',
+      render: (text, record) => {
+        return record.hospital.name;
+      },
     },
     {
       title: 'Bác Sĩ Phụ Trách',
-      dataIndex: 'doctor',
       key: 'doctor',
+      render: (text, record) => {
+        return record.doctor?.name;
+      },
     },
     {
       title: 'Vòng Đeo',
@@ -196,9 +203,11 @@ const ExpertPatientManager = () => {
   ];
   const getAllPatient = async () => {
     try {
+      setIsLoadingSkeleton(true);
       const patientSourceResult = await patientAPI.getAllPatients();
       setPatientSource(patientSourceResult);
-      console.log(patientSource);
+      setIsLoadingSkeleton(false);
+      console.log(patientSourceResult);
     } catch (error) {
       console.log(error);
     }
@@ -502,7 +511,11 @@ const ExpertPatientManager = () => {
           </Form.Item> */}
         </Form>
       </Modal>
-      <Table columns={tableColumns} dataSource={patientSource} pagination={{ pageSize: 10 }} />
+      {isLoadingSkeleton ? (
+        renderLoadingSkeleton
+      ) : (
+        <Table columns={tableColumns} dataSource={patientSource} pagination={{ pageSize: 10 }} />
+      )}
     </div>
   );
 };

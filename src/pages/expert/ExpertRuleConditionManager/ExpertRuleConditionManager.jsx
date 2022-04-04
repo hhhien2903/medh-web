@@ -12,7 +12,6 @@ import {
   Tag,
   TimePicker,
 } from 'antd';
-import FormItem from 'antd/lib/form/FormItem';
 import React, { useState, useEffect } from 'react';
 import { AiOutlineDelete, AiOutlineEdit, AiOutlinePlus } from 'react-icons/ai';
 import { MdMoreHoriz } from 'react-icons/md';
@@ -325,12 +324,12 @@ const ExpertRuleConditionManager = () => {
             <Input placeholder="Tên Luật Y Tế" />
           </Form.Item>
 
-          <FormItem
+          <Form.Item
             // name="temp"
             label="Ngưỡng Nhiệt Độ (°C)::"
           >
             <Input.Group compact>
-              <FormItem
+              <Form.Item
                 name="tempLow"
                 label="Nhiệt Độ Thấp:"
                 noStyle
@@ -370,7 +369,7 @@ const ExpertRuleConditionManager = () => {
                   style={{ width: `calc(50% - 15px)`, textAlign: 'center' }}
                   placeholder="Nhiệt Độ Thấp"
                 />
-              </FormItem>
+              </Form.Item>
               <Input
                 className="site-input-split"
                 style={{
@@ -382,7 +381,7 @@ const ExpertRuleConditionManager = () => {
                 placeholder="-"
                 disabled
               />
-              <FormItem
+              <Form.Item
                 name="tempHigh"
                 label="Nhiệt Độ Cao:"
                 noStyle
@@ -415,10 +414,10 @@ const ExpertRuleConditionManager = () => {
                   placeholder="Nhiệt Độ Cao"
                   controls={false}
                 />
-              </FormItem>
+              </Form.Item>
             </Input.Group>
-          </FormItem>
-          <FormItem name="time" label="Ngưỡng Thời Gian (Phút)::">
+          </Form.Item>
+          <Form.Item name="time" label="Ngưỡng Thời Gian (Phút)::">
             <TimePicker.RangePicker
               style={{ width: '100%' }}
               allowClear
@@ -429,7 +428,7 @@ const ExpertRuleConditionManager = () => {
               className="timepicker"
             />
             {/* <Input.Group compact>
-              <FormItem
+              <Form.Item
                 name="timeStart"
                 label="Thời Gian Bắt Đầu:"
                 noStyle
@@ -461,7 +460,7 @@ const ExpertRuleConditionManager = () => {
                   style={{ width: `calc(50% - 15px)`, textAlign: 'center' }}
                   placeholder="Thời Gian Bắt Đầu"
                 />
-              </FormItem>
+              </Form.Item>
               <Input
                 className="site-input-split"
                 style={{
@@ -473,7 +472,7 @@ const ExpertRuleConditionManager = () => {
                 placeholder="-"
                 disabled
               />
-              <FormItem
+              <Form.Item
                 name="timeEnd"
                 label="Thời Gian Kết Thúc:"
                 noStyle
@@ -499,9 +498,9 @@ const ExpertRuleConditionManager = () => {
                   placeholder="Thời Gian Kết Thúc"
                   controls={false}
                 />
-              </FormItem>
+              </Form.Item>
             </Input.Group> */}
-          </FormItem>
+          </Form.Item>
           <Form.Item
             name="treatment"
             label="Hành Động:"
