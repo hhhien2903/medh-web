@@ -1,10 +1,10 @@
-import { Form, Input, Select } from 'antd';
+import { Form, Select } from 'antd';
 import React, { useState, useEffect } from 'react';
 import doctorAPI from '../../../api/doctorAPI';
 
 const useFormItemDoctor = () => {
   const [doctorSource, setDoctorSource] = useState([]);
-
+  const [isDoctorFormItemRequired, setIsDoctorFormItemRequired] = useState(true);
   const getAllDoctor = async () => {
     try {
       const doctorSourceResult = await doctorAPI.getAllDoctors();
@@ -18,6 +18,7 @@ const useFormItemDoctor = () => {
   }, []);
 
   return {
+    setIsDoctorFormItemRequired,
     renderFormItemDoctor: (
       <>
         <Form.Item
@@ -25,7 +26,7 @@ const useFormItemDoctor = () => {
           label="Bác Sĩ Phụ Trách:"
           rules={[
             {
-              required: true,
+              required: isDoctorFormItemRequired,
               message: 'Bác Sĩ Phụ Trách không được để trống!',
             },
           ]}

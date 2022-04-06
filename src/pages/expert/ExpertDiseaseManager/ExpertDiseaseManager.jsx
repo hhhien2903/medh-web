@@ -18,7 +18,7 @@ import diseaseAPI from '../../../api/diseaseAPI';
 import useFormItemRule from '../../../components/shared/FormItemRule/useFormItemRule';
 import { vietnameseNameRegex } from '../../../utils/regex';
 import './ExpertDiseaseManager.scss';
-
+import useLoadingSkeleton from '../../../components/shared/LoadingSkeleton/useLoadingSkeleton';
 const ExpertDiseaseManager = () => {
   const [diseaseSource, setDiseaseSource] = useState([]);
   const [isAddEditDiseaseModalVisible, setAddEditDiseaseModalVisible] = useState(false);
@@ -28,6 +28,7 @@ const ExpertDiseaseManager = () => {
   const [modalTitle, setModalTitle] = useState('');
   const [modalUsedFor, setModalUsedFor] = useState('');
   const { renderFormItemRule } = useFormItemRule();
+  const { renderLoadingSkeleton, setIsLoadingSkeleton, isLoadingSkeleton } = useLoadingSkeleton();
   // const dataSourceTest = [
   //   {
   //     id: 1,
@@ -84,6 +85,12 @@ const ExpertDiseaseManager = () => {
       // render: (name) => <Link to="/expert/patient/123">{name}</Link>,
     },
     {
+      title: 'Tên Tập Luật',
+      key: 'rule',
+      render: (record) => record.rule?.name,
+    },
+
+    {
       title: 'Tác Vụ',
       key: 'action',
       align: 'center',
@@ -136,11 +143,15 @@ const ExpertDiseaseManager = () => {
       },
     },
   ].filter((item) => !item.hidden);
+
   const getAllDiseases = async () => {
     try {
+      setIsLoadingSkeleton(true);
       const diseaseSourceResult = await diseaseAPI.getAllDiseases();
       setDiseaseSource(diseaseSourceResult);
+      setIsLoadingSkeleton(false);
     } catch (error) {
+      setIsLoadingSkeleton(false);
       console.log(error);
     }
   };
@@ -157,7 +168,13 @@ const ExpertDiseaseManager = () => {
           name: formValue.name,
           description: formValue.description,
         };
+        const assignRuleData = {
+          id: formValue.id,
+          ruleId: formValue.ruleId,
+        };
+        console.log(assignRuleData);
         await diseaseAPI.updateDisease(sendData);
+        await diseaseAPI.assignRule(assignRuleData);
         message.success('Sửa Mầm Bệnh thành công.', 5);
         getAllDiseases();
         handleCancelDiseaseModal();
@@ -177,7 +194,12 @@ const ExpertDiseaseManager = () => {
           name: formValue.name,
           description: formValue.description,
         };
-        await diseaseAPI.createDisease(sendData);
+        const createDiseaseResult = await diseaseAPI.createDisease(sendData);
+        const assignRuleData = {
+          id: createDiseaseResult.id,
+          ruleId: formValue.ruleId,
+        };
+        await diseaseAPI.assignRule(assignRuleData);
         message.success('Tạo Mầm Bệnh thành công.', 5);
         getAllDiseases();
         handleCancelDiseaseModal();
@@ -227,6 +249,7 @@ const ExpertDiseaseManager = () => {
       id: record.id,
       name: record.name,
       description: record.description,
+      ruleId: record.rule?.id,
     });
   };
 
@@ -310,14 +333,18 @@ const ExpertDiseaseManager = () => {
           {renderFormItemRule}
         </Form>
       </Modal>
-      <Table
-        locale={{
-          emptyText: <Empty description="Không có dữ liệu." />,
-        }}
-        columns={tableColumns}
-        dataSource={diseaseSource}
-        pagination={{ pageSize: 10 }}
-      />
+      {isLoadingSkeleton ? (
+        renderLoadingSkeleton
+      ) : (
+        <Table
+          locale={{
+            emptyText: <Empty description="Không có dữ liệu." />,
+          }}
+          columns={tableColumns}
+          dataSource={diseaseSource}
+          pagination={{ pageSize: 10 }}
+        />
+      )}
     </div>
   );
 };

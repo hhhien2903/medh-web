@@ -19,6 +19,10 @@ const diseaseAPI = {
     const url = `${API_ENDPOINT}/${id}`;
     return axiosClient.delete(url);
   },
+  assignRule: (data) => {
+    const url = `${API_ENDPOINT}/rule?id=${data.id}&ruleId=${data.ruleId}`;
+    return axiosClient.patch(url);
+  },
 };
 
 export default diseaseAPI;

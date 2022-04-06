@@ -22,15 +22,15 @@ const useFormItemHospital = () => {
       <>
         <Form.Item
           name="hospitalId"
-          label="Bệnh Viện Công Tác:"
+          label="Bệnh Viện:"
           rules={[
             {
               required: true,
-              message: 'Bệnh Viện Công Tác không được để trống!',
+              message: 'Bệnh Viện không được để trống!',
             },
           ]}
         >
-          <Select placeholder="Vui lòng chọn Bệnh Viện Công Tác">
+          <Select placeholder="Vui lòng chọn Bệnh Viện ">
             {hospitalSource.map((hospital) => {
               return <Select.Option value={hospital.id}>{hospital.name}</Select.Option>;
             })}
