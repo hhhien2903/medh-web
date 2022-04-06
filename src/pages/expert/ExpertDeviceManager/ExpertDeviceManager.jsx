@@ -1,33 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import {
-  Button,
-  DatePicker,
-  Form,
-  Input,
-  Modal,
-  Space,
-  Table,
-  Tag,
-  Select,
-  Avatar,
-  Tooltip,
-  Upload,
-  Dropdown,
-  Menu,
-} from 'antd';
-import moment from 'moment';
-import { AiOutlineDelete, AiOutlineEdit, AiOutlinePlus, AiOutlineInfoCircle } from 'react-icons/ai';
+import { Button, Dropdown, Empty, Form, Input, Menu, Modal, Select, Table, Tag } from 'antd';
+import React, { useState } from 'react';
+import { AiOutlineDelete, AiOutlineEdit, AiOutlineInfoCircle, AiOutlinePlus } from 'react-icons/ai';
 import { MdMoreHoriz } from 'react-icons/md';
-
-import './ExpertDeviceManager.scss';
-import { emailRegex, phoneNumberRegex, vietnameseNameRegex } from '../../../utils/regex';
-import localeVN from 'antd/es/date-picker/locale/vi_VN';
-import ImgCrop from 'antd-img-crop';
-import { AiFillCamera, AiOutlineUser } from 'react-icons/ai';
 import doctorAPI from '../../../api/doctorAPI';
-import useFormItemPatient from '../../../components/shared/FormItemPatient/useFormItemPatient';
 import useFormItemDisease from '../../../components/shared/FormItemDisease/useFormItemDisease';
-import useFormItemRule from '../../../components/shared/FormItemRule/useFormItemRule';
+import useFormItemPatient from '../../../components/shared/FormItemPatient/useFormItemPatient';
+import { vietnameseNameRegex } from '../../../utils/regex';
+import './ExpertDeviceManager.scss';
+
 const ExpertDeviceManager = () => {
   const [doctorDataSource, setDoctorDataSource] = useState([]);
   const [isAddEditDeviceModalVisible, setAddEditDeviceModalVisible] = useState(false);
@@ -375,7 +355,14 @@ const ExpertDeviceManager = () => {
           </Form.Item>
         </Form>
       </Modal>
-      <Table columns={tableColumns} dataSource={dataSourceTest} pagination={{ pageSize: 10 }} />
+      <Table
+        locale={{
+          emptyText: <Empty description="Không có dữ liệu." />,
+        }}
+        columns={tableColumns}
+        dataSource={dataSourceTest}
+        pagination={{ pageSize: 10 }}
+      />
     </div>
   );
 };

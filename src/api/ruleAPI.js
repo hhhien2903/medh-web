@@ -19,6 +19,14 @@ const ruleAPI = {
     const url = `${API_ENDPOINT}/${id}`;
     return axiosClient.delete(url);
   },
+  findById: (id) => {
+    const url = `${API_ENDPOINT}/${id}`;
+    return axiosClient.get(url);
+  },
+  clearRuleConditionsById: (id) => {
+    const url = `${API_ENDPOINT}/${id}/clear-conditions`;
+    return axiosClient.patch(url);
+  },
 };
 
 export default ruleAPI;

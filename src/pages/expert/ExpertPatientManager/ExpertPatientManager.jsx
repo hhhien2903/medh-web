@@ -2,6 +2,7 @@ import {
   Button,
   DatePicker,
   Dropdown,
+  Empty,
   Form,
   Input,
   Menu,
@@ -9,11 +10,18 @@ import {
   Modal,
   Select,
   Table,
+  Descriptions,
 } from 'antd';
 import localeVN from 'antd/es/date-picker/locale/vi_VN';
 import moment from 'moment';
 import React, { useState, useEffect } from 'react';
-import { AiOutlineDelete, AiOutlineEdit, AiOutlineInfoCircle, AiOutlinePlus } from 'react-icons/ai';
+import {
+  AiOutlineDelete,
+  AiOutlineEdit,
+  AiOutlineInfoCircle,
+  AiOutlinePlus,
+  AiOutlineAreaChart,
+} from 'react-icons/ai';
 import { MdMoreHoriz } from 'react-icons/md';
 import { emailRegex, phoneNumberRegex, vietnameseNameRegex } from '../../../utils/regex';
 import './ExpertPatientManager.scss';
@@ -22,6 +30,10 @@ import patientAPI from '../../../api/patientAPI';
 import useFormItemHospital from '../../../components/shared/FormItemHospital/useFormItemHospital';
 import useFormItemDoctor from '../../../components/shared/FormItemDoctor/useFormItemDoctor';
 import useFormItemDevice from '../../../components/shared/FormItemDevice/useFormItemDevice';
+import useLoadingSkeleton from '../../../components/shared/LoadingSkeleton/useLoadingSkeleton';
+import { Line } from 'react-chartjs-2';
+import { Chart as ChartJS, registerables } from 'chart.js';
+ChartJS.register(...registerables);
 const ExpertPatientManager = () => {
   const [patientSource, setPatientSource] = useState([]);
   const [isAddEditPatientModalVisible, setIsAddEditPatientModalVisible] = useState(false);
@@ -33,49 +45,53 @@ const ExpertPatientManager = () => {
   const { renderFormItemHospital } = useFormItemHospital();
   const { setIsDisableDistrict, setIsDisableWard, renderFormItemAddress } =
     useFormItemAddress(formAddEditPatient);
-  const { renderFormItemDoctor } = useFormItemDoctor();
-  const { renderFormItemDevice } = useFormItemDevice();
-  const dataSourceTest = [
-    {
-      id: 16,
-      uuid: '98a20510-e61f-42a3-9324-3bbc6b51165f',
-      createdAt: '2022-03-15T00:00:00.000Z',
-      updatedAt: '2022-03-15T00:00:00.000Z',
-      avatar: 'https://eitrawmaterials.eu/wp-content/uploads/2016/09/person-icon.png',
-      cmnd: '123456789',
-      dateOfBirth: '2000-01-16T07:58:29.000Z',
-      email: 'test123@gmail.com',
-      gender: true,
-      isActive: true,
-      mobile: '0975846784',
-      name: 'Nguyễn Văn A',
-      address: '12 Nguyễn Văn Bảo, Phường 4, Gò Vấp, Thành phố Hồ Chí Minh',
-      hospital: 'Bệnh Viện Quân Y',
-      doctor: 'Nguyễn Văn A',
-      device: 'Số 1',
-      cityId: 79,
-      districtId: 767,
-      wardId: 1460,
-    },
-    {
-      id: 17,
-      uuid: '98a20510-e61f-42a3-9324-3bbc6b51165f',
-      createdAt: '2022-03-15T00:00:00.000Z',
-      updatedAt: '2022-03-15T00:00:00.000Z',
-      avatar: 'https://eitrawmaterials.eu/wp-content/uploads/2016/09/person-icon.png',
-      cmnd: '123456789',
-      dateOfBirth: '2000-01-16T07:58:29.000Z',
-      email: 'test123@gmail.com',
-      gender: true,
-      isActive: true,
-      mobile: '0975846784',
-      name: 'Nguyễn Văn B',
-      address: '12 Nguyễn Văn Bảo, Phường 4, Gò Vấp, Thành phố Hồ Chí Minh',
-      hospital: 'Bệnh Viện Quân Y',
-      doctor: 'Nguyễn Văn B',
-      device: 'Số 2',
-    },
-  ];
+  const { renderFormItemDoctor, setIsDoctorFormItemRequired } = useFormItemDoctor();
+  const { renderFormItemDevice, setIsDeviceFormItemRequired } = useFormItemDevice();
+  const { renderLoadingSkeleton, setIsLoadingSkeleton, isLoadingSkeleton } = useLoadingSkeleton();
+  const [isVisibleChartModal, setIsVisibleChartModal] = useState(false);
+  const [isDetailModalVisible, setIsDetailModalVisible] = useState(false);
+  const [patientDetail, setPatientDetail] = useState({});
+  // const dataSourceTest = [
+  //   {
+  //     id: 16,
+  //     uuid: '98a20510-e61f-42a3-9324-3bbc6b51165f',
+  //     createdAt: '2022-03-15T00:00:00.000Z',
+  //     updatedAt: '2022-03-15T00:00:00.000Z',
+  //     avatar: 'https://eitrawmaterials.eu/wp-content/uploads/2016/09/person-icon.png',
+  //     cmnd: '123456789',
+  //     dateOfBirth: '2000-01-16T07:58:29.000Z',
+  //     email: 'test123@gmail.com',
+  //     gender: true,
+  //     isActive: true,
+  //     mobile: '0975846784',
+  //     name: 'Nguyễn Văn A',
+  //     address: '12 Nguyễn Văn Bảo, Phường 4, Gò Vấp, Thành phố Hồ Chí Minh',
+  //     hospital: 'Bệnh Viện Quân Y',
+  //     doctor: 'Nguyễn Văn A',
+  //     device: 'Số 1',
+  //     cityId: 79,
+  //     districtId: 767,
+  //     wardId: 1460,
+  //   },
+  //   {
+  //     id: 17,
+  //     uuid: '98a20510-e61f-42a3-9324-3bbc6b51165f',
+  //     createdAt: '2022-03-15T00:00:00.000Z',
+  //     updatedAt: '2022-03-15T00:00:00.000Z',
+  //     avatar: 'https://eitrawmaterials.eu/wp-content/uploads/2016/09/person-icon.png',
+  //     cmnd: '123456789',
+  //     dateOfBirth: '2000-01-16T07:58:29.000Z',
+  //     email: 'test123@gmail.com',
+  //     gender: true,
+  //     isActive: true,
+  //     mobile: '0975846784',
+  //     name: 'Nguyễn Văn B',
+  //     address: '12 Nguyễn Văn Bảo, Phường 4, Gò Vấp, Thành phố Hồ Chí Minh',
+  //     hospital: 'Bệnh Viện Quân Y',
+  //     doctor: 'Nguyễn Văn B',
+  //     device: 'Số 2',
+  //   },
+  // ];
   const tableColumns = [
     {
       title: 'STT',
@@ -87,8 +103,8 @@ const ExpertPatientManager = () => {
     },
     {
       title: 'Tên',
-      dataIndex: 'name',
-      key: 'name',
+      dataIndex: 'fullName',
+      key: 'fullName',
     },
     {
       title: 'Ngày Sinh',
@@ -108,34 +124,38 @@ const ExpertPatientManager = () => {
       },
     },
     {
-      title: 'CMND/CCCD',
+      title: 'CMND',
       dataIndex: 'cmnd',
       key: 'cmnd',
     },
-    {
-      title: 'Email',
-      dataIndex: 'email',
-      key: 'email',
-    },
+    // {
+    //   title: 'Email',
+    //   dataIndex: 'email',
+    //   key: 'email',
+    // },
     {
       title: 'Số Điện Thoại',
       dataIndex: 'mobile',
       key: 'mobile',
     },
-    {
-      title: 'Địa Chỉ',
-      dataIndex: 'address',
-      key: 'address',
-    },
+    // {
+    //   title: 'Địa Chỉ',
+    //   dataIndex: 'address',
+    //   key: 'address',
+    // },
     {
       title: 'Bệnh Viện',
-      dataIndex: 'hospital',
       key: 'hospital',
+      render: (text, record) => {
+        return record.hospital.name;
+      },
     },
     {
       title: 'Bác Sĩ Phụ Trách',
-      dataIndex: 'doctor',
       key: 'doctor',
+      render: (text, record) => {
+        return record.doctor?.name;
+      },
     },
     {
       title: 'Vòng Đeo',
@@ -170,9 +190,16 @@ const ExpertPatientManager = () => {
                 <Menu.Item
                   key="3"
                   icon={<AiOutlineInfoCircle size={15} />}
-                  // onClick={() => handleVisibleDetailDoctor(record)}
+                  onClick={() => handleVisibleDetailModal(record)}
                 >
                   Xem chi tiết
+                </Menu.Item>
+                <Menu.Item
+                  key="4"
+                  icon={<AiOutlineAreaChart size={15} />}
+                  onClick={() => setIsVisibleChartModal(true)}
+                >
+                  Xem biểu đồ
                 </Menu.Item>
               </Menu>
             }
@@ -196,14 +223,19 @@ const ExpertPatientManager = () => {
   ];
   const getAllPatient = async () => {
     try {
+      setIsLoadingSkeleton(true);
       const patientSourceResult = await patientAPI.getAllPatients();
       setPatientSource(patientSourceResult);
-      console.log(patientSource);
+      setIsLoadingSkeleton(false);
+      console.log(patientSourceResult);
     } catch (error) {
+      setIsLoadingSkeleton(false);
       console.log(error);
     }
   };
   useEffect(() => {
+    setIsDoctorFormItemRequired(false);
+    setIsDeviceFormItemRequired(false);
     getAllPatient();
   }, []);
 
@@ -277,13 +309,12 @@ const ExpertPatientManager = () => {
       gender: record.gender,
       dateOfBirth: moment(record.dateOfBirth),
       mobile: record.mobile,
-      // isActive: record.isActive,
-      // hospital: record.hospital.name,
       email: record.email,
       cmnd: record.cmnd,
       city: record.cityId,
-      ward: record.wardId,
-      district: record.districtId,
+      wardId: record.wardId,
+      cityId: record.cityId,
+      districtId: record.districtId,
     });
   };
 
@@ -295,6 +326,14 @@ const ExpertPatientManager = () => {
     setIsDisableWard(true);
   };
 
+  const handleVisibleDetailModal = (record) => {
+    setIsDetailModalVisible(true);
+    setPatientDetail({
+      ...record,
+      gender: record.gender ? 'Nam' : 'Nữ',
+      dateOfBirth: moment(record.dateOfBirth).format('DD/MM/YYYY'),
+    });
+  };
   return (
     <div className="patient-manager-container">
       <div className="tool-container">
@@ -454,6 +493,7 @@ const ExpertPatientManager = () => {
           {renderFormItemAddress}
           {renderFormItemHospital}
           {renderFormItemDoctor}
+          {renderFormItemDevice}
           {/* {renderFormItemDevice} */}
           {/* <Form.Item
             name="hospital"
@@ -502,7 +542,120 @@ const ExpertPatientManager = () => {
           </Form.Item> */}
         </Form>
       </Modal>
-      <Table columns={tableColumns} dataSource={patientSource} pagination={{ pageSize: 10 }} />
+
+      {/* Temperature Chart Modal */}
+
+      <Modal
+        title="Biểu đồ"
+        visible={isVisibleChartModal}
+        cancelText="Đóng"
+        okButtonProps={{ style: { display: 'none' } }}
+        onCancel={() => {
+          setIsVisibleChartModal(false);
+        }}
+      >
+        <Line
+          data={{
+            labels: ['00:00', '01:00', '02:00', '03:00', '04:00', '05:00'],
+            datasets: [
+              {
+                label: 'Nhiệt Độ (°C)',
+                data: [36, 37, 38, 37, 37.5, 38],
+                backgroundColor: [
+                  'rgba(255, 99, 132, 0.2)',
+                  'rgba(54, 162, 235, 0.2)',
+                  'rgba(255, 206, 86, 0.2)',
+                  'rgba(75, 192, 192, 0.2)',
+                  'rgba(153, 102, 255, 0.2)',
+                  'rgba(255, 159, 64, 0.2)',
+                ],
+                borderColor: [
+                  'rgba(255, 99, 132, 1)',
+                  'rgba(54, 162, 235, 1)',
+                  'rgba(255, 206, 86, 1)',
+                  'rgba(75, 192, 192, 1)',
+                  'rgba(153, 102, 255, 1)',
+                  'rgba(255, 159, 64, 1)',
+                ],
+                borderWidth: 1,
+              },
+              // {
+              //   label: 'Quantity',
+              //   data: [47, 52, 67, 58, 9, 50],
+              //   backgroundColor: 'orange',
+              //   borderColor: 'red',
+              // },
+            ],
+          }}
+          height={400}
+          width={600}
+          // options={{
+          //   maintainAspectRatio: false,
+          //   scales: {
+
+          //     yAxes: [
+          //       {
+          //         ticks: {
+          //           beginAtZero: true,
+          //         },
+          //       },
+          //     ],
+          //   },
+          //   legend: {
+          //     labels: {
+          //       fontSize: 25,
+          //     },
+          //   },
+          // }}
+        />
+      </Modal>
+
+      {/* Doctor Detail Modal */}
+      <Modal
+        title="Thông Tin Chi Tiết"
+        visible={isDetailModalVisible}
+        cancelText="Đóng"
+        width={550}
+        className="add-doctor-modal-container"
+        onCancel={() => setIsDetailModalVisible(false)}
+        okButtonProps={{ style: { display: 'none' } }}
+      >
+        <Descriptions
+          bordered
+          column={1}
+          size="middle"
+          style={{ marginTop: 20 }}
+          labelStyle={{ width: 200 }}
+        >
+          <Descriptions.Item label="ID:">{patientDetail.id}</Descriptions.Item>
+          <Descriptions.Item label="Họ và tên:">{patientDetail.fullName}</Descriptions.Item>
+          <Descriptions.Item label="Giới tính:">{patientDetail.gender}</Descriptions.Item>
+          <Descriptions.Item label="Ngày sinh:">{patientDetail.dateOfBirth}</Descriptions.Item>
+          <Descriptions.Item label="Địa chỉ:">{patientDetail.address}</Descriptions.Item>
+          <Descriptions.Item label="CMND:">{patientDetail.cmnd}</Descriptions.Item>
+          <Descriptions.Item label="Email:">{patientDetail.email}</Descriptions.Item>
+          <Descriptions.Item label="Số điện thoại:">{patientDetail.mobile}</Descriptions.Item>
+          <Descriptions.Item label="Bệnh viện:">{patientDetail.hospital?.name}</Descriptions.Item>
+          <Descriptions.Item label="Bác sĩ phụ trách:">
+            {patientDetail.doctor?.name}
+          </Descriptions.Item>
+          <Descriptions.Item label="Vòng Đeo:">{patientDetail.device?.name}</Descriptions.Item>
+        </Descriptions>
+      </Modal>
+
+      {/* Table */}
+      {isLoadingSkeleton ? (
+        renderLoadingSkeleton
+      ) : (
+        <Table
+          locale={{
+            emptyText: <Empty description="Không có dữ liệu." />,
+          }}
+          columns={tableColumns}
+          dataSource={patientSource}
+          pagination={{ pageSize: 10 }}
+        />
+      )}
     </div>
   );
 };

@@ -97,20 +97,20 @@ const ExpertHome = () => {
       ],
       url: '/expert/rule',
     },
-    {
-      title: 'Quản Lý Luật Y Tế',
-      type: 'menu',
-      icon: <IoMdMedical />,
-      subMenuItems: [
-        // {
-        //   title: 'Auth Log',
-        //   type: 'menu',
-        //   icon: <PieChartOutlined />,
-        //   url: '/expert/logs/authlog',
-        // },
-      ],
-      url: '/expert/rule-condition',
-    },
+    // {
+    //   title: 'Quản Lý Luật Y Tế',
+    //   type: 'menu',
+    //   icon: <IoMdMedical />,
+    //   subMenuItems: [
+    //     // {
+    //     //   title: 'Auth Log',
+    //     //   type: 'menu',
+    //     //   icon: <PieChartOutlined />,
+    //     //   url: '/expert/logs/authlog',
+    //     // },
+    //   ],
+    //   url: '/expert/rule-condition',
+    // },
     {
       title: 'Quản Lý Bệnh Viện',
       type: 'menu',
