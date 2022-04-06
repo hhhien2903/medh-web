@@ -1,9 +1,10 @@
-import { Form, Input, Select } from 'antd';
+import { Form, Select } from 'antd';
 import React, { useState, useEffect } from 'react';
 import deviceAPI from '../../../api/deviceAPI';
 
 const useFormItemDevice = () => {
   const [deviceSource, setDeviceSource] = useState([]);
+  const [isDeviceFormItemRequired, setIsDeviceFormItemRequired] = useState(true);
 
   const getAllDevice = async () => {
     try {
@@ -18,6 +19,7 @@ const useFormItemDevice = () => {
   }, []);
 
   return {
+    setIsDeviceFormItemRequired,
     renderFormItemDevice: (
       <>
         <Form.Item
@@ -25,7 +27,7 @@ const useFormItemDevice = () => {
           label="Vòng Đeo:"
           rules={[
             {
-              required: true,
+              required: isDeviceFormItemRequired,
               message: 'Vòng Đeo không được để trống!',
             },
           ]}

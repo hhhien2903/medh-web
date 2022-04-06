@@ -1,4 +1,4 @@
-import { Button, Input, Modal, Space, Table, Tag, Tooltip, message } from 'antd';
+import { Button, Input, Modal, Space, Table, Tag, Tooltip, message, Empty } from 'antd';
 import moment from 'moment';
 import React, { useState, useEffect } from 'react';
 import { AiOutlineDelete, AiOutlineEdit, AiOutlineCheck } from 'react-icons/ai';
@@ -409,6 +409,9 @@ const DoctorRegisterPending = () => {
         />
       </div>
       <Table
+        locale={{
+          emptyText: <Empty description="Không có dữ liệu." />,
+        }}
         columns={tableColumns}
         dataSource={doctorPendingSource}
         pagination={{ pageSize: 10 }}

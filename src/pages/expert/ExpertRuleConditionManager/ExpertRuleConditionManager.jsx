@@ -1,6 +1,7 @@
 import {
   Button,
   Dropdown,
+  Empty,
   Form,
   Input,
   InputNumber,
@@ -561,6 +562,9 @@ const ExpertRuleConditionManager = () => {
         </Form>
       </Modal>
       <Table
+        locale={{
+          emptyText: <Empty description="Không có dữ liệu." />,
+        }}
         columns={tableColumns}
         dataSource={ruleConditionSource}
         pagination={{ pageSize: 10 }}

@@ -1,4 +1,4 @@
-import { Button, Dropdown, Form, Input, Menu, Modal, Table } from 'antd';
+import { Button, Dropdown, Empty, Form, Input, Menu, Modal, Table } from 'antd';
 import React, { useState } from 'react';
 import { AiOutlineDelete, AiOutlineEdit, AiOutlinePlus } from 'react-icons/ai';
 import { MdMoreHoriz } from 'react-icons/md';
@@ -247,7 +247,14 @@ const ExpertHospitalManager = () => {
           {renderFormItemAddress}
         </Form>
       </Modal>
-      <Table columns={tableColumns} dataSource={dataSourceTest} pagination={{ pageSize: 10 }} />
+      <Table
+        locale={{
+          emptyText: <Empty description="Không có dữ liệu." />,
+        }}
+        columns={tableColumns}
+        dataSource={dataSourceTest}
+        pagination={{ pageSize: 10 }}
+      />
     </div>
   );
 };

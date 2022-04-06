@@ -16,6 +16,7 @@ import {
   Menu,
   Descriptions,
   message,
+  Empty,
 } from 'antd';
 import moment from 'moment';
 import { AiOutlineDelete, AiOutlineEdit, AiOutlinePlus, AiOutlineInfoCircle } from 'react-icons/ai';
@@ -26,6 +27,7 @@ import localeVN from 'antd/es/date-picker/locale/vi_VN';
 import ImgCrop from 'antd-img-crop';
 import { AiFillCamera, AiOutlineUser } from 'react-icons/ai';
 import useFormItemHospital from '../../../../components/shared/FormItemHospital/useFormItemHospital';
+import useLoadingSkeleton from '../../../../components/shared/LoadingSkeleton/useLoadingSkeleton';
 
 const DoctorManager = () => {
   const [doctorSource, setDoctorSource] = useState([]);
@@ -37,349 +39,8 @@ const DoctorManager = () => {
   const [modalUsedFor, setModalUsedFor] = useState('');
   const [doctorDetail, setDoctorDetail] = useState({});
   const { renderFormItemHospital } = useFormItemHospital();
+  const { renderLoadingSkeleton, setIsLoadingSkeleton, isLoadingSkeleton } = useLoadingSkeleton();
 
-  const dataSourceTest = [
-    {
-      id: 28,
-      uuid: 'f26d6c55-b7ef-429a-933e-64ede07f57d2',
-      createdAt: '2022-03-27T00:00:00.000Z',
-      updatedAt: '2022-03-27T00:00:00.000Z',
-      avatar: null,
-      cmnd: '111111111',
-      dateOfBirth: '2022-03-27T17:00:00.000Z',
-      email: 'test@gmail.com',
-      gender: true,
-      isActive: true,
-      isDisabled: false,
-      mobile: '0978078706',
-      name: 'hhhh',
-      hospitalId: 1,
-    },
-    {
-      id: 17,
-      uuid: '98a20510-e61f-42a3-9324-3bbc6b51165f',
-      createdAt: '2022-03-15T00:00:00.000Z',
-      updatedAt: '2022-03-15T00:00:00.000Z',
-      avatar: 'https://eitrawmaterials.eu/wp-content/uploads/2016/09/person-icon.png',
-      cmnd: '123456789',
-      dateOfBirth: '2000-01-16T07:58:29.000Z',
-      email: 'mr.bin2584531232136@gmail.com',
-      gender: true,
-      isActive: false,
-      mobile: '0975846784',
-      name: 'Nguyễn Văn B',
-      hospital: {
-        id: 1,
-        uuid: '1f5b8b1b-fce7-477a-a1f3-d4aeca502611',
-        createdAt: '2022-03-13T00:00:00.000Z',
-        updatedAt: '2022-03-13T00:00:00.000Z',
-        address: '215 Hồng Bàng',
-        cityId: 79,
-        districtId: 774,
-        image: null,
-        name: 'Bệnh Viện Đại Học Y Dược TP HC Bệnh Viện Đại Học Y Dược TP HCM M P HC Bệnh Viện Đại Học Y Dược ',
-        status: true,
-        wardId: 137,
-      },
-    },
-    {
-      id: 17,
-      uuid: '98a20510-e61f-42a3-9324-3bbc6b51165f',
-      createdAt: '2022-03-15T00:00:00.000Z',
-      updatedAt: '2022-03-15T00:00:00.000Z',
-      avatar: 'https://eitrawmaterials.eu/wp-content/uploads/2016/09/person-icon.png',
-      cmnd: '123456789',
-      dateOfBirth: '2000-01-16T07:58:29.000Z',
-      email: 'mr.bin258456@gmail.com',
-      gender: true,
-      isActive: false,
-      mobile: '0975846784',
-      name: 'Nguyễn Văn B',
-      hospital: {
-        id: 1,
-        uuid: '1f5b8b1b-fce7-477a-a1f3-d4aeca502611',
-        createdAt: '2022-03-13T00:00:00.000Z',
-        updatedAt: '2022-03-13T00:00:00.000Z',
-        address: '215 Hồng Bàng',
-        cityId: 79,
-        districtId: 774,
-        image: null,
-        name: 'Bệnh Viện Đại Học Y Dược TP HCM',
-        status: true,
-        wardId: 137,
-      },
-    },
-    {
-      id: 17,
-      uuid: '98a20510-e61f-42a3-9324-3bbc6b51165f',
-      createdAt: '2022-03-15T00:00:00.000Z',
-      updatedAt: '2022-03-15T00:00:00.000Z',
-      avatar: 'https://eitrawmaterials.eu/wp-content/uploads/2016/09/person-icon.png',
-      cmnd: '123456789',
-      dateOfBirth: '2000-01-16T07:58:29.000Z',
-      email: 'mr.bin258456@gmail.com',
-      gender: true,
-      isActive: false,
-      mobile: '0975846784',
-      name: 'Nguyễn Văn B',
-      hospital: {
-        id: 1,
-        uuid: '1f5b8b1b-fce7-477a-a1f3-d4aeca502611',
-        createdAt: '2022-03-13T00:00:00.000Z',
-        updatedAt: '2022-03-13T00:00:00.000Z',
-        address: '215 Hồng Bàng',
-        cityId: 79,
-        districtId: 774,
-        image: null,
-        name: 'Bệnh Viện Đại Học Y Dược TP HCM',
-        status: true,
-        wardId: 137,
-      },
-    },
-    {
-      id: 17,
-      uuid: '98a20510-e61f-42a3-9324-3bbc6b51165f',
-      createdAt: '2022-03-15T00:00:00.000Z',
-      updatedAt: '2022-03-15T00:00:00.000Z',
-      avatar: 'https://eitrawmaterials.eu/wp-content/uploads/2016/09/person-icon.png',
-      cmnd: '123456789',
-      dateOfBirth: '2000-01-16T07:58:29.000Z',
-      email: 'mr.bin258456@gmail.com',
-      gender: true,
-      isActive: false,
-      mobile: '0975846784',
-      name: 'Nguyễn Văn B',
-      hospital: {
-        id: 1,
-        uuid: '1f5b8b1b-fce7-477a-a1f3-d4aeca502611',
-        createdAt: '2022-03-13T00:00:00.000Z',
-        updatedAt: '2022-03-13T00:00:00.000Z',
-        address: '215 Hồng Bàng',
-        cityId: 79,
-        districtId: 774,
-        image: null,
-        name: 'Bệnh Viện Đại Học Y Dược TP HCM',
-        status: true,
-        wardId: 137,
-      },
-    },
-    {
-      id: 17,
-      uuid: '98a20510-e61f-42a3-9324-3bbc6b51165f',
-      createdAt: '2022-03-15T00:00:00.000Z',
-      updatedAt: '2022-03-15T00:00:00.000Z',
-      avatar: 'https://eitrawmaterials.eu/wp-content/uploads/2016/09/person-icon.png',
-      cmnd: '123456789',
-      dateOfBirth: '2000-01-16T07:58:29.000Z',
-      email: 'mr.bin258456@gmail.com',
-      gender: true,
-      isActive: false,
-      mobile: '0975846784',
-      name: 'Nguyễn Văn B',
-      hospital: {
-        id: 1,
-        uuid: '1f5b8b1b-fce7-477a-a1f3-d4aeca502611',
-        createdAt: '2022-03-13T00:00:00.000Z',
-        updatedAt: '2022-03-13T00:00:00.000Z',
-        address: '215 Hồng Bàng',
-        cityId: 79,
-        districtId: 774,
-        image: null,
-        name: 'Bệnh Viện Đại Học Y Dược TP HCM',
-        status: true,
-        wardId: 137,
-      },
-    },
-    {
-      id: 17,
-      uuid: '98a20510-e61f-42a3-9324-3bbc6b51165f',
-      createdAt: '2022-03-15T00:00:00.000Z',
-      updatedAt: '2022-03-15T00:00:00.000Z',
-      avatar: 'https://eitrawmaterials.eu/wp-content/uploads/2016/09/person-icon.png',
-      cmnd: '123456789',
-      dateOfBirth: '2000-01-16T07:58:29.000Z',
-      email: 'mr.bin258456@gmail.com',
-      gender: true,
-      isActive: false,
-      mobile: '0975846784',
-      name: 'Nguyễn Văn B',
-      hospital: {
-        id: 1,
-        uuid: '1f5b8b1b-fce7-477a-a1f3-d4aeca502611',
-        createdAt: '2022-03-13T00:00:00.000Z',
-        updatedAt: '2022-03-13T00:00:00.000Z',
-        address: '215 Hồng Bàng',
-        cityId: 79,
-        districtId: 774,
-        image: null,
-        name: 'Bệnh Viện Đại Học Y Dược TP HCM',
-        status: true,
-        wardId: 137,
-      },
-    },
-    {
-      id: 17,
-      uuid: '98a20510-e61f-42a3-9324-3bbc6b51165f',
-      createdAt: '2022-03-15T00:00:00.000Z',
-      updatedAt: '2022-03-15T00:00:00.000Z',
-      avatar: 'https://eitrawmaterials.eu/wp-content/uploads/2016/09/person-icon.png',
-      cmnd: '123456789',
-      dateOfBirth: '2000-01-16T07:58:29.000Z',
-      email: 'mr.bin258456@gmail.com',
-      gender: true,
-      isActive: false,
-      mobile: '0975846784',
-      name: 'Nguyễn Văn B',
-      hospital: {
-        id: 1,
-        uuid: '1f5b8b1b-fce7-477a-a1f3-d4aeca502611',
-        createdAt: '2022-03-13T00:00:00.000Z',
-        updatedAt: '2022-03-13T00:00:00.000Z',
-        address: '215 Hồng Bàng',
-        cityId: 79,
-        districtId: 774,
-        image: null,
-        name: 'Bệnh Viện Đại Học Y Dược TP HCM',
-        status: true,
-        wardId: 137,
-      },
-    },
-    {
-      id: 17,
-      uuid: '98a20510-e61f-42a3-9324-3bbc6b51165f',
-      createdAt: '2022-03-15T00:00:00.000Z',
-      updatedAt: '2022-03-15T00:00:00.000Z',
-      avatar: 'https://eitrawmaterials.eu/wp-content/uploads/2016/09/person-icon.png',
-      cmnd: '123456789',
-      dateOfBirth: '2000-01-16T07:58:29.000Z',
-      email: 'mr.bin258456@gmail.com',
-      gender: true,
-      isActive: false,
-      mobile: '0975846784',
-      name: 'Nguyễn Văn B',
-      hospital: {
-        id: 1,
-        uuid: '1f5b8b1b-fce7-477a-a1f3-d4aeca502611',
-        createdAt: '2022-03-13T00:00:00.000Z',
-        updatedAt: '2022-03-13T00:00:00.000Z',
-        address: '215 Hồng Bàng',
-        cityId: 79,
-        districtId: 774,
-        image: null,
-        name: 'Bệnh Viện Đại Học Y Dược TP HCM',
-        status: true,
-        wardId: 137,
-      },
-    },
-    {
-      id: 17,
-      uuid: '98a20510-e61f-42a3-9324-3bbc6b51165f',
-      createdAt: '2022-03-15T00:00:00.000Z',
-      updatedAt: '2022-03-15T00:00:00.000Z',
-      avatar: 'https://eitrawmaterials.eu/wp-content/uploads/2016/09/person-icon.png',
-      cmnd: '123456789',
-      dateOfBirth: '2000-01-16T07:58:29.000Z',
-      email: 'mr.bin258456@gmail.com',
-      gender: true,
-      isActive: false,
-      mobile: '0975846784',
-      name: 'Nguyễn Văn B',
-      hospital: {
-        id: 1,
-        uuid: '1f5b8b1b-fce7-477a-a1f3-d4aeca502611',
-        createdAt: '2022-03-13T00:00:00.000Z',
-        updatedAt: '2022-03-13T00:00:00.000Z',
-        address: '215 Hồng Bàng',
-        cityId: 79,
-        districtId: 774,
-        image: null,
-        name: 'Bệnh Viện Đại Học Y Dược TP HCM',
-        status: true,
-        wardId: 137,
-      },
-    },
-    {
-      id: 17,
-      uuid: '98a20510-e61f-42a3-9324-3bbc6b51165f',
-      createdAt: '2022-03-15T00:00:00.000Z',
-      updatedAt: '2022-03-15T00:00:00.000Z',
-      avatar: 'https://eitrawmaterials.eu/wp-content/uploads/2016/09/person-icon.png',
-      cmnd: '123456789',
-      dateOfBirth: '2000-01-16T07:58:29.000Z',
-      email: 'mr.bin258456@gmail.com',
-      gender: true,
-      isActive: false,
-      mobile: '0975846784',
-      name: 'Nguyễn Văn B',
-      hospital: {
-        id: 1,
-        uuid: '1f5b8b1b-fce7-477a-a1f3-d4aeca502611',
-        createdAt: '2022-03-13T00:00:00.000Z',
-        updatedAt: '2022-03-13T00:00:00.000Z',
-        address: '215 Hồng Bàng',
-        cityId: 79,
-        districtId: 774,
-        image: null,
-        name: 'Bệnh Viện Đại Học Y Dược TP HCM',
-        status: true,
-        wardId: 137,
-      },
-    },
-    {
-      id: 17,
-      uuid: '98a20510-e61f-42a3-9324-3bbc6b51165f',
-      createdAt: '2022-03-15T00:00:00.000Z',
-      updatedAt: '2022-03-15T00:00:00.000Z',
-      avatar: 'https://eitrawmaterials.eu/wp-content/uploads/2016/09/person-icon.png',
-      cmnd: '123456789',
-      dateOfBirth: '2000-01-16T07:58:29.000Z',
-      email: 'mr.bin258456@gmail.com',
-      gender: true,
-      isActive: false,
-      mobile: '0975846784',
-      name: 'Nguyễn Văn B',
-      hospital: {
-        id: 1,
-        uuid: '1f5b8b1b-fce7-477a-a1f3-d4aeca502611',
-        createdAt: '2022-03-13T00:00:00.000Z',
-        updatedAt: '2022-03-13T00:00:00.000Z',
-        address: '215 Hồng Bàng',
-        cityId: 79,
-        districtId: 774,
-        image: null,
-        name: 'Bệnh Viện Đại Học Y Dược TP HCM',
-        status: true,
-        wardId: 137,
-      },
-    },
-    {
-      id: 17,
-      uuid: '98a20510-e61f-42a3-9324-3bbc6b51165f',
-      createdAt: '2022-03-15T00:00:00.000Z',
-      updatedAt: '2022-03-15T00:00:00.000Z',
-      avatar: 'https://eitrawmaterials.eu/wp-content/uploads/2016/09/person-icon.png',
-      cmnd: '123456789',
-      dateOfBirth: '2000-01-16T07:58:29.000Z',
-      email: 'mr.bin258456@gmail.com',
-      gender: true,
-      isActive: false,
-      mobile: '0975846784',
-      name: 'Nguyễn Văn B',
-      hospital: {
-        id: 1,
-        uuid: '1f5b8b1b-fce7-477a-a1f3-d4aeca502611',
-        createdAt: '2022-03-13T00:00:00.000Z',
-        updatedAt: '2022-03-13T00:00:00.000Z',
-        address: '215 Hồng Bàng',
-        cityId: 79,
-        districtId: 774,
-        image: null,
-        name: 'Bệnh Viện Đại Học Y Dược TP HCM',
-        status: true,
-        wardId: 137,
-      },
-    },
-  ];
   const tableColumns = [
     {
       title: 'STT',
@@ -451,13 +112,13 @@ const DoctorManager = () => {
       width: 110,
     },
 
-    // {
-    //   title: 'Bệnh Viện Công Tác',
-    //   dataIndex: 'hospital',
-    //   key: 'hospital',
-    //   width: 250,
-    //   render: (hospital) => hospital.name,
-    // },
+    {
+      title: 'Bệnh Viện Công Tác',
+      dataIndex: 'hospital',
+      key: 'hospital',
+      width: 250,
+      render: (_text, record) => record.hospital.name,
+    },
     {
       title: 'Trạng Thái',
       dataIndex: 'isDisabled',
@@ -528,9 +189,12 @@ const DoctorManager = () => {
   ];
   const getAllDoctors = async () => {
     try {
+      setIsLoadingSkeleton(true);
       const doctorSourceResult = await doctorAPI.getAllDoctors();
       setDoctorSource(doctorSourceResult.filter((doctor) => doctor.isActive));
+      setIsLoadingSkeleton(false);
     } catch (error) {
+      setIsLoadingSkeleton(true);
       console.log(error);
     }
   };
@@ -630,7 +294,7 @@ const DoctorManager = () => {
       dateOfBirth: moment(record.dateOfBirth),
       mobile: record.mobile,
       isDisabled: record.isDisabled,
-      hospitalId: record.hospitalId,
+      hospitalId: record.hospital.id,
       email: record.email,
       cmnd: record.cmnd,
     });
@@ -646,7 +310,7 @@ const DoctorManager = () => {
       dateOfBirth: moment(record.dateOfBirth).format('DD/MM/YYYY'),
       mobile: record.mobile,
       isDisabled: record.isDisabled ? 'Vô Hiệu Hoá' : 'Đang Hoạt Động',
-      hospital: record.hospital,
+      hospital: record.hospital.name,
       email: record.email,
       cmnd: record.cmnd,
     });
@@ -894,13 +558,20 @@ const DoctorManager = () => {
           </Descriptions.Item>
         </Descriptions>
       </Modal>
-      <Table
-        className="doctor-table"
-        columns={tableColumns}
-        dataSource={doctorSource}
-        pagination={{ pageSize: 10 }}
-        scroll={{ x: 1200 }}
-      />
+      {isLoadingSkeleton ? (
+        renderLoadingSkeleton
+      ) : (
+        <Table
+          locale={{
+            emptyText: <Empty description="Không có dữ liệu." />,
+          }}
+          className="doctor-table"
+          columns={tableColumns}
+          dataSource={doctorSource}
+          pagination={{ pageSize: 10 }}
+          scroll={{ x: 1200 }}
+        />
+      )}
     </div>
   );
 };
