@@ -11,6 +11,7 @@ import {
   Select,
   Table,
   Descriptions,
+  Skeleton,
 } from 'antd';
 import localeVN from 'antd/es/date-picker/locale/vi_VN';
 import moment from 'moment';
@@ -37,20 +38,24 @@ ChartJS.register(...registerables);
 const ExpertPatientManager = () => {
   const [patientSource, setPatientSource] = useState([]);
   const [isAddEditPatientModalVisible, setIsAddEditPatientModalVisible] = useState(false);
-  const [isConfirmLoadingAddEditPatientModal, setIsConfirmLoadingAddEditPatientModal] =
-    useState(false);
   const [formAddEditPatient] = Form.useForm();
   const [modalTitle, setModalTitle] = useState('');
   const [modalUsedFor, setModalUsedFor] = useState('');
   const { renderFormItemHospital } = useFormItemHospital();
-  const { setIsDisableDistrict, setIsDisableWard, renderFormItemAddress } =
-    useFormItemAddress(formAddEditPatient);
+  const {
+    setIsDisableDistrict,
+    setIsDisableWard,
+    renderFormItemAddress,
+    onCitySelect,
+    onDistrictSelect,
+  } = useFormItemAddress(formAddEditPatient);
   const { renderFormItemDoctor, setIsDoctorFormItemRequired } = useFormItemDoctor();
   const { renderFormItemDevice, setIsDeviceFormItemRequired } = useFormItemDevice();
   const { renderLoadingSkeleton, setIsLoadingSkeleton, isLoadingSkeleton } = useLoadingSkeleton();
   const [isVisibleChartModal, setIsVisibleChartModal] = useState(false);
   const [isDetailModalVisible, setIsDetailModalVisible] = useState(false);
   const [patientDetail, setPatientDetail] = useState({});
+  const [isLoadingSkeletonForm, setIsLoadingSkeletonForm] = useState(false);
   // const dataSourceTest = [
   //   {
   //     id: 16,
@@ -256,11 +261,31 @@ const ExpertPatientManager = () => {
   };
 
   const handleEditPatient = () => {
-    console.log('edit doctor');
+    formAddEditPatient.validateFields().then((formValue) => {
+      const confirmUpdatePatientModal = Modal.confirm({
+        title: 'Xác Nhận',
+        content: 'Bạn có chắc chắn với các thông tin đã nhập?',
+        okText: 'Xác Nhận',
+        cancelText: 'Không',
+        onOk: async () => {
+          try {
+            console.log(formValue);
+            message.success('Sửa Thông Tin Bệnh Nhân Thành Công.', 5);
+            getAllPatient();
+            // handleCancelAddPatient();
+          } catch (error) {
+            console.log(error);
+            message.error('Sửa Thông Tin Bệnh Nhân Không Thành Công.', 5);
+          }
+        },
+        onCancel() {
+          confirmUpdatePatientModal.destroy();
+        },
+      });
+    });
   };
   const handleAddPatient = () => {
     formAddEditPatient.validateFields().then(async (formValue) => {
-      setIsConfirmLoadingAddEditPatientModal(true);
       try {
         const sendData = {
           name: formValue.name,
@@ -286,7 +311,6 @@ const ExpertPatientManager = () => {
       } catch (error) {
         console.log(error);
         message.error('Tạo Bệnh Nhân không thành công.', 5);
-        setIsConfirmLoadingAddEditPatientModal(false);
       }
     });
   };
@@ -300,10 +324,15 @@ const ExpertPatientManager = () => {
   const handleVisibleEditPatient = async (record) => {
     setIsAddEditPatientModalVisible(true);
     setModalUsedFor('editPatient');
-    setModalTitle('Sửa Bệnh Nhân');
+    setModalTitle('Sửa Thông Tin Bệnh Nhân');
     setIsDisableDistrict(false);
     setIsDisableWard(false);
+    setIsLoadingSkeletonForm(true);
+    await onCitySelect(record.cityId);
+    await onDistrictSelect(record.districtId);
+    setIsLoadingSkeletonForm(false);
     formAddEditPatient.setFieldsValue({
+      id: record.id,
       name: record.name,
       surname: record.surname,
       gender: record.gender,
@@ -315,13 +344,16 @@ const ExpertPatientManager = () => {
       wardId: record.wardId,
       cityId: record.cityId,
       districtId: record.districtId,
+      address: record.address.split(',')[0],
+      hospitalId: record.hospital.id,
+      doctorId: record.doctor?.id,
+      deviceId: record.device?.id,
     });
   };
 
   const handleCancelAddPatient = () => {
     setIsAddEditPatientModalVisible(false);
     formAddEditPatient.resetFields();
-    setIsConfirmLoadingAddEditPatientModal(false);
     setIsDisableDistrict(true);
     setIsDisableWard(true);
   };
@@ -366,7 +398,6 @@ const ExpertPatientManager = () => {
         visible={isAddEditPatientModalVisible}
         okText="Xác Nhận"
         cancelText="Huỷ"
-        confirmLoading={isConfirmLoadingAddEditPatientModal}
         className="add-doctor-modal-container"
         onCancel={handleCancelAddPatient}
         // bodyStyle={{ overflowY: 'scroll' }}
@@ -378,124 +409,130 @@ const ExpertPatientManager = () => {
           }
         }}
       >
-        <Form layout="vertical" className="add-doctor-form" form={formAddEditPatient}>
-          <Form.Item
-            name="surname"
-            label="Họ:"
-            rules={[
-              {
-                required: true,
-                message: 'Họ không được để trống!',
-              },
-              {
-                pattern: vietnameseNameRegex,
-                message: 'Họ không đúng định dạng',
-              },
-            ]}
-          >
-            <Input placeholder="Họ" />
-          </Form.Item>
-          <Form.Item
-            name="name"
-            label="Tên:"
-            rules={[
-              {
-                required: true,
-                message: 'Tên không được để trống!',
-              },
-              {
-                pattern: vietnameseNameRegex,
-                message: 'Tên không đúng định dạng',
-              },
-            ]}
-          >
-            <Input placeholder="Tên" />
-          </Form.Item>
-          <Form.Item
-            name="dateOfBirth"
-            label="Ngày Sinh:"
-            rules={[
-              {
-                required: true,
-                message: 'Ngày sinh không được để trống!',
-              },
-            ]}
-          >
-            <DatePicker
-              disabledDate={(current) => current > moment()}
-              // defaultPickerValue={moment().subtract(18, 'year')}
-              placeholder="Vui lòng chọn ngày sinh"
-              style={{ width: '100%' }}
-              locale={localeVN}
-              format={'DD/MM/YYYY'}
-            />
-          </Form.Item>
-          <Form.Item
-            name="gender"
-            label="Giới Tính:"
-            rules={[
-              {
-                required: true,
-                message: 'Giới tính không được để trống!',
-              },
-            ]}
-          >
-            <Select placeholder="Vui lòng chọn giới tính">
-              <Select.Option value={true}>Nam</Select.Option>
-              <Select.Option value={false}>Nữ</Select.Option>
-            </Select>
-          </Form.Item>
-          <Form.Item
-            name="cmnd"
-            label="CMND/CCCD:"
-            rules={[
-              {
-                required: true,
-                message: 'CMND/CCCD không được để trống!',
-              },
-            ]}
-          >
-            <Input placeholder="CMND/CCCD" />
-          </Form.Item>
-          <Form.Item
-            name="email"
-            label="Email:"
-            rules={[
-              {
-                required: true,
-                message: 'Email không được để trống!',
-              },
-              {
-                pattern: emailRegex,
-                message: 'Email không đúng định dạng',
-              },
-            ]}
-          >
-            <Input placeholder="Email" />
-          </Form.Item>
-          <Form.Item
-            name="mobile"
-            label="Số Điện Thoại:"
-            rules={[
-              {
-                required: true,
-                message: 'Số điện thoại không được để trống!',
-              },
-              {
-                required: true,
-                pattern: phoneNumberRegex,
-                message: 'Số điện thoại không đúng định dạng',
-              },
-            ]}
-          >
-            <Input placeholder="Số Điện Thoại" />
-          </Form.Item>
-          {renderFormItemAddress}
-          {renderFormItemHospital}
-          {renderFormItemDoctor}
-          {renderFormItemDevice}
-          {/* {renderFormItemDevice} */}
-          {/* <Form.Item
+        {isLoadingSkeletonForm ? (
+          <Skeleton active loading={isLoadingSkeletonForm} />
+        ) : (
+          <Form layout="vertical" className="add-doctor-form" form={formAddEditPatient}>
+            <Form.Item name="id" noStyle>
+              <Input type="hidden" />
+            </Form.Item>
+            <Form.Item
+              name="surname"
+              label="Họ:"
+              rules={[
+                {
+                  required: true,
+                  message: 'Họ không được để trống!',
+                },
+                {
+                  pattern: vietnameseNameRegex,
+                  message: 'Họ không đúng định dạng',
+                },
+              ]}
+            >
+              <Input placeholder="Họ" />
+            </Form.Item>
+            <Form.Item
+              name="name"
+              label="Tên:"
+              rules={[
+                {
+                  required: true,
+                  message: 'Tên không được để trống!',
+                },
+                {
+                  pattern: vietnameseNameRegex,
+                  message: 'Tên không đúng định dạng',
+                },
+              ]}
+            >
+              <Input placeholder="Tên" />
+            </Form.Item>
+            <Form.Item
+              name="dateOfBirth"
+              label="Ngày Sinh:"
+              rules={[
+                {
+                  required: true,
+                  message: 'Ngày sinh không được để trống!',
+                },
+              ]}
+            >
+              <DatePicker
+                disabledDate={(current) => current > moment()}
+                // defaultPickerValue={moment().subtract(18, 'year')}
+                placeholder="Vui lòng chọn ngày sinh"
+                style={{ width: '100%' }}
+                locale={localeVN}
+                format={'DD/MM/YYYY'}
+              />
+            </Form.Item>
+            <Form.Item
+              name="gender"
+              label="Giới Tính:"
+              rules={[
+                {
+                  required: true,
+                  message: 'Giới tính không được để trống!',
+                },
+              ]}
+            >
+              <Select placeholder="Vui lòng chọn giới tính">
+                <Select.Option value={true}>Nam</Select.Option>
+                <Select.Option value={false}>Nữ</Select.Option>
+              </Select>
+            </Form.Item>
+            <Form.Item
+              name="cmnd"
+              label="CMND/CCCD:"
+              rules={[
+                {
+                  required: true,
+                  message: 'CMND/CCCD không được để trống!',
+                },
+              ]}
+            >
+              <Input placeholder="CMND/CCCD" />
+            </Form.Item>
+            <Form.Item
+              name="email"
+              label="Email:"
+              rules={[
+                {
+                  required: true,
+                  message: 'Email không được để trống!',
+                },
+                {
+                  pattern: emailRegex,
+                  message: 'Email không đúng định dạng',
+                },
+              ]}
+            >
+              <Input placeholder="Email" />
+            </Form.Item>
+            <Form.Item
+              name="mobile"
+              label="Số Điện Thoại:"
+              rules={[
+                {
+                  required: true,
+                  message: 'Số điện thoại không được để trống!',
+                },
+                {
+                  required: true,
+                  pattern: phoneNumberRegex,
+                  message: 'Số điện thoại không đúng định dạng',
+                },
+              ]}
+            >
+              <Input placeholder="Số Điện Thoại" />
+            </Form.Item>
+            {renderFormItemAddress}
+            {renderFormItemHospital}
+            {renderFormItemDoctor}
+            {renderFormItemDevice}
+            {/* {renderFormItemDevice} */}
+            {/* <Form.Item
             name="hospital"
             label="Bệnh Viện:"
             rules={[
@@ -510,7 +547,7 @@ const ExpertPatientManager = () => {
               <Select.Option value={2}>Bệnh Viện Quân Y</Select.Option>
             </Select>
           </Form.Item> */}
-          {/* <Form.Item
+            {/* <Form.Item
             name="doctor_id"
             label="Bác Sĩ Phụ Trách:"
             rules={[
@@ -525,7 +562,7 @@ const ExpertPatientManager = () => {
               <Select.Option value={17}>17 - Nguyễn Văn B</Select.Option>
             </Select>
           </Form.Item> */}
-          {/* <Form.Item
+            {/* <Form.Item
             name="device_id"
             label="Vòng Đeo:"
             rules={[
@@ -540,7 +577,8 @@ const ExpertPatientManager = () => {
               <Select.Option value={2}>Vòng Đeo Số 2</Select.Option>
             </Select>
           </Form.Item> */}
-        </Form>
+          </Form>
+        )}
       </Modal>
 
       {/* Temperature Chart Modal */}
