@@ -39,9 +39,7 @@ const useFormItemDoctor = () => {
             }
           >
             {doctorSource.map((doctor) => {
-              return (
-                <Select.Option value={doctor.id}>{doctor.id + ' - ' + doctor.name}</Select.Option>
-              );
+              return <Select.Option value={doctor.id}>{doctor.name}</Select.Option>;
             })}
           </Select>
         </Form.Item>

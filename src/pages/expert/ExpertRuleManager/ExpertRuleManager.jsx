@@ -200,7 +200,6 @@ const ExpertRuleManager = () => {
         cancelText: 'Không',
         onOk: async () => {
           console.log(formValue);
-          console.log(formValue);
           setIsConfirmLoadingAddEditRuleModal(true);
           try {
             const ruleSendData = {

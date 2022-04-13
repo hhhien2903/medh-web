@@ -31,7 +31,8 @@ const Header = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [formUpdateCurrentUserInfo] = Form.useForm();
   const history = useHistory();
-
+  const [avatarUploadPreview, setAvatarUploadPreview] = useState(null);
+  const [avatarUploadSource, setAvatarUploadSource] = useState(null);
   const getPageTitle = () => {
     const title = history.location.pathname;
     // if (title.match(new RegExp(/\/expert\/patient\/[0-9]+/))) {
@@ -107,7 +108,6 @@ const Header = () => {
     try {
       const expertData = await expertAPI.checkAccountRegistered(phoneNumber, email);
       setCurrentUser(expertData);
-      console.log(currentUser);
       formUpdateCurrentUserInfo.setFieldsValue({
         id: currentUser.id,
         name: currentUser.name,
@@ -116,6 +116,8 @@ const Header = () => {
         mobile: currentUser.mobile,
         email: currentUser.email,
       });
+      setAvatarUploadPreview(null);
+      setAvatarUploadSource(null);
       setIsModalVisible(true);
     } catch (error) {
       console.log(error);
@@ -136,9 +138,14 @@ const Header = () => {
               ...formValue,
               dateOfBirth: formValue.dateOfBirth.toISOString(),
             };
-            console.log(data);
+            delete data['avatar'];
+            if (avatarUploadSource) {
+              const uploadAvatarForm = new FormData();
+              uploadAvatarForm.append('file', avatarUploadSource);
+              await expertAPI.uploadAvatar(currentUser.id, uploadAvatarForm);
+            }
+
             const result = await expertAPI.updateInfo(data);
-            console.log(result);
             setCurrentUser(result);
             setIsModalVisible(false);
             message.success('Cập nhật thành công!', 10);
@@ -160,6 +167,36 @@ const Header = () => {
     }
   }, []);
 
+  const handleUploadAvatar = async (fileUpload) => {
+    const { file } = fileUpload;
+    let src = await new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+    });
+    setAvatarUploadPreview(src);
+    setAvatarUploadSource(file);
+  };
+
+  const checkFileIsImage = {
+    beforeCrop: (file) => {
+      if (!file['type'].includes('image')) {
+        message.error(`${file.name} Không phải là tệp hình ảnh.`);
+        return false;
+      }
+      if (file.size > 1048576) {
+        message.error(`${file.name} vượt quá dung lượng cho phép.`);
+        return false;
+      }
+      return true;
+    },
+  };
+
+  const closeInfoCurrentUserModal = () => {
+    setIsModalVisible(false);
+    setAvatarUploadPreview(null);
+    setAvatarUploadSource(null);
+  };
   return (
     <Layout.Header className="site-layout-background header-container">
       <div>
@@ -174,8 +211,8 @@ const Header = () => {
       <div className="avatar">
         <Dropdown overlay={menu} trigger={['click']}>
           <div>
-            <Avatar size={45} src={currentUser?.photoURL}>
-              {currentUser.name}
+            <Avatar size={45} src={currentUser?.avatar}>
+              {!currentUser.avatar ? currentUser.name : ''}
             </Avatar>
           </div>
         </Dropdown>
@@ -186,11 +223,11 @@ const Header = () => {
             centered
             visible={isModalVisible}
             width={400}
-            onCancel={() => setIsModalVisible(false)}
+            onCancel={closeInfoCurrentUserModal}
             footer={[
               <Button
                 style={{ fontWeight: 'bold', fontFamily: 'Helvetica' }}
-                onClick={() => setIsModalVisible(false)}
+                onClick={closeInfoCurrentUserModal}
               >
                 Huỷ
               </Button>,
@@ -206,30 +243,37 @@ const Header = () => {
             <div className="form-header">
               <div className="avatar-container-profile">
                 <div className="upload-avatar">
-                  <Avatar size={80}>{currentUser.name}</Avatar>
+                  {!avatarUploadPreview ? (
+                    <Avatar size={100} src={currentUser?.avatar}>
+                      {!currentUser.avatar ? currentUser.name : ''}
+                    </Avatar>
+                  ) : (
+                    <Avatar size={100} src={avatarUploadPreview}></Avatar>
+                  )}
                 </div>
                 <div className="btn-upload-avatar">
                   <Tooltip title="Tải ảnh lên">
                     <ImgCrop
-                      // {...checkFileIsImage}
+                      {...checkFileIsImage}
                       rotate
                       modalTitle="Chỉnh sửa ảnh"
                       modalOk="Xác Nhận"
                       modalCancel="Huỷ"
                     >
-                      <Upload
-                        previewFile={false}
-                        //  customRequest={handleUploadAvatar}
-                        progress={false}
-                      >
-                        {<AiFillCamera />}
+                      <Upload customRequest={handleUploadAvatar} progress={false}>
+                        <AiFillCamera style={{ position: 'absolute', top: '3px', right: '4px' }} />
                       </Upload>
                     </ImgCrop>
                   </Tooltip>
                 </div>
               </div>
             </div>
-            <Form form={formUpdateCurrentUserInfo} layout="vertical" style={{ gap: '10px' }}>
+            <Form
+              form={formUpdateCurrentUserInfo}
+              className="form-edit-current-user"
+              layout="vertical"
+              style={{ gap: '10px' }}
+            >
               <Form.Item
                 name="name"
                 label="Họ Và Tên:"

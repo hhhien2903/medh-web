@@ -33,13 +33,15 @@ const DoctorManager = () => {
   const [doctorSource, setDoctorSource] = useState([]);
   const [isDetailModalVisible, setIsDetailModalVisible] = useState(false);
   const [isAddDoctorModalVisible, setIsAddDoctorModalVisible] = useState(false);
-  const [isConfirmLoadingAddDoctorModal, setIsConfirmLoadingAddDoctorModal] = useState(false);
   const [formAddEditDoctor] = Form.useForm();
   const [modalTitle, setModalTitle] = useState('');
   const [modalUsedFor, setModalUsedFor] = useState('');
   const [doctorDetail, setDoctorDetail] = useState({});
   const { renderFormItemHospital } = useFormItemHospital();
   const { renderLoadingSkeleton, setIsLoadingSkeleton, isLoadingSkeleton } = useLoadingSkeleton();
+  const [avatarUploadPreview, setAvatarUploadPreview] = useState(null);
+  const [avatarUploadSource, setAvatarUploadSource] = useState(null);
+  const [avatarSource, setAvatarSource] = useState(null);
 
   const tableColumns = [
     {
@@ -221,36 +223,50 @@ const DoctorManager = () => {
 
   const handleEditDoctor = () => {
     formAddEditDoctor.validateFields().then(async (formValue) => {
-      setIsConfirmLoadingAddDoctorModal(true);
-      try {
-        const sendData = {
-          name: formValue.name,
-          cmnd: formValue.cmnd,
-          dateOfBirth: moment(formValue.dateOfBirth).toISOString(),
-          gender: formValue.gender,
-          mobile: formValue.mobile,
-          email: formValue.email,
-          hospitalId: formValue.hospitalId,
-          id: formValue.id,
-        };
-        await doctorAPI.updateDoctor(sendData);
-        await doctorAPI.activeDoctor(formValue.id);
-        if (formValue.isDisabled) {
-          await doctorAPI.disableDoctor(formValue.id);
-        }
-        message.success('Sửa Bác Sĩ thành công.', 5);
-        getAllDoctors();
-        handleCancelAddDoctor();
-      } catch (error) {
-        console.log(error);
-        message.error('Sửa Bác Sĩ không thành công.', 5);
-        setIsConfirmLoadingAddDoctorModal(false);
-      }
+      const confirmUpdateInfoModal = Modal.confirm({
+        title: 'Xác Nhận',
+        content: 'Bạn có chắc chắn với các thông tin đã nhập?',
+        okText: 'Xác Nhận',
+        cancelText: 'Không',
+        onOk: async () => {
+          try {
+            const sendData = {
+              name: formValue.name,
+              cmnd: formValue.cmnd,
+              dateOfBirth: moment(formValue.dateOfBirth).toISOString(),
+              gender: formValue.gender,
+              mobile: formValue.mobile,
+              email: formValue.email,
+              hospitalId: formValue.hospitalId,
+              id: formValue.id,
+            };
+            delete sendData['avatar'];
+            if (avatarUploadSource) {
+              const uploadAvatarForm = new FormData();
+              uploadAvatarForm.append('file', avatarUploadSource);
+              await doctorAPI.uploadAvatar(formValue.id, uploadAvatarForm);
+            }
+            await doctorAPI.updateDoctor(sendData);
+            await doctorAPI.activeDoctor(formValue.id);
+            if (formValue.isDisabled) {
+              await doctorAPI.disableDoctor(formValue.id);
+            }
+            message.success('Sửa Bác Sĩ thành công.', 5);
+            getAllDoctors();
+            handleCancelAddDoctor();
+          } catch (error) {
+            console.log(error);
+            message.error('Sửa Bác Sĩ không thành công.', 5);
+          }
+        },
+        onCancel() {
+          confirmUpdateInfoModal.destroy();
+        },
+      });
     });
   };
   const handleAddDoctor = () => {
     formAddEditDoctor.validateFields().then(async (formValue) => {
-      setIsConfirmLoadingAddDoctorModal(true);
       try {
         const sendData = {
           name: formValue.name,
@@ -272,7 +288,6 @@ const DoctorManager = () => {
       } catch (error) {
         console.log(error);
         message.error('Tạo Bác Sĩ không thành công.', 5);
-        setIsConfirmLoadingAddDoctorModal(false);
       }
     });
   };
@@ -298,11 +313,13 @@ const DoctorManager = () => {
       email: record.email,
       cmnd: record.cmnd,
     });
+    setAvatarUploadPreview(null);
+    setAvatarUploadSource(null);
+    setAvatarSource(record.avatar);
   };
 
   const handleVisibleDetailDoctor = (record) => {
     setIsDetailModalVisible(true);
-
     setDoctorDetail({
       id: record.id,
       name: record.name,
@@ -314,13 +331,38 @@ const DoctorManager = () => {
       email: record.email,
       cmnd: record.cmnd,
     });
+    setAvatarSource(record.avatar);
   };
 
   const handleCancelAddDoctor = () => {
-    console.log('handle cancel');
     setIsAddDoctorModalVisible(false);
     formAddEditDoctor.resetFields();
-    setIsConfirmLoadingAddDoctorModal(false);
+
+    setAvatarUploadPreview(null);
+    setAvatarUploadSource(null);
+  };
+  const handleUploadAvatar = async (fileUpload) => {
+    const { file } = fileUpload;
+    let src = await new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+    });
+    setAvatarUploadPreview(src);
+    setAvatarUploadSource(file);
+  };
+  const checkFileIsImage = {
+    beforeCrop: (file) => {
+      if (!file['type'].includes('image')) {
+        message.error(`${file.name} Không phải là tệp hình ảnh.`);
+        return false;
+      }
+      if (file.size > 1048576) {
+        message.error(`${file.name} vượt quá dung lượng cho phép.`);
+        return false;
+      }
+      return true;
+    },
   };
 
   return (
@@ -352,7 +394,6 @@ const DoctorManager = () => {
         visible={isAddDoctorModalVisible}
         okText="Xác Nhận"
         cancelText="Huỷ"
-        confirmLoading={isConfirmLoadingAddDoctorModal}
         className="add-doctor-modal-container"
         onCancel={handleCancelAddDoctor}
         // bodyStyle={{ overflowY: 'scroll' }}
@@ -366,22 +407,22 @@ const DoctorManager = () => {
       >
         <div className="avatar-container-profile">
           <div className="upload-avatar">
-            <Avatar size={100} icon={<AiOutlineUser />}></Avatar>
+            {!avatarUploadPreview ? (
+              <Avatar size={100} src={avatarSource} icon={<AiOutlineUser />}></Avatar>
+            ) : (
+              <Avatar size={100} src={avatarUploadPreview}></Avatar>
+            )}
             <div className="btn-upload-avatar">
               <Tooltip title="Tải ảnh lên">
                 <ImgCrop
-                  // {...checkFileIsImage}
+                  {...checkFileIsImage}
                   rotate
                   modalTitle="Chỉnh sửa ảnh"
                   modalOk="Xác Nhận"
                   modalCancel="Huỷ"
                 >
-                  <Upload
-                    previewFile={false}
-                    //  customRequest={handleUploadAvatar}
-                    progress={false}
-                  >
-                    {<AiFillCamera />}
+                  <Upload previewFile={false} customRequest={handleUploadAvatar} progress={false}>
+                    {<AiFillCamera style={{ position: 'absolute', top: '3px', right: '4px' }} />}
                   </Upload>
                 </ImgCrop>
               </Tooltip>
@@ -534,7 +575,7 @@ const DoctorManager = () => {
       >
         <div className="avatar-container-profile">
           <div className="upload-avatar">
-            <Avatar size={100} icon={<AiOutlineUser />}></Avatar>
+            <Avatar size={100} src={avatarSource} icon={<AiOutlineUser />}></Avatar>
           </div>
         </div>
 

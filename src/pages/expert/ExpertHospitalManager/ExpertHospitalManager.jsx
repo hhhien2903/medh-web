@@ -1,27 +1,29 @@
-import { Button, Dropdown, Empty, Form, Input, Menu, Modal, Table } from 'antd';
-import React, { useState } from 'react';
+import { Button, Dropdown, Empty, Form, Input, Menu, message, Modal, Skeleton, Table } from 'antd';
+import React, { useState, useEffect } from 'react';
 import { AiOutlineDelete, AiOutlineEdit, AiOutlinePlus } from 'react-icons/ai';
 import { MdMoreHoriz } from 'react-icons/md';
 import addressAPI from '../../../api/addressAPI';
-import doctorAPI from '../../../api/doctorAPI';
+import hospitalAPI from '../../../api/hospitalAPI';
 import useFormItemAddress from '../../../components/shared/FormItemAddress/useFormItemAddress';
+import useLoadingSkeleton from '../../../components/shared/LoadingSkeleton/useLoadingSkeleton';
 import { vietnameseNameRegex } from '../../../utils/regex';
 import './ExpertHospitalManager.scss';
 
 const ExpertHospitalManager = () => {
-  const [doctorDataSource, setDoctorDataSource] = useState([]);
+  const [hospitalSource, setHospitalSource] = useState([]);
   const [isAddEditHospitalModalVisible, setAddEditHospitalModalVisible] = useState(false);
-  const [isConfirmLoadingAddDoctorModal, setIsConfirmLoadingAddDoctorModal] = useState(false);
   const [formAddEditHospital] = Form.useForm();
   const [modalTitle, setModalTitle] = useState('');
   const [modalUsedFor, setModalUsedFor] = useState('');
+  const { renderLoadingSkeleton, setIsLoadingSkeleton, isLoadingSkeleton } = useLoadingSkeleton();
+  const [isLoadingSkeletonForm, setIsLoadingSkeletonForm] = useState(false);
   const {
     renderFormItemAddress,
     setCitySource,
-    setDistrictSource,
     setIsDisableDistrict,
     setIsDisableWard,
-    setWardSource,
+    onCitySelect,
+    onDistrictSelect,
   } = useFormItemAddress(formAddEditHospital);
   const dataSourceTest = [
     {
@@ -49,7 +51,7 @@ const ExpertHospitalManager = () => {
       key: 'index',
       width: 40,
       align: 'center',
-      render: (text, record) => dataSourceTest.indexOf(record) + 1,
+      render: (text, record) => hospitalSource.indexOf(record) + 1,
     },
     {
       title: 'Tên Bệnh Viện',
@@ -115,17 +117,21 @@ const ExpertHospitalManager = () => {
       },
     },
   ];
-  const getAllDoctors = async () => {
+  const getAllHospital = async () => {
     try {
-      const listDoctors = await doctorAPI.getAllDoctors();
-      setDoctorDataSource(listDoctors);
+      setIsLoadingSkeleton(true);
+      const hospitalSourceResult = await hospitalAPI.getAllHospital();
+      setHospitalSource(hospitalSourceResult);
+      setIsLoadingSkeleton(false);
     } catch (error) {
+      setIsLoadingSkeleton(false);
       console.log(error);
     }
   };
-  // useEffect(() => {
-  //   getAllDoctors();
-  // }, []);
+
+  useEffect(() => {
+    getAllHospital();
+  }, []);
 
   const handleDeleteHospital = (record) => {
     const confirmDeleteHospital = Modal.confirm({
@@ -134,8 +140,16 @@ const ExpertHospitalManager = () => {
       okText: 'Xoá',
       okType: 'danger',
       cancelText: 'Huỷ',
-      onOk() {
-        console.log('delete', record.id);
+      onOk: async () => {
+        try {
+          await hospitalAPI.deleteHospital(record.id);
+          confirmDeleteHospital.destroy();
+          message.success('Xoá thành công', 5);
+          getAllHospital();
+        } catch (error) {
+          console.log(error);
+          message.success('Xoá không thành công', 5);
+        }
       },
       onCancel() {
         confirmDeleteHospital.destroy();
@@ -145,37 +159,64 @@ const ExpertHospitalManager = () => {
 
   const handleEditDisease = () => {
     formAddEditHospital.validateFields().then((formValue) => {
-      console.log(formValue);
+      const confirmUpdateHospitalModal = Modal.confirm({
+        title: 'Xác Nhận',
+        content: 'Bạn có chắc chắn với các thông tin đã nhập?',
+        okText: 'Xác Nhận',
+        cancelText: 'Không',
+        onOk: async () => {
+          try {
+            await hospitalAPI.updateHospital({ ...formValue, status: true });
+            message.success('Sửa Bệnh Viện Thành Công.', 5);
+            getAllHospital();
+            handleCancelHospitalModal();
+          } catch (error) {
+            console.log(error);
+            message.error('Sửa Bệnh Viện Không Thành Công.', 5);
+          }
+        },
+        onCancel() {
+          confirmUpdateHospitalModal.destroy();
+        },
+      });
     });
   };
-  const handleAddDisease = () => {};
+  const handleAddHospital = () => {
+    formAddEditHospital.validateFields().then(async (formValue) => {
+      try {
+        await hospitalAPI.createHospital({ ...formValue, status: true });
+        message.success('Tạo Bệnh Viện thành công.', 5);
+        getAllHospital();
+        handleCancelHospitalModal();
+      } catch (error) {
+        console.log(error);
+        message.error('Tạo Bệnh Viện không thành công.', 5);
+      }
+    });
+  };
 
   const handleVisibleAddHospital = async () => {
     setAddEditHospitalModalVisible(true);
     setModalUsedFor('addHospital');
     setModalTitle('Thêm Bệnh Viện');
-    try {
-      const citySourceResult = await addressAPI.getCity();
-      setCitySource(citySourceResult);
-    } catch (error) {
-      console.log(error);
-    }
   };
 
-  const handleVisibleEditHospital = (record) => {
+  const handleVisibleEditHospital = async (record) => {
     setAddEditHospitalModalVisible(true);
     setModalUsedFor('editHospital');
-    setModalTitle('Sửa Bệnh Viện');
-    console.log(record);
+    setModalTitle('Sửa Thông Tin Bệnh Viện');
+    setIsLoadingSkeletonForm(true);
+    await onCitySelect(record.cityId);
+    await onDistrictSelect(record.districtId);
+    setIsLoadingSkeletonForm(false);
     formAddEditHospital.setFieldsValue({
+      id: record.id,
       name: record.name,
-      description: record.description,
-      // gender: record.gender,
-      // dateOfBirth: moment(record.dateOfBirth),
-      // mobile: record.mobile,
-      // isActive: record.isActive,
-      // hospital: record.hospital.name,
-      // email: record.email,
+      cityId: record.cityId,
+      wardId: record.wardId,
+      districtId: record.districtId,
+      address: record.address,
+      status: record.status,
     });
   };
 
@@ -215,46 +256,56 @@ const ExpertHospitalManager = () => {
         visible={isAddEditHospitalModalVisible}
         okText="Xác Nhận"
         cancelText="Huỷ"
-        confirmLoading={isConfirmLoadingAddDoctorModal}
         className="add-edit-hospital-modal-container"
         onCancel={handleCancelHospitalModal}
         // bodyStyle={{ overflowY: 'scroll' }}
         onOk={() => {
           if (modalUsedFor === 'addHospital') {
-            return handleVisibleAddHospital();
+            return handleAddHospital();
           } else {
-            return handleVisibleEditHospital();
+            return handleEditDisease();
           }
         }}
       >
-        <Form layout="vertical" className="add-edit-hospital-form" form={formAddEditHospital}>
-          <Form.Item
-            name="name"
-            label="Tên Bệnh Viện:"
-            rules={[
-              {
-                required: true,
-                message: 'Tên Bệnh Viện không được để trống!',
-              },
-              {
-                pattern: vietnameseNameRegex,
-                message: 'Tên Bệnh Viện không đúng định dạng',
-              },
-            ]}
-          >
-            <Input placeholder="Tên Bệnh Viện" />
-          </Form.Item>
-          {renderFormItemAddress}
-        </Form>
+        {isLoadingSkeletonForm ? (
+          <Skeleton active loading={isLoadingSkeletonForm} />
+        ) : (
+          <Form layout="vertical" className="add-edit-hospital-form" form={formAddEditHospital}>
+            <Form.Item name="id" noStyle>
+              <Input type="hidden"></Input>
+            </Form.Item>
+            <Form.Item
+              name="name"
+              label="Tên Bệnh Viện:"
+              rules={[
+                {
+                  required: true,
+                  message: 'Tên Bệnh Viện không được để trống!',
+                },
+                // {
+                //   pattern: vietnameseNameRegex,
+                //   message: 'Tên Bệnh Viện không đúng định dạng',
+                // },
+              ]}
+            >
+              <Input placeholder="Tên Bệnh Viện" />
+            </Form.Item>
+            {renderFormItemAddress}
+          </Form>
+        )}
       </Modal>
-      <Table
-        locale={{
-          emptyText: <Empty description="Không có dữ liệu." />,
-        }}
-        columns={tableColumns}
-        dataSource={dataSourceTest}
-        pagination={{ pageSize: 10 }}
-      />
+      {isLoadingSkeleton ? (
+        renderLoadingSkeleton
+      ) : (
+        <Table
+          locale={{
+            emptyText: <Empty description="Không có dữ liệu." />,
+          }}
+          columns={tableColumns}
+          dataSource={hospitalSource}
+          pagination={{ pageSize: 10 }}
+        />
+      )}
     </div>
   );
 };

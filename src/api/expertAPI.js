@@ -1,4 +1,4 @@
-import { axiosClient } from './axiosClient';
+import { axiosClient, axiosClientFormData } from './axiosClient';
 
 const API_ENDPOINT = '/expert';
 
@@ -20,6 +20,10 @@ const expertAPI = {
   updateInfo: (data) => {
     const url = `${API_ENDPOINT}?id=${data.id}`;
     return axiosClient.put(url, data);
+  },
+  uploadAvatar: (id, data) => {
+    const url = `${API_ENDPOINT}/avatar/${id}`;
+    return axiosClientFormData.patch(url, data);
   },
 };
 
