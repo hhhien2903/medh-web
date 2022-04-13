@@ -53,6 +53,8 @@ const useFormItemAddress = (form) => {
     citySource,
     wardSource,
     districtSource,
+    onCitySelect,
+    onDistrictSelect,
     renderFormItemAddress: (
       <>
         <Form.Item

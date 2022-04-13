@@ -32,20 +32,24 @@
   .name-user {
     font-weight: bold;
   }
-  .form-header {
-    margin-bottom: 38px;
-  }
+  // .form-header {
+  //   margin-bottom: 38px;
+  // }
   .avatar-container-profile {
     height: 150px;
     // background: linear-gradient(to left, #b066fe, #63e2ff);
     background: linear-gradient(to right, #457fca, #5691c8);
   }
   .upload-avatar {
-    transform: translate(130px, 103px);
+    transform: translate(125px, 95px);
   }
   .btn-upload-avatar {
-    transform: translate(190px, 83px);
+    transform: translate(196px, 74px);
     cursor: pointer;
+    background: #fff;
+    width: 22px;
+    height: 22px;
+    border-radius: 50px;
     .ant-upload-list {
       display: none;
     }
@@ -67,5 +71,9 @@
     margin-bottom: 10px;
     padding: 0 2px;
     border-radius: '5px';
+  }
+
+  .form-edit-current-user {
+    margin-top: 45px;
   }
 }
