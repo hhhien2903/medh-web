@@ -1,0 +1,15 @@
+.medical-record-manager-container {
+  margin: 10px 10px;
+  .tool-container {
+    display: flex;
+    justify-content: space-between;
+  }
+}
+.add-edit-medical-record-modal-container {
+  top: 50px;
+  .add-edit-medical-record-form {
+    .ant-form-item {
+      margin-bottom: 7px;
+    }
+  }
+}

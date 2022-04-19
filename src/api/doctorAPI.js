@@ -11,6 +11,10 @@ const doctorAPI = {
     const url = `${API_ENDPOINT}`;
     return axiosClient.get(url);
   },
+  getAllDoctorsByHospitalId: (hospitalId) => {
+    const url = `${API_ENDPOINT}?hospitalId=${hospitalId}`;
+    return axiosClient.get(url);
+  },
   getPendingDoctors: () => {
     const url = `${API_ENDPOINT}/application/pending`;
     return axiosClient.get(url);

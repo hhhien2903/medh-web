@@ -24,7 +24,13 @@ import ImgCrop from 'antd-img-crop';
 import localeVN from 'antd/es/date-picker/locale/vi_VN';
 import moment from 'moment';
 import { phoneNumberRegex } from '../../../utils/regex';
-import { AiOutlineMenuUnfold, AiFillCamera, AiOutlineMenuFold } from 'react-icons/ai';
+import {
+  AiOutlineMenuUnfold,
+  AiFillCamera,
+  AiOutlineMenuFold,
+  AiOutlineUser,
+  AiOutlineLogout,
+} from 'react-icons/ai';
 const Header = () => {
   const { menuToggleCollapsed, setMenuToggleCollapsed } = useContext(AppContext);
   const { currentUser, setCurrentUser } = useContext(AuthContext);
@@ -57,6 +63,8 @@ const Header = () => {
         return 'Quản Lý Luật Y Tế';
       case '/expert/hospital':
         return 'Quản Lý Bệnh Viện';
+      case '/expert/medical-record':
+        return 'Quản Lý Bệnh Án';
       default:
         return '';
     }
@@ -70,7 +78,10 @@ const Header = () => {
           handleClickGetInfoCurrentUser();
         }}
       >
-        Thông Tin Cá Nhân
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <AiOutlineUser size={16} />
+          <p style={{ margin: 0, display: 'inline' }}>&nbsp;Thông Tin Cá Nhân</p>
+        </div>
       </Menu.Item>
       <Menu.Item
         key={1}
@@ -91,7 +102,10 @@ const Header = () => {
           });
         }}
       >
-        Thoát
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <AiOutlineLogout size={16} />
+          <p style={{ margin: 0, display: 'inline' }}>&nbsp;Thoát</p>
+        </div>
       </Menu.Item>
     </Menu>
   );
@@ -209,11 +223,17 @@ const Header = () => {
       </div>
 
       <div className="avatar">
-        <Dropdown overlay={menu} trigger={['click']}>
+        <Dropdown
+          overlay={menu}
+          placement="bottomRight"
+          trigger={['hover']}
+          // overlayStyle={{ left: 300 }}
+        >
           <div>
             <Avatar size={45} src={currentUser?.avatar}>
               {!currentUser.avatar ? currentUser.name : ''}
             </Avatar>
+            &nbsp;&nbsp;{currentUser.name}
           </div>
         </Dropdown>
         <div>

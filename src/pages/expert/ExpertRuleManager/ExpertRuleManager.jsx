@@ -176,13 +176,14 @@ const ExpertRuleManager = () => {
       cancelText: 'Huỷ',
       onOk: async () => {
         try {
+          await ruleAPI.clearRuleConditionsById(record.id);
           await ruleAPI.deleteRule(record.id);
           confirmDeleteRule.destroy();
           message.success('Xoá thành công', 5);
           getAllRule();
         } catch (error) {
           console.log(error);
-          message.success('Xoá không thành công', 5);
+          message.error('Xoá không thành công', 5);
         }
       },
       onCancel() {
@@ -278,6 +279,7 @@ const ExpertRuleManager = () => {
     setModalUsedFor('editRule');
     setModalTitle('Sửa Tập Luật Y Tế');
     const findRuleResult = await ruleAPI.findById(record.id);
+    console.log(findRuleResult);
     formAddEditRule.setFieldsValue({
       id: findRuleResult.id,
       name: findRuleResult.name,
