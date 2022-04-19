@@ -1,4 +1,4 @@
-import { Form, Select } from 'antd';
+import { Empty, Form, Select } from 'antd';
 import React, { useState, useEffect } from 'react';
 import ruleConditionAPI from '../../../api/ruleConditionAPI';
 
@@ -31,6 +31,13 @@ const useFormItemRuleCondition = (multipleSelect) => {
           ]}
         >
           <Select
+            notFoundContent={
+              <Empty
+                description="Không có dữ liệu."
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                style={{ height: 50 }}
+              />
+            }
             allowClear
             mode={multipleSelect ? 'multiple' : ''}
             placeholder="Vui lòng chọn Luật Y Tế"

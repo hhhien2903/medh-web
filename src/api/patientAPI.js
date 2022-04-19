@@ -11,6 +11,10 @@ const patientAPI = {
     const url = `${API_ENDPOINT}`;
     return axiosClient.get(url);
   },
+  getAllPatientsIsTreated: () => {
+    const url = `${API_ENDPOINT}?treated=true`;
+    return axiosClient.get(url);
+  },
   updatePatient: (data) => {
     const url = `${API_ENDPOINT}`;
     return axiosClient.put(url, data);
@@ -18,6 +22,10 @@ const patientAPI = {
   deletePatient: (id) => {
     const url = `${API_ENDPOINT}/${id}`;
     return axiosClient.delete(url);
+  },
+  assignPatientForDoctor: (data) => {
+    const url = `${API_ENDPOINT}/doctor`;
+    return axiosClient.patch(url, data);
   },
 };
 

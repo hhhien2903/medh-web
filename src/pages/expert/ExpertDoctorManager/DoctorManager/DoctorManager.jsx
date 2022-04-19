@@ -154,14 +154,14 @@ const DoctorManager = () => {
                 >
                   Sửa thông tin
                 </Menu.Item>
-                <Menu.Item
+                {/* <Menu.Item
                   key="2"
                   icon={<AiOutlineDelete size={15} color="#FF4D4F" />}
                   style={{ color: '#FF4D4F' }}
                   onClick={() => handleDeleteDoctor(record)}
                 >
                   Xoá
-                </Menu.Item>
+                </Menu.Item> */}
                 <Menu.Item
                   key="3"
                   icon={<AiOutlineInfoCircle size={15} />}
@@ -296,6 +296,8 @@ const DoctorManager = () => {
     setIsAddDoctorModalVisible(true);
     setModalUsedFor('addDoctor');
     setModalTitle('Thêm Bác Sĩ');
+
+    formAddEditDoctor.setFieldsValue({ isDisabled: false });
   };
 
   const handleVisibleEditDoctor = (record) => {
@@ -331,15 +333,16 @@ const DoctorManager = () => {
       email: record.email,
       cmnd: record.cmnd,
     });
+
     setAvatarSource(record.avatar);
   };
 
   const handleCancelAddDoctor = () => {
     setIsAddDoctorModalVisible(false);
     formAddEditDoctor.resetFields();
-
     setAvatarUploadPreview(null);
     setAvatarUploadSource(null);
+    setAvatarSource(null);
   };
   const handleUploadAvatar = async (fileUpload) => {
     const { file } = fileUpload;
@@ -410,7 +413,7 @@ const DoctorManager = () => {
             {!avatarUploadPreview ? (
               <Avatar size={100} src={avatarSource} icon={<AiOutlineUser />}></Avatar>
             ) : (
-              <Avatar size={100} src={avatarUploadPreview}></Avatar>
+              <Avatar size={100} src={avatarUploadPreview} icon={<AiOutlineUser />}></Avatar>
             )}
             <div className="btn-upload-avatar">
               <Tooltip title="Tải ảnh lên">

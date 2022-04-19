@@ -10,19 +10,14 @@ import {
   Modal,
   Select,
   Table,
-  Tag,
   TimePicker,
 } from 'antd';
-import React, { useState, useEffect } from 'react';
+import moment from 'moment';
+import React, { useEffect, useState } from 'react';
 import { AiOutlineDelete, AiOutlineEdit, AiOutlinePlus } from 'react-icons/ai';
 import { MdMoreHoriz } from 'react-icons/md';
 import ruleConditionAPI from '../../../api/ruleConditionAPI';
-import moment from 'moment';
-import {
-  onePrecisionDecimalsRegex,
-  twoPrecisionDecimalsRegex,
-  vietnameseNameRegex,
-} from '../../../utils/regex';
+import { onePrecisionDecimalsRegex } from '../../../utils/regex';
 import './ExpertRuleConditionManager.scss';
 
 const ExpertRuleConditionManager = () => {
@@ -33,36 +28,6 @@ const ExpertRuleConditionManager = () => {
   const [modalTitle, setModalTitle] = useState('');
   const [modalUsedFor, setModalUsedFor] = useState('');
 
-  const dataSourceTest = [
-    {
-      id: 1,
-      uuid: '98a20510-e61f-42a3-9324-3bbc6b51165f',
-      createdAt: '2022-03-15T00:00:00.000Z',
-      updatedAt: '2022-03-15T00:00:00.000Z',
-      description: 'Bệnh COVID-19',
-      name: 'COVID-19',
-      mac_address: '50-5B-C2-AB-63-F1',
-      email: 'test123@gmail.com',
-      status: true,
-      temp: '38',
-      patient: 'Nguyễn Văn A',
-      diseases: 'COVID-19',
-    },
-    {
-      id: 2,
-      uuid: '98a20510-e61f-42a3-9324-3bbc6b51165f',
-      createdAt: '2022-03-15T00:00:00.000Z',
-      updatedAt: '2022-03-15T00:00:00.000Z',
-      description: 'Sốt xuất huyết',
-      name: 'Sốt xuất huyết',
-      mac_address: 'D8-C4-97-7A-2C-8F',
-      email: 'test123@gmail.com',
-      status: true,
-      temp: '38.5',
-      patient: 'Nguyễn Văn B',
-      diseases: 'Sốt xuất huyết',
-    },
-  ];
   const tableColumns = [
     // {
     //   title: 'ID',

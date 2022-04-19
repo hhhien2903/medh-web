@@ -1,10 +1,10 @@
-import { Form, Input, Select } from 'antd';
+import { Empty, Form, Input, Select } from 'antd';
 import React, { useState, useEffect } from 'react';
 import diseaseAPI from '../../../api/diseaseAPI';
 
 const useFormItemDisease = () => {
   const [diseaseSource, setDiseaseSource] = useState([]);
-
+  const [isFormItemDiseaseDisabled, setIsFormItemDiseaseDisabled] = useState(false);
   const getAllDisease = async () => {
     try {
       const diseaseSourceResult = await diseaseAPI.getAllDiseases();
@@ -18,10 +18,11 @@ const useFormItemDisease = () => {
   }, []);
 
   return {
+    setIsFormItemDiseaseDisabled,
     renderFormItemDisease: (
       <>
         <Form.Item
-          name="diseaseId"
+          name="diseasesId"
           label="Bệnh Theo Dõi:"
           rules={[
             {
@@ -31,6 +32,14 @@ const useFormItemDisease = () => {
           ]}
         >
           <Select
+            disabled={isFormItemDiseaseDisabled}
+            notFoundContent={
+              <Empty
+                description="Không có dữ liệu."
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                style={{ height: 50 }}
+              />
+            }
             allowClear
             showSearch
             placeholder="Vui lòng chọn Bệnh Theo Dõi"

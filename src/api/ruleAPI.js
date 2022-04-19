@@ -11,6 +11,10 @@ const ruleAPI = {
     const url = `${API_ENDPOINT}`;
     return axiosClient.get(url);
   },
+  getAllRulesNotAssign: () => {
+    const url = `${API_ENDPOINT}?used=false`;
+    return axiosClient.get(url);
+  },
   updateRule: (data) => {
     const url = `${API_ENDPOINT}`;
     return axiosClient.put(url, data);
