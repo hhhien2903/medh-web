@@ -417,6 +417,11 @@ const ExpertPatientManager = () => {
         onOk: async () => {
           try {
             console.log(formValue);
+            const result = await patientAPI.updatePatient({
+              ...formValue,
+              dateOfBirth: moment(formValue.dateOfBirth).toISOString(),
+            });
+            console.log(result);
             message.success('Sửa Thông Tin Bệnh Nhân Thành Công.', 5);
             getAllPatient();
             handleCancelAddPatient();
