@@ -19,6 +19,16 @@
     display: flex;
     align-items: center;
   }
+  .ant-dropdown-open {
+    background-color: #fafafa;
+    border-radius: 3px;
+  }
+  .ant-dropdown-trigger {
+    padding: 0px 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 }
 
 .modal-user {

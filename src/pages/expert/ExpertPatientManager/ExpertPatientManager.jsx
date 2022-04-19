@@ -12,6 +12,7 @@ import {
   Table,
   Descriptions,
   Skeleton,
+  Space,
 } from 'antd';
 import localeVN from 'antd/es/date-picker/locale/vi_VN';
 import moment from 'moment';
@@ -56,47 +57,182 @@ const ExpertPatientManager = () => {
   const [isDetailModalVisible, setIsDetailModalVisible] = useState(false);
   const [patientDetail, setPatientDetail] = useState({});
   const [isLoadingSkeletonForm, setIsLoadingSkeletonForm] = useState(false);
-  // const dataSourceTest = [
-  //   {
-  //     id: 16,
-  //     uuid: '98a20510-e61f-42a3-9324-3bbc6b51165f',
-  //     createdAt: '2022-03-15T00:00:00.000Z',
-  //     updatedAt: '2022-03-15T00:00:00.000Z',
-  //     avatar: 'https://eitrawmaterials.eu/wp-content/uploads/2016/09/person-icon.png',
-  //     cmnd: '123456789',
-  //     dateOfBirth: '2000-01-16T07:58:29.000Z',
-  //     email: 'test123@gmail.com',
-  //     gender: true,
-  //     isActive: true,
-  //     mobile: '0975846784',
-  //     name: 'Nguyễn Văn A',
-  //     address: '12 Nguyễn Văn Bảo, Phường 4, Gò Vấp, Thành phố Hồ Chí Minh',
-  //     hospital: 'Bệnh Viện Quân Y',
-  //     doctor: 'Nguyễn Văn A',
-  //     device: 'Số 1',
-  //     cityId: 79,
-  //     districtId: 767,
-  //     wardId: 1460,
-  //   },
-  //   {
-  //     id: 17,
-  //     uuid: '98a20510-e61f-42a3-9324-3bbc6b51165f',
-  //     createdAt: '2022-03-15T00:00:00.000Z',
-  //     updatedAt: '2022-03-15T00:00:00.000Z',
-  //     avatar: 'https://eitrawmaterials.eu/wp-content/uploads/2016/09/person-icon.png',
-  //     cmnd: '123456789',
-  //     dateOfBirth: '2000-01-16T07:58:29.000Z',
-  //     email: 'test123@gmail.com',
-  //     gender: true,
-  //     isActive: true,
-  //     mobile: '0975846784',
-  //     name: 'Nguyễn Văn B',
-  //     address: '12 Nguyễn Văn Bảo, Phường 4, Gò Vấp, Thành phố Hồ Chí Minh',
-  //     hospital: 'Bệnh Viện Quân Y',
-  //     doctor: 'Nguyễn Văn B',
-  //     device: 'Số 2',
-  //   },
-  // ];
+  const [datePickerChart, setDatePickerChart] = useState(null);
+  const [tempData, setTempData] = useState([]);
+  const [patientNameChart, setPatientNameChart] = useState(null);
+  const tempTestData = [
+    {
+      date: '18/04/2022',
+      hour: '01:00',
+      temp: 38,
+    },
+    {
+      date: '18/04/2022',
+      hour: '02:00',
+      temp: 38,
+    },
+    {
+      date: '18/04/2022',
+      hour: '03:00',
+      temp: 39,
+    },
+    {
+      date: '18/04/2022',
+      hour: '04:00',
+      temp: 40,
+    },
+    {
+      date: '18/04/2022',
+      hour: '05:00',
+      temp: 39.5,
+    },
+    {
+      date: '18/04/2022',
+      hour: '06:00',
+      temp: 39,
+    },
+    {
+      date: '18/04/2022',
+      hour: '07:00',
+      temp: 39,
+    },
+    {
+      date: '18/04/2022',
+      hour: '08:00',
+      temp: 40,
+    },
+    {
+      date: '18/04/2022',
+      hour: '09:00',
+      temp: 39,
+    },
+    {
+      date: '18/04/2022',
+      hour: '10:00',
+      temp: 39.5,
+    },
+    {
+      date: '18/04/2022',
+      hour: '11:00',
+      temp: 39,
+    },
+    {
+      date: '18/04/2022',
+      hour: '12:00',
+      temp: 40,
+    },
+    {
+      date: '18/04/2022',
+      hour: '13:00',
+      temp: 39.5,
+    },
+    {
+      date: '18/04/2022',
+      hour: '14:00',
+      temp: 39.5,
+    },
+    {
+      date: '18/04/2022',
+      hour: '15:00',
+      temp: 39,
+    },
+    {
+      date: '18/04/2022',
+      hour: '16:00',
+      temp: 38.5,
+    },
+    {
+      date: '18/04/2022',
+      hour: '17:00',
+      temp: 38,
+    },
+    {
+      date: '19/04/2022',
+      hour: '01:00',
+      temp: 39.5,
+    },
+    {
+      date: '19/04/2022',
+      hour: '02:00',
+      temp: 40,
+    },
+    {
+      date: '19/04/2022',
+      hour: '03:00',
+      temp: 39.5,
+    },
+    {
+      date: '19/04/2022',
+      hour: '04:00',
+      temp: 39,
+    },
+    {
+      date: '19/04/2022',
+      hour: '05:00',
+      temp: 39,
+    },
+    {
+      date: '19/04/2022',
+      hour: '06:00',
+      temp: 39.5,
+    },
+    {
+      date: '19/04/2022',
+      hour: '07:00',
+      temp: 40,
+    },
+    {
+      date: '19/04/2022',
+      hour: '08:00',
+      temp: 40,
+    },
+    {
+      date: '19/04/2022',
+      hour: '09:00',
+      temp: 39.5,
+    },
+    {
+      date: '19/04/2022',
+      hour: '10:00',
+      temp: 39.5,
+    },
+    {
+      date: '19/04/2022',
+      hour: '11:00',
+      temp: 39,
+    },
+    {
+      date: '19/04/2022',
+      hour: '12:00',
+      temp: 39,
+    },
+    {
+      date: '19/04/2022',
+      hour: '13:00',
+      temp: 38.5,
+    },
+    {
+      date: '19/04/2022',
+      hour: '14:00',
+      temp: 38.5,
+    },
+    {
+      date: '19/04/2022',
+      hour: '15:00',
+      temp: 38,
+    },
+    {
+      date: '19/04/2022',
+      hour: '16:00',
+      temp: 37.5,
+    },
+    {
+      date: '19/04/2022',
+      hour: '17:00',
+      temp: 37,
+    },
+  ];
+
   const tableColumns = [
     {
       title: 'STT',
@@ -148,13 +284,13 @@ const ExpertPatientManager = () => {
     //   dataIndex: 'address',
     //   key: 'address',
     // },
-    {
-      title: 'Bệnh Viện',
-      key: 'hospital',
-      render: (text, record) => {
-        return record.hospital.name;
-      },
-    },
+    // {
+    //   title: 'Bệnh Viện',
+    //   key: 'hospital',
+    //   render: (text, record) => {
+    //     return record.hospital?.name;
+    //   },
+    // },
     {
       title: 'Bác Sĩ Phụ Trách',
       key: 'doctor',
@@ -188,7 +324,7 @@ const ExpertPatientManager = () => {
                   key="2"
                   icon={<AiOutlineDelete size={15} color="#FF4D4F" />}
                   style={{ color: '#FF4D4F' }}
-                  onClick={() => handleDeleteDoctor(record)}
+                  onClick={() => handleDeletePatient(record)}
                 >
                   Xoá
                 </Menu.Item>
@@ -202,7 +338,11 @@ const ExpertPatientManager = () => {
                 <Menu.Item
                   key="4"
                   icon={<AiOutlineAreaChart size={15} />}
-                  onClick={() => setIsVisibleChartModal(true)}
+                  onClick={() => {
+                    setPatientNameChart(record.fullName);
+                    setDatePickerChart(null);
+                    setIsVisibleChartModal(true);
+                  }}
                 >
                   Xem biểu đồ
                 </Menu.Item>
@@ -244,15 +384,22 @@ const ExpertPatientManager = () => {
     getAllPatient();
   }, []);
 
-  const handleDeleteDoctor = (record) => {
+  const handleDeletePatient = (record) => {
     const confirmDeleteDoctor = Modal.confirm({
       title: 'Xác Nhận',
       content: 'Bạn có chắc chắn muốn xoá?',
       okText: 'Xoá',
       okType: 'danger',
       cancelText: 'Huỷ',
-      onOk() {
-        console.log('delete', record.id);
+      onOk: async () => {
+        try {
+          await patientAPI.deletePatient(record.id);
+          message.success('Xoá Bệnh Nhân thành công.', 5);
+          getAllPatient();
+        } catch (error) {
+          message.error('Xoá Bệnh Nhân không thành công.', 5);
+          console.log(error);
+        }
       },
       onCancel() {
         confirmDeleteDoctor.destroy();
@@ -272,7 +419,7 @@ const ExpertPatientManager = () => {
             console.log(formValue);
             message.success('Sửa Thông Tin Bệnh Nhân Thành Công.', 5);
             getAllPatient();
-            // handleCancelAddPatient();
+            handleCancelAddPatient();
           } catch (error) {
             console.log(error);
             message.error('Sửa Thông Tin Bệnh Nhân Không Thành Công.', 5);
@@ -296,12 +443,10 @@ const ExpertPatientManager = () => {
           mobile: formValue.mobile,
           email: formValue.email,
           hospitalId: formValue.hospitalId,
-          doctor_id: formValue.doctorId,
           cityId: formValue.cityId,
           districtId: formValue.districtId,
           wardId: formValue.wardId,
           address: formValue.address,
-          device_id: 1,
         };
         console.log(sendData);
         await patientAPI.createPatient(sendData);
@@ -345,7 +490,7 @@ const ExpertPatientManager = () => {
       cityId: record.cityId,
       districtId: record.districtId,
       address: record.address.split(',')[0],
-      hospitalId: record.hospital.id,
+      hospitalId: record.hospital?.id,
       doctorId: record.doctor?.id,
       deviceId: record.device?.id,
     });
@@ -366,6 +511,17 @@ const ExpertPatientManager = () => {
       dateOfBirth: moment(record.dateOfBirth).format('DD/MM/YYYY'),
     });
   };
+
+  const handleChangeDatePickerChart = (value) => {
+    setDatePickerChart(value);
+    let temp = tempTestData.filter(
+      (tempTest) => tempTest.date === moment(value).format('DD/MM/YYYY')
+    );
+    setTempData(temp);
+    // console.log([...temp.hour]);
+    // setTempLabel([...temp.hour])
+  };
+
   return (
     <div className="patient-manager-container">
       <div className="tool-container">
@@ -400,7 +556,7 @@ const ExpertPatientManager = () => {
         cancelText="Huỷ"
         className="add-doctor-modal-container"
         onCancel={handleCancelAddPatient}
-        // bodyStyle={{ overflowY: 'scroll' }}
+        bodyStyle={{ overflowY: 'scroll', height: 600 }}
         onOk={() => {
           if (modalUsedFor === 'addPatient') {
             return handleAddPatient();
@@ -460,7 +616,6 @@ const ExpertPatientManager = () => {
             >
               <DatePicker
                 disabledDate={(current) => current > moment()}
-                // defaultPickerValue={moment().subtract(18, 'year')}
                 placeholder="Vui lòng chọn ngày sinh"
                 style={{ width: '100%' }}
                 locale={localeVN}
@@ -498,10 +653,10 @@ const ExpertPatientManager = () => {
               name="email"
               label="Email:"
               rules={[
-                {
-                  required: true,
-                  message: 'Email không được để trống!',
-                },
+                // {
+                //   required: true,
+                //   message: 'Email không được để trống!',
+                // },
                 {
                   pattern: emailRegex,
                   message: 'Email không đúng định dạng',
@@ -514,12 +669,11 @@ const ExpertPatientManager = () => {
               name="mobile"
               label="Số Điện Thoại:"
               rules={[
+                // {
+                //   required: true,
+                //   message: 'Số điện thoại không được để trống!',
+                // },
                 {
-                  required: true,
-                  message: 'Số điện thoại không được để trống!',
-                },
-                {
-                  required: true,
                   pattern: phoneNumberRegex,
                   message: 'Số điện thoại không đúng định dạng',
                 },
@@ -528,55 +682,6 @@ const ExpertPatientManager = () => {
               <Input placeholder="Số Điện Thoại" />
             </Form.Item>
             {renderFormItemAddress}
-            {renderFormItemHospital}
-            {renderFormItemDoctor}
-            {renderFormItemDevice}
-            {/* {renderFormItemDevice} */}
-            {/* <Form.Item
-            name="hospital"
-            label="Bệnh Viện:"
-            rules={[
-              {
-                required: true,
-                message: 'Bệnh Viện không được để trống!',
-              },
-            ]}
-          >
-            <Select placeholder="Vui lòng chọn Bệnh Viện">
-              <Select.Option value={1}>Bệnh Viện Đại Học Y Dược</Select.Option>
-              <Select.Option value={2}>Bệnh Viện Quân Y</Select.Option>
-            </Select>
-          </Form.Item> */}
-            {/* <Form.Item
-            name="doctor_id"
-            label="Bác Sĩ Phụ Trách:"
-            rules={[
-              {
-                required: true,
-                message: 'Bác Sĩ Phụ Trách không được để trống!',
-              },
-            ]}
-          >
-            <Select placeholder="Vui lòng chọn Bác Sĩ Phụ Trách">
-              <Select.Option value={16}>16 - Nguyễn Văn A</Select.Option>
-              <Select.Option value={17}>17 - Nguyễn Văn B</Select.Option>
-            </Select>
-          </Form.Item> */}
-            {/* <Form.Item
-            name="device_id"
-            label="Vòng Đeo:"
-            rules={[
-              {
-                required: true,
-                message: 'Vòng Đeo không được để trống!',
-              },
-            ]}
-          >
-            <Select placeholder="Vui lòng chọn Vòng Đeo">
-              <Select.Option value={1}>Vòng Đeo Số 1</Select.Option>
-              <Select.Option value={2}>Vòng Đeo Số 2</Select.Option>
-            </Select>
-          </Form.Item> */}
           </Form>
         )}
       </Modal>
@@ -590,15 +695,17 @@ const ExpertPatientManager = () => {
         okButtonProps={{ style: { display: 'none' } }}
         onCancel={() => {
           setIsVisibleChartModal(false);
+          setTempData([]);
         }}
       >
+        <h3>Tên Bệnh Nhân: {patientNameChart}</h3>
         <Line
           data={{
-            labels: ['00:00', '01:00', '02:00', '03:00', '04:00', '05:00'],
+            labels: tempData?.map((temp) => temp.hour),
             datasets: [
               {
                 label: 'Nhiệt Độ (°C)',
-                data: [36, 37, 38, 37, 37.5, 38],
+                data: tempData?.map((temp) => temp.temp),
                 backgroundColor: [
                   'rgba(255, 99, 132, 0.2)',
                   'rgba(54, 162, 235, 0.2)',
@@ -646,9 +753,19 @@ const ExpertPatientManager = () => {
           //   },
           // }}
         />
+        <h3>Chọn Ngày:</h3>
+        <DatePicker
+          disabledDate={(current) => current > moment()}
+          placeholder="Vui lòng chọn Ngày"
+          style={{ width: '100%' }}
+          locale={localeVN}
+          format={'DD/MM/YYYY'}
+          value={datePickerChart}
+          onChange={handleChangeDatePickerChart}
+        />
       </Modal>
 
-      {/* Doctor Detail Modal */}
+      {/* Patient Detail Modal */}
       <Modal
         title="Thông Tin Chi Tiết"
         visible={isDetailModalVisible}

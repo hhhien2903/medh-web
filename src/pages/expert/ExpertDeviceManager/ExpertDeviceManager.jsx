@@ -1,54 +1,23 @@
-import { Button, Dropdown, Empty, Form, Input, Menu, Modal, Select, Table, Tag } from 'antd';
-import React, { useState } from 'react';
+import { Button, Dropdown, Empty, Form, Input, Menu, message, Modal, Table, Tag } from 'antd';
+import React, { useEffect, useState } from 'react';
 import { AiOutlineDelete, AiOutlineEdit, AiOutlineInfoCircle, AiOutlinePlus } from 'react-icons/ai';
 import { MdMoreHoriz } from 'react-icons/md';
-import doctorAPI from '../../../api/doctorAPI';
+import deviceAPI from '../../../api/deviceAPI';
 import useFormItemDisease from '../../../components/shared/FormItemDisease/useFormItemDisease';
+import useFormItemHospital from '../../../components/shared/FormItemHospital/useFormItemHospital';
 import useFormItemPatient from '../../../components/shared/FormItemPatient/useFormItemPatient';
+import useLoadingSkeleton from '../../../components/shared/LoadingSkeleton/useLoadingSkeleton';
 import { vietnameseNameRegex } from '../../../utils/regex';
 import './ExpertDeviceManager.scss';
 
 const ExpertDeviceManager = () => {
-  const [doctorDataSource, setDoctorDataSource] = useState([]);
+  const [deviceSource, setDeviceSource] = useState([]);
   const [isAddEditDeviceModalVisible, setAddEditDeviceModalVisible] = useState(false);
-  const [isConfirmLoadingAddDoctorModal, setIsConfirmLoadingAddDoctorModal] = useState(false);
-  const [formAddEditDoctor] = Form.useForm();
+  const [formAddEditDevice] = Form.useForm();
   const [modalTitle, setModalTitle] = useState('');
   const [modalUsedFor, setModalUsedFor] = useState('');
-
-  const { renderFormItemPatient } = useFormItemPatient();
-  const { renderFormItemDisease } = useFormItemDisease();
-
-  const dataSourceTest = [
-    {
-      id: 1,
-      uuid: '98a20510-e61f-42a3-9324-3bbc6b51165f',
-      createdAt: '2022-03-15T00:00:00.000Z',
-      updatedAt: '2022-03-15T00:00:00.000Z',
-      description: 'Vòng đeo tay',
-      name: 'Vòng đeo tay số 1',
-      mac_address: '50-5B-C2-AB-63-F1',
-      email: 'test123@gmail.com',
-      status: true,
-      temp: '38',
-      patient: 'Nguyễn Văn A',
-      diseases: 'COVID-19',
-    },
-    {
-      id: 2,
-      uuid: '98a20510-e61f-42a3-9324-3bbc6b51165f',
-      createdAt: '2022-03-15T00:00:00.000Z',
-      updatedAt: '2022-03-15T00:00:00.000Z',
-      description: 'Vòng đeo tay',
-      name: 'Vòng đeo tay số 2',
-      mac_address: 'D8-C4-97-7A-2C-8F',
-      email: 'test123@gmail.com',
-      status: true,
-      temp: '38.5',
-      patient: 'Nguyễn Văn B',
-      diseases: 'Sốt xuất huyết',
-    },
-  ];
+  const { renderLoadingSkeleton, setIsLoadingSkeleton, isLoadingSkeleton } = useLoadingSkeleton();
+  const { renderFormItemHospital } = useFormItemHospital();
   const tableColumns = [
     // {
     //   title: 'ID',
@@ -61,7 +30,7 @@ const ExpertDeviceManager = () => {
       width: 40,
       align: 'center',
       className: 'index-row',
-      render: (text, record) => dataSourceTest.indexOf(record) + 1,
+      render: (text, record) => deviceSource.indexOf(record) + 1,
     },
     {
       title: 'Tên Thiết Bị',
@@ -76,43 +45,98 @@ const ExpertDeviceManager = () => {
     },
     {
       title: 'MAC',
-      dataIndex: 'mac_address',
-      key: 'mac_address',
+      dataIndex: 'macAddress',
+      key: 'macAddress',
     },
-
-    {
-      title: 'Bệnh Nhân',
-      dataIndex: 'patient',
-      key: 'patient',
-    },
-    {
-      title: 'Bệnh Theo Dõi',
-      dataIndex: 'diseases',
-      key: 'diseases',
-    },
-
     {
       title: 'Nhiệt Độ',
       dataIndex: 'temp',
       key: 'temp',
+      render: (text, record) => {
+        if (!record.temp) return 'Đang Cập Nhật';
+        else return record.temp;
+      },
     },
     {
       title: 'Trạng Thái',
       dataIndex: 'status',
       key: 'status',
       align: 'center',
+      filters: [
+        {
+          text: 'Sẵn Sàng',
+          value: 'INIT',
+        },
+        {
+          text: 'Đang Theo Dõi',
+          value: 'LISTENING',
+        },
+        {
+          text: 'Sốt',
+          value: 'FEVER',
+        },
+        {
+          text: 'Khẩn Cấp',
+          value: 'EMERGENCY',
+        },
+        {
+          text: 'Đang Hồi Phục',
+          value: 'RECOVERY',
+        },
+        {
+          text: 'Hư Hỏng',
+          value: 'INCUBATION',
+        },
+      ],
+      onFilter: (value, record) => record.status === value,
       render: (status) => {
-        if (status) {
-          return <Tag color="green">Đang Hoạt Động</Tag>;
+        switch (status) {
+          case 'INIT':
+            return (
+              <Tag color="green" style={{ width: '120px' }}>
+                Sẵn Sàng
+              </Tag>
+            );
+          case 'LISTENING':
+            return (
+              <Tag color="gray" style={{ width: '120px' }}>
+                Đang Theo Dõi
+              </Tag>
+            );
+          case 'FEVER':
+            return (
+              <Tag color="orange" style={{ width: '120px' }}>
+                Sốt
+              </Tag>
+            );
+          case 'EMERGENCY':
+            return (
+              <Tag color="red" style={{ width: '120px' }}>
+                Khẩn Cấp
+              </Tag>
+            );
+          case 'RECOVERY':
+            return (
+              <Tag color="yellow" style={{ width: '120px' }}>
+                Đang Hồi Phục
+              </Tag>
+            );
+          case 'INCUBATION':
+            return (
+              <Tag color="black" style={{ width: '120px' }}>
+                Hư Hỏng
+              </Tag>
+            );
+          default:
+            break;
         }
-        return <Tag color="volcano">Không Hoạt Động</Tag>;
       },
     },
     {
       title: 'Tác Vụ',
       key: 'action',
       align: 'center',
-      width: 60,
+      width: 90,
       render: (record) => {
         return (
           <Dropdown
@@ -161,17 +185,21 @@ const ExpertDeviceManager = () => {
       },
     },
   ];
-  const getAllDoctors = async () => {
+  const getAllDevices = async () => {
     try {
-      const listDoctors = await doctorAPI.getAllDoctors();
-      setDoctorDataSource(listDoctors);
+      setIsLoadingSkeleton(true);
+      const deviceResult = await deviceAPI.getAllDevices();
+      setDeviceSource(deviceResult);
+      setIsLoadingSkeleton(false);
+      console.log(deviceResult);
     } catch (error) {
+      setIsLoadingSkeleton(false);
       console.log(error);
     }
   };
-  // useEffect(() => {
-  //   getAllDoctors();
-  // }, []);
+  useEffect(() => {
+    getAllDevices();
+  }, []);
 
   const handleDeleteDevice = (record) => {
     const confirmDeleteDevice = Modal.confirm({
@@ -180,8 +208,16 @@ const ExpertDeviceManager = () => {
       okText: 'Xoá',
       okType: 'danger',
       cancelText: 'Huỷ',
-      onOk() {
-        console.log('delete', record.id);
+      onOk: async () => {
+        try {
+          await deviceAPI.deleteDevice(record.id);
+          confirmDeleteDevice.destroy();
+          message.success('Xoá thành công', 5);
+          getAllDevices();
+        } catch (error) {
+          console.log(error);
+          message.success('Xoá không thành công', 5);
+        }
       },
       onCancel() {
         confirmDeleteDevice.destroy();
@@ -189,12 +225,46 @@ const ExpertDeviceManager = () => {
     });
   };
 
-  const handleEditDoctor = () => {
-    formAddEditDoctor.validateFields().then((formValue) => {
-      console.log(formValue);
+  const handleEditDevice = () => {
+    formAddEditDevice.validateFields().then((formValue) => {
+      const confirmUpdateDeviceModal = Modal.confirm({
+        title: 'Xác Nhận',
+        content: 'Bạn có chắc chắn với các thông tin đã nhập?',
+        okText: 'Xác Nhận',
+        cancelText: 'Không',
+        onOk: async () => {
+          try {
+            await deviceAPI.updateDevice(formValue);
+            await deviceAPI.moveDeviceToHospital(formValue.id, formValue.hospitalId);
+            message.success('Sửa Thiết Bị Thành Công.', 5);
+            getAllDevices();
+            handleCancelDeviceModal();
+          } catch (error) {
+            console.log(error);
+            message.error('Sửa Thiết Bị Không Thành Công.', 5);
+          }
+        },
+        onCancel() {
+          confirmUpdateDeviceModal.destroy();
+        },
+      });
     });
   };
-  const handleAddDoctor = () => {};
+
+  const handleAddDevice = () => {
+    formAddEditDevice.validateFields().then(async (formValue) => {
+      try {
+        const deviceResult = await deviceAPI.createDevice({ ...formValue, status: 'INIT' });
+        await deviceAPI.moveDeviceToHospital(deviceResult.id, formValue.hospitalId);
+        message.success('Tạo Thiết Bị thành công.', 5);
+        getAllDevices();
+        handleCancelDeviceModal();
+      } catch (error) {
+        console.log(error);
+        message.error('Tạo Thiết Bị không thành công.', 5);
+      }
+    });
+  };
 
   const handleVisibleAddDevice = () => {
     setAddEditDeviceModalVisible(true);
@@ -206,21 +276,17 @@ const ExpertDeviceManager = () => {
     setAddEditDeviceModalVisible(true);
     setModalUsedFor('editDevice');
     setModalTitle('Sửa Thiết Bị');
-    console.log(record);
-    formAddEditDoctor.setFieldsValue({
+    formAddEditDevice.setFieldsValue({
       name: record.name,
-      gender: record.gender,
       description: record.description,
-      mac_address: record.mac_address,
-      isActive: record.isActive,
-      patient: record.patient,
-      diseases: record.diseases,
+      macAddress: record.macAddress,
+      hospitalId: record.hospital?.id,
     });
   };
 
-  const handleCancelAddDoctor = () => {
+  const handleCancelDeviceModal = () => {
     setAddEditDeviceModalVisible(false);
-    formAddEditDoctor.resetFields();
+    formAddEditDevice.resetFields();
   };
 
   return (
@@ -252,19 +318,18 @@ const ExpertDeviceManager = () => {
         visible={isAddEditDeviceModalVisible}
         okText="Xác Nhận"
         cancelText="Huỷ"
-        confirmLoading={isConfirmLoadingAddDoctorModal}
         className="add-device-modal-container"
-        onCancel={handleCancelAddDoctor}
+        onCancel={handleCancelDeviceModal}
         // bodyStyle={{ overflowY: 'scroll' }}
         onOk={() => {
           if (modalUsedFor === 'addDevice') {
-            return handleAddDoctor();
+            return handleAddDevice();
           } else {
-            return handleEditDoctor();
+            return handleEditDevice();
           }
         }}
       >
-        <Form layout="vertical" className="add-device-form" form={formAddEditDoctor}>
+        <Form layout="vertical" className="add-device-form" form={formAddEditDevice}>
           <Form.Item
             name="name"
             label="Tên Thiết Bị:"
@@ -273,10 +338,10 @@ const ExpertDeviceManager = () => {
                 required: true,
                 message: 'Tên thiết bị không được để trống!',
               },
-              {
-                pattern: vietnameseNameRegex,
-                message: 'Tên thiết bị không đúng định dạng',
-              },
+              // {
+              //   pattern: vietnameseNameRegex,
+              //   message: 'Tên thiết bị không đúng định dạng',
+              // },
             ]}
           >
             <Input placeholder="Tên Thiết Bị" />
@@ -284,17 +349,17 @@ const ExpertDeviceManager = () => {
           <Form.Item
             name="description"
             label="Mô Tả:"
-            // rules={[
-            //   {
-            //     required: true,
-            //     message: ' không được để trống!',
-            //   },
-            // ]}
+            rules={[
+              {
+                required: true,
+                message: ' không được để trống!',
+              },
+            ]}
           >
             <Input placeholder="Mô Tả" />
           </Form.Item>
           <Form.Item
-            name="mac_address"
+            name="macAddress"
             label="MAC:"
             rules={[
               {
@@ -305,6 +370,7 @@ const ExpertDeviceManager = () => {
           >
             <Input placeholder="Địa chỉ MAC" />
           </Form.Item>
+          {renderFormItemHospital}
           {/* <Form.Item
             name="patient"
             label="Bệnh Nhân:"
@@ -320,8 +386,8 @@ const ExpertDeviceManager = () => {
               <Select.Option value={17}>17 - Nguyễn Văn B</Select.Option>
             </Select>
           </Form.Item> */}
-          {renderFormItemPatient}
-          {renderFormItemDisease}
+          {/* {renderFormItemPatient}
+          {renderFormItemDisease} */}
           {/* <Form.Item
             name="diseases"
             label="Bệnh Theo Dõi:"
@@ -338,7 +404,7 @@ const ExpertDeviceManager = () => {
             </Select>
           </Form.Item> */}
 
-          <Form.Item
+          {/* <Form.Item
             name="status"
             label="Trạng Thái Hoạt Động:"
             rules={[
@@ -352,17 +418,22 @@ const ExpertDeviceManager = () => {
               <Select.Option value={true}>Hoạt Động</Select.Option>
               <Select.Option value={false}>Vô Hiệu Hoá</Select.Option>
             </Select>
-          </Form.Item>
+          </Form.Item> */}
         </Form>
       </Modal>
-      <Table
-        locale={{
-          emptyText: <Empty description="Không có dữ liệu." />,
-        }}
-        columns={tableColumns}
-        dataSource={dataSourceTest}
-        pagination={{ pageSize: 10 }}
-      />
+      {isLoadingSkeleton ? (
+        renderLoadingSkeleton
+      ) : (
+        <Table
+          locale={{
+            filterReset: 'Đặt lại',
+            emptyText: <Empty description="Không có dữ liệu." />,
+          }}
+          columns={tableColumns}
+          dataSource={deviceSource}
+          pagination={{ pageSize: 10 }}
+        />
+      )}
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import { Form, Select } from 'antd';
+import { Empty, Form, Select } from 'antd';
 import React, { useState, useEffect } from 'react';
 import ruleAPI from '../../../api/ruleAPI';
 
@@ -13,11 +13,22 @@ const useFormItemRule = (multipleSelect) => {
       console.log(error);
     }
   };
+
+  const getAllRulesNotAssign = async () => {
+    try {
+      const ruleSourceResult = await ruleAPI.getAllRulesNotAssign();
+      setRuleSource(ruleSourceResult);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     getAllRule();
   }, []);
 
   return {
+    getAllRulesNotAssign,
     renderFormItemRule: (
       <>
         <Form.Item
@@ -31,6 +42,13 @@ const useFormItemRule = (multipleSelect) => {
           ]}
         >
           <Select
+            notFoundContent={
+              <Empty
+                description="Không có dữ liệu."
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                style={{ height: 50 }}
+              />
+            }
             allowClear
             mode={multipleSelect ? 'multiple' : ''}
             placeholder="Vui lòng chọn Tập Luật Y Tế"

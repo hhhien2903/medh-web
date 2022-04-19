@@ -1,21 +1,29 @@
-import Layout from '../../../components/shared/Layout/Layout';
-import { Button, Layout as AntLayout } from 'antd';
-import { Redirect, Route, Switch } from 'react-router-dom';
-import ExpertDashboard from '../ExpertDashboard/ExpertDashboard';
-import backgroundImage from '../../../assets/images/background-1.jpg';
-import DoctorRegisterPending from '../ExpertDoctorManager/DoctorRegisterPending/DoctorRegisterPending';
-import DoctorManager from '../ExpertDoctorManager/DoctorManager/DoctorManager';
-import { FaDisease, FaUserMd, FaUser, FaChartPie, FaMicrochip } from 'react-icons/fa';
+import { Layout as AntLayout } from 'antd';
+import { BsFileEarmarkMedicalFill } from 'react-icons/bs';
+import {
+  FaChartPie,
+  FaDisease,
+  FaMicrochip,
+  FaUser,
+  FaUserMd,
+  FaNotesMedical,
+} from 'react-icons/fa';
 import { RiHospitalFill } from 'react-icons/ri';
-import { BsFillFileEarmarkRuledFill, BsFileEarmarkMedicalFill } from 'react-icons/bs';
-import { IoMdMedical } from 'react-icons/io';
-import ExpertPatientManager from '../ExpertPatientManager/ExpertPatientManager';
+import { Redirect, Route, Switch } from 'react-router-dom';
+import backgroundImage from '../../../assets/images/background-1.jpg';
+import Breadcrumb from '../../../components/shared/Breadcrumb/Breadcrumb';
+import Layout from '../../../components/shared/Layout/Layout';
+import ExpertDashboard from '../ExpertDashboard/ExpertDashboard';
 import ExpertDeviceManager from '../ExpertDeviceManager/ExpertDeviceManager';
 import ExpertDiseaseManager from '../ExpertDiseaseManager/ExpertDiseaseManager';
-import ExpertRuleManager from '../ExpertRuleManager/ExpertRuleManager';
+import DoctorManager from '../ExpertDoctorManager/DoctorManager/DoctorManager';
+import DoctorRegisterPending from '../ExpertDoctorManager/DoctorRegisterPending/DoctorRegisterPending';
 import ExpertHospitalManager from '../ExpertHospitalManager/ExpertHospitalManager';
+import ExpertMediaRecordManager from '../ExpertMedicalRecordManager/ExpertMediaRecordManager';
+import ExpertPatientManager from '../ExpertPatientManager/ExpertPatientManager';
 import ExpertRuleConditionManager from '../ExpertRuleConditionManager/ExpertRuleConditionManager';
-
+import ExpertRuleManager from '../ExpertRuleManager/ExpertRuleManager';
+import './ExpertHome.scss';
 const ExpertHome = () => {
   const sideMenuItems = [
     {
@@ -45,56 +53,28 @@ const ExpertHome = () => {
       title: 'Quản Lý Bệnh Nhân',
       type: 'menu',
       icon: <FaUser />,
-      subMenuItems: [
-        // {
-        //   title: 'Auth Log',
-        //   type: 'menu',
-        //   icon: <PieChartOutlined />,
-        //   url: '/expert/logs/authlog',
-        // },
-      ],
+      subMenuItems: [],
       url: '/expert/patient',
     },
     {
       title: 'Quản Lý Thiết Bị',
       type: 'menu',
       icon: <FaMicrochip />,
-      subMenuItems: [
-        // {
-        //   title: 'Auth Log',
-        //   type: 'menu',
-        //   icon: <PieChartOutlined />,
-        //   url: '/expert/logs/authlog',
-        // },
-      ],
+      subMenuItems: [],
       url: '/expert/device',
     },
     {
       title: 'Quản Lý Mầm Bệnh',
       type: 'menu',
       icon: <FaDisease />,
-      subMenuItems: [
-        // {
-        //   title: 'Auth Log',
-        //   type: 'menu',
-        //   icon: <PieChartOutlined />,
-        //   url: '/expert/logs/authlog',
-        // },
-      ],
+      subMenuItems: [],
       url: '/expert/disease',
     },
     {
       title: 'Quản Lý Tập Luật Y Tế',
       type: 'menu',
       icon: <BsFileEarmarkMedicalFill />,
-      subMenuItems: [
-        // {
-        //   title: 'Auth Log',
-        //   type: 'menu',
-        //   icon: <PieChartOutlined />,
-        //   url: '/expert/logs/authlog',
-        // },
-      ],
+      subMenuItems: [],
       url: '/expert/rule',
     },
     // {
@@ -112,18 +92,18 @@ const ExpertHome = () => {
     //   url: '/expert/rule-condition',
     // },
     {
+      title: 'Quản Lý Bệnh Án',
+      type: 'menu',
+      icon: <FaNotesMedical />,
+      url: '/expert/medical-record',
+      subMenuItems: [],
+    },
+    {
       title: 'Quản Lý Bệnh Viện',
       type: 'menu',
       icon: <RiHospitalFill />,
-      subMenuItems: [
-        // {
-        //   title: 'Auth Log',
-        //   type: 'menu',
-        //   icon: <PieChartOutlined />,
-        //   url: '/expert/logs/authlog',
-        // },
-      ],
       url: '/expert/hospital',
+      subMenuItems: [],
     },
   ];
 
@@ -135,6 +115,7 @@ const ExpertHome = () => {
           backgroundRepeat: 'no-repeat',
         }}
       >
+        {/* <Breadcrumb /> */}
         <Switch>
           <Route exact path="/expert/dashboard" component={ExpertDashboard} />
           <Route exact path="/expert/doctor" component={DoctorManager} />
@@ -146,6 +127,7 @@ const ExpertHome = () => {
           <Route exact path="/expert/rule" component={ExpertRuleManager} />
           <Route exact path="/expert/rule-condition" component={ExpertRuleConditionManager} />
           <Route exact path="/expert/hospital" component={ExpertHospitalManager} />
+          <Route exact path="/expert/medical-record" component={ExpertMediaRecordManager} />
           <Route exact path="/expert/">
             <Redirect to="/expert/dashboard" />
           </Route>

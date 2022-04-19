@@ -1,4 +1,4 @@
-import { Form, Input, Select } from 'antd';
+import { Empty, Form, Input, Select } from 'antd';
 import React, { useState, useEffect } from 'react';
 import addressAPI from '../../../api/addressAPI';
 
@@ -68,6 +68,13 @@ const useFormItemAddress = (form) => {
           ]}
         >
           <Select
+            notFoundContent={
+              <Empty
+                description="Không có dữ liệu."
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                style={{ height: 50 }}
+              />
+            }
             onChange={(selectedCity) => onCitySelect(selectedCity)}
             placeholder="Vui lòng chọn Tỉnh/Thành Phố"
           >
@@ -91,6 +98,13 @@ const useFormItemAddress = (form) => {
           ]}
         >
           <Select
+            notFoundContent={
+              <Empty
+                description="Không có dữ liệu."
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                style={{ height: 50 }}
+              />
+            }
             onChange={(selectedDistrict) => onDistrictSelect(selectedDistrict)}
             placeholder="Vui lòng chọn Quận/Huyện"
             disabled={isDisableDistrict}
@@ -114,7 +128,17 @@ const useFormItemAddress = (form) => {
             },
           ]}
         >
-          <Select placeholder="Vui lòng chọn Phường/Xã" disabled={isDisableWard}>
+          <Select
+            notFoundContent={
+              <Empty
+                description="Không có dữ liệu."
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                style={{ height: 50 }}
+              />
+            }
+            placeholder="Vui lòng chọn Phường/Xã"
+            disabled={isDisableWard}
+          >
             {wardSource.map((ward) => {
               return (
                 <Select.Option key={ward.id} value={ward.id}>

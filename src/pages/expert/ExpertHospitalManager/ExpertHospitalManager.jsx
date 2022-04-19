@@ -68,7 +68,7 @@ const ExpertHospitalManager = () => {
       title: 'Tác Vụ',
       key: 'action',
       align: 'center',
-
+      width: 60,
       render: (record) => {
         return (
           <Dropdown
@@ -123,6 +123,7 @@ const ExpertHospitalManager = () => {
       const hospitalSourceResult = await hospitalAPI.getAllHospital();
       setHospitalSource(hospitalSourceResult);
       setIsLoadingSkeleton(false);
+      console.log(hospitalSourceResult);
     } catch (error) {
       setIsLoadingSkeleton(false);
       console.log(error);
@@ -215,7 +216,7 @@ const ExpertHospitalManager = () => {
       cityId: record.cityId,
       wardId: record.wardId,
       districtId: record.districtId,
-      address: record.address,
+      address: record.address.split(',')[0],
       status: record.status,
     });
   };
