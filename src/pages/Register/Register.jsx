@@ -61,14 +61,14 @@ const Register = () => {
             console.log(result);
           } catch (error) {
             if (error.status === 403) {
-              notification.open({
+              notification.error({
                 message: 'Đăng ký thông tin không thành công!',
                 description: 'Email/SĐT của bạn không nằm trong danh sách được phép đăng ký.',
                 duration: 15,
               });
             }
             if (error.status === 500) {
-              notification.open({
+              notification.error({
                 message: 'Đăng ký thông tin không thành công!',
                 description:
                   'Email/SĐT của bạn đã từng được đăng ký trước đây, hãy bấm nút Thoát và tiến hành đăng nhập lại.',

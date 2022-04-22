@@ -29,6 +29,7 @@ const useFormItemRule = (multipleSelect) => {
 
   return {
     getAllRulesNotAssign,
+    getAllRule,
     renderFormItemRule: (
       <>
         <Form.Item

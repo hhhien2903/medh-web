@@ -19,7 +19,7 @@ import ExpertDiseaseManager from '../ExpertDiseaseManager/ExpertDiseaseManager';
 import DoctorManager from '../ExpertDoctorManager/DoctorManager/DoctorManager';
 import DoctorRegisterPending from '../ExpertDoctorManager/DoctorRegisterPending/DoctorRegisterPending';
 import ExpertHospitalManager from '../ExpertHospitalManager/ExpertHospitalManager';
-import ExpertMediaRecordManager from '../ExpertMedicalRecordManager/ExpertMediaRecordManager';
+import ExpertMedicalRecordManager from '../ExpertMedicalRecordManager/ExpertMedicalRecordManager';
 import ExpertPatientManager from '../ExpertPatientManager/ExpertPatientManager';
 import ExpertRuleConditionManager from '../ExpertRuleConditionManager/ExpertRuleConditionManager';
 import ExpertRuleManager from '../ExpertRuleManager/ExpertRuleManager';
@@ -127,7 +127,7 @@ const ExpertHome = () => {
           <Route exact path="/expert/rule" component={ExpertRuleManager} />
           <Route exact path="/expert/rule-condition" component={ExpertRuleConditionManager} />
           <Route exact path="/expert/hospital" component={ExpertHospitalManager} />
-          <Route exact path="/expert/medical-record" component={ExpertMediaRecordManager} />
+          <Route exact path="/expert/medical-record" component={ExpertMedicalRecordManager} />
           <Route exact path="/expert/">
             <Redirect to="/expert/dashboard" />
           </Route>

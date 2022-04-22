@@ -15,6 +15,10 @@ const deviceAPI = {
     const url = `${API_ENDPOINT}?hospitalId=${hospitalId}`;
     return axiosClient.get(url);
   },
+  getAllUnusedDevicesByHospitalId: (hospitalId) => {
+    const url = `${API_ENDPOINT}?hospitalId=${hospitalId}&used=false`;
+    return axiosClient.get(url);
+  },
   deleteDevice: (id) => {
     const url = `${API_ENDPOINT}/${id}`;
     return axiosClient.delete(url);

@@ -399,7 +399,7 @@ const DoctorManager = () => {
         cancelText="Huỷ"
         className="add-doctor-modal-container"
         onCancel={handleCancelAddDoctor}
-        // bodyStyle={{ overflowY: 'scroll' }}
+        bodyStyle={{ overflowY: 'scroll', height: 600 }}
         onOk={() => {
           if (modalUsedFor === 'addDoctor') {
             return handleAddDoctor();

@@ -269,11 +269,11 @@ const ExpertPatientManager = () => {
       dataIndex: 'cmnd',
       key: 'cmnd',
     },
-    // {
-    //   title: 'Email',
-    //   dataIndex: 'email',
-    //   key: 'email',
-    // },
+    {
+      title: 'Email',
+      dataIndex: 'email',
+      key: 'email',
+    },
     {
       title: 'Số Điện Thoại',
       dataIndex: 'mobile',
@@ -291,18 +291,18 @@ const ExpertPatientManager = () => {
     //     return record.hospital?.name;
     //   },
     // },
-    {
-      title: 'Bác Sĩ Phụ Trách',
-      key: 'doctor',
-      render: (text, record) => {
-        return record.doctor?.name;
-      },
-    },
-    {
-      title: 'Vòng Đeo',
-      dataIndex: 'device',
-      key: 'device',
-    },
+    // {
+    //   title: 'Bác Sĩ Phụ Trách',
+    //   key: 'doctor',
+    //   render: (text, record) => {
+    //     return record.doctor?.name;
+    //   },
+    // },
+    // {
+    //   title: 'Vòng Đeo',
+    //   dataIndex: 'device',
+    //   key: 'device',
+    // },
 
     {
       title: 'Tác Vụ',

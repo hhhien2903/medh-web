@@ -42,7 +42,7 @@ const Login = () => {
         .signInWithPhoneNumber(phoneNumber, appVerifier)
         .then((confirmationResult) => {
           window.confirmationResult = confirmationResult;
-          notification.open({
+          notification.success({
             key: 'sendedOtpNotify',
             message: 'Mã OTP đã được gửi!',
             description:

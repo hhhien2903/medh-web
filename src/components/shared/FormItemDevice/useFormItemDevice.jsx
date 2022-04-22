@@ -22,11 +22,20 @@ const useFormItemDevice = () => {
       console.log(error);
     }
   };
+  const getAllUnusedDevicesByHospitalId = async (hospitalId) => {
+    try {
+      const deviceSourceResult = await deviceAPI.getAllUnusedDevicesByHospitalId(hospitalId);
+      setDeviceSource(deviceSourceResult);
+    } catch (error) {
+      console.log(error);
+    }
+  };
   useEffect(() => {
     getAllDevice();
   }, []);
 
   return {
+    getAllUnusedDevicesByHospitalId,
     getAllDevicesByHospitalId,
     setIsDeviceFormItemRequired,
     setIsFormItemDeviceDisabled,
