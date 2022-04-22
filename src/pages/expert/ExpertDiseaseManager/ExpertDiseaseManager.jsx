@@ -14,7 +14,7 @@ const ExpertDiseaseManager = () => {
   const [formAddEditDisease] = Form.useForm();
   const [modalTitle, setModalTitle] = useState('');
   const [modalUsedFor, setModalUsedFor] = useState('');
-  const { renderFormItemRule, getAllRulesNotAssign } = useFormItemRule();
+  const { renderFormItemRule, getAllRulesNotAssign, getAllRule } = useFormItemRule();
   const { renderLoadingSkeleton, setIsLoadingSkeleton, isLoadingSkeleton } = useLoadingSkeleton();
   // const [stepForm, setStepForm] = useState(1);
   const [diseasesIdForAssignRule, setDiseasesIdForAssignRule] = useState(null);
@@ -230,8 +230,8 @@ const ExpertDiseaseManager = () => {
   };
 
   const handleVisibleEditDisease = async (record) => {
-    await getAllRulesNotAssign();
     setAddEditDiseaseModalVisible(true);
+    getAllRule();
     setModalUsedFor('editDisease');
     setModalTitle('Sửa Mầm Bệnh');
     formAddEditDisease.setFieldsValue({

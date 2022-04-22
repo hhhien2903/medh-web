@@ -3,13 +3,14 @@ import React, { useEffect, useState } from 'react';
 import { AiOutlineDelete, AiOutlineEdit, AiOutlineInfoCircle, AiOutlinePlus } from 'react-icons/ai';
 import { MdMoreHoriz } from 'react-icons/md';
 import deviceAPI from '../../../api/deviceAPI';
+import hospitalAPI from '../../../api/hospitalAPI';
 import useFormItemDisease from '../../../components/shared/FormItemDisease/useFormItemDisease';
 import useFormItemHospital from '../../../components/shared/FormItemHospital/useFormItemHospital';
 import useFormItemPatient from '../../../components/shared/FormItemPatient/useFormItemPatient';
 import useLoadingSkeleton from '../../../components/shared/LoadingSkeleton/useLoadingSkeleton';
 import { vietnameseNameRegex } from '../../../utils/regex';
 import './ExpertDeviceManager.scss';
-
+import getListFilterHospital from '../../../utils/ListFilterHospital';
 const ExpertDeviceManager = () => {
   const [deviceSource, setDeviceSource] = useState([]);
   const [isAddEditDeviceModalVisible, setAddEditDeviceModalVisible] = useState(false);
@@ -18,6 +19,8 @@ const ExpertDeviceManager = () => {
   const [modalUsedFor, setModalUsedFor] = useState('');
   const { renderLoadingSkeleton, setIsLoadingSkeleton, isLoadingSkeleton } = useLoadingSkeleton();
   const { renderFormItemHospital } = useFormItemHospital();
+  const [listFilterHospital, setListFilterHospital] = useState([]);
+
   const tableColumns = [
     // {
     //   title: 'ID',
@@ -56,6 +59,13 @@ const ExpertDeviceManager = () => {
         if (!record.temp) return 'Đang Cập Nhật';
         else return record.temp;
       },
+    },
+    {
+      title: 'Thuộc Bệnh Viện',
+      key: 'hospitalId',
+      filters: listFilterHospital,
+      onFilter: (value, record) => record.hospital.id === value,
+      render: (text, record) => record.hospital?.name,
     },
     {
       title: 'Trạng Thái',
@@ -132,6 +142,7 @@ const ExpertDeviceManager = () => {
         }
       },
     },
+
     {
       title: 'Tác Vụ',
       key: 'action',
@@ -199,6 +210,7 @@ const ExpertDeviceManager = () => {
   };
   useEffect(() => {
     getAllDevices();
+    getListFilterHospital().then((listFilterHospital) => setListFilterHospital(listFilterHospital));
   }, []);
 
   const handleDeleteDevice = (record) => {
