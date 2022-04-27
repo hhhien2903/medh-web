@@ -59,7 +59,7 @@ const useFormItemAddress = (form) => {
       <>
         <Form.Item
           name="cityId"
-          label="Tỉnh/Thành Phố:"
+          label="Tỉnh / Thành Phố:"
           rules={[
             {
               required: true,
@@ -89,7 +89,7 @@ const useFormItemAddress = (form) => {
         </Form.Item>
         <Form.Item
           name="districtId"
-          label="Quận/Huyện:"
+          label="Quận / Huyện:"
           rules={[
             {
               required: true,
@@ -120,7 +120,7 @@ const useFormItemAddress = (form) => {
         </Form.Item>
         <Form.Item
           name="wardId"
-          label="Phường/Xã:"
+          label="Phường / Xã:"
           rules={[
             {
               required: true,

@@ -8,29 +8,21 @@ import {
   Menu,
   message,
   Modal,
-  Select,
   Table,
   Tag,
 } from 'antd';
-import React, { useState, useEffect } from 'react';
-import {
-  AiOutlineDelete,
-  AiOutlineEdit,
-  AiOutlinePlus,
-  AiOutlineInfoCircle,
-  AiOutlineFileDone,
-} from 'react-icons/ai';
+import moment from 'moment';
+import React, { useEffect, useState } from 'react';
+import { AiOutlineFileDone, AiOutlineInfoCircle, AiOutlinePlus } from 'react-icons/ai';
 import { MdMoreHoriz } from 'react-icons/md';
 import medicalRecordAPI from '../../../api/medicalRecordAPI';
-import useFormItemDisease from '../../../components/shared/FormItemDisease/useFormItemDisease';
-import useFormItemPatient from '../../../components/shared/FormItemPatient/useFormItemPatient';
-import useFormItemHospital from '../../../components/shared/FormItemHospital/useFormItemHospital';
 import useFormItemDevice from '../../../components/shared/FormItemDevice/useFormItemDevice';
+import useFormItemDisease from '../../../components/shared/FormItemDisease/useFormItemDisease';
 import useFormItemDoctor from '../../../components/shared/FormItemDoctor/useFormItemDoctor';
+import useFormItemHospital from '../../../components/shared/FormItemHospital/useFormItemHospital';
+import useFormItemPatient from '../../../components/shared/FormItemPatient/useFormItemPatient';
 import useLoadingSkeleton from '../../../components/shared/LoadingSkeleton/useLoadingSkeleton';
-import { vietnameseNameRegex } from '../../../utils/regex';
 import getListFilterHospital from '../../../utils/ListFilterHospital';
-import moment from 'moment';
 import './ExpertMedicalRecordManager.scss';
 
 const ExpertMedicalRecordManager = () => {
@@ -376,27 +368,39 @@ const ExpertMedicalRecordManager = () => {
   };
 
   const onChangeFormItem = async (fieldData) => {
-    if (fieldData[0].name[0] === 'hospitalId') {
+    // if (fieldData[0].name[0] === 'hospitalId') {
+    //   formAddEditMedicalRecord.resetFields(['deviceId', 'doctorId']);
+    //   await getAllDoctorByHospitalId(fieldData[0].value);
+    //   setIsFormItemDeviceDisabled(false);
+    //   setIsFormItemDoctorDisabled(false);
+    //   await getAllUnusedDevicesByHospitalId(fieldData[0].value).catch((error) => {
+    //     if (error.status === 404) {
+    //       setIsFormItemDeviceDisabled(true);
+    //     }
+    //   });
+    // }
+    if (fieldData.hospitalId) {
       formAddEditMedicalRecord.resetFields(['deviceId', 'doctorId']);
-      await getAllDoctorByHospitalId(fieldData[0].value);
-      await getAllUnusedDevicesByHospitalId(fieldData[0].value);
+      await getAllDoctorByHospitalId(fieldData.hospitalId);
       setIsFormItemDeviceDisabled(false);
       setIsFormItemDoctorDisabled(false);
+      await getAllUnusedDevicesByHospitalId(fieldData.hospitalId);
     }
 
-    if (fieldData[0].name[0] === 'treated' && fieldData[0].value === true) {
-      setIsDisabledConcludeFormItem(false);
-    }
-    if (fieldData[0].name[0] === 'treated' && fieldData[0].value === false) {
-      setIsDisabledConcludeFormItem(true);
-      formAddEditMedicalRecord.resetFields(['conclude']);
-    }
+    // if (fieldData[0].name[0] === 'treated' && fieldData[0].value === true) {
+    //   setIsDisabledConcludeFormItem(false);
+    // }
+    // if (fieldData[0].name[0] === 'treated' && fieldData[0].value === false) {
+    //   setIsDisabledConcludeFormItem(true);
+    //   formAddEditMedicalRecord.resetFields(['conclude']);
+    // }
   };
 
   const handleVisibleDetailMedicalRecord = (record) => {
     setIsDetailModalVisible(true);
     setMedicalRecordDetail(record);
   };
+
   return (
     <div className="medical-record-manager-container">
       <div className="tool-container">
@@ -451,7 +455,9 @@ const ExpertMedicalRecordManager = () => {
           layout="vertical"
           className="add-edit-medical-record-form"
           form={formAddEditMedicalRecord}
-          onFieldsChange={onChangeFormItem}
+          // onFieldsChange={onChangeFormItem}
+          onValuesChange={onChangeFormItem}
+          on
         >
           <Form.Item name="id" noStyle>
             <Input type="hidden"></Input>
@@ -490,7 +496,8 @@ const ExpertMedicalRecordManager = () => {
                   },
                 ]}
               >
-                <Input placeholder="Chuẩn Đoán" />
+                <Input.TextArea placeholder="Chuẩn Đoán" rows={3} />
+                {/* <Input  /> */}
               </Form.Item>
             </>
           ) : (

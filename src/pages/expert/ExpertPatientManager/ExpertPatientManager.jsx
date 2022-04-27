@@ -561,7 +561,7 @@ const ExpertPatientManager = () => {
         cancelText="Huỷ"
         className="add-doctor-modal-container"
         onCancel={handleCancelAddPatient}
-        bodyStyle={{ overflowY: 'scroll', height: 600 }}
+        bodyStyle={{ overflowY: 'auto', height: 600 }}
         onOk={() => {
           if (modalUsedFor === 'addPatient') {
             return handleAddPatient();
@@ -590,6 +590,7 @@ const ExpertPatientManager = () => {
                   message: 'Họ không đúng định dạng',
                 },
               ]}
+              style={{ display: 'inline-block', width: 'calc(50% - 8px)' }}
             >
               <Input placeholder="Họ" />
             </Form.Item>
@@ -606,6 +607,7 @@ const ExpertPatientManager = () => {
                   message: 'Tên không đúng định dạng',
                 },
               ]}
+              style={{ display: 'inline-block', width: '50%', marginLeft: '8px' }}
             >
               <Input placeholder="Tên" />
             </Form.Item>
@@ -618,6 +620,7 @@ const ExpertPatientManager = () => {
                   message: 'Ngày sinh không được để trống!',
                 },
               ]}
+              style={{ display: 'inline-block', width: 'calc(50% - 8px)' }}
             >
               <DatePicker
                 disabledDate={(current) => current > moment()}
@@ -636,6 +639,7 @@ const ExpertPatientManager = () => {
                   message: 'Giới tính không được để trống!',
                 },
               ]}
+              style={{ display: 'inline-block', width: '50%', marginLeft: '8px' }}
             >
               <Select placeholder="Vui lòng chọn giới tính">
                 <Select.Option value={true}>Nam</Select.Option>
@@ -651,8 +655,26 @@ const ExpertPatientManager = () => {
                   message: 'CMND/CCCD không được để trống!',
                 },
               ]}
+              style={{ display: 'inline-block', width: 'calc(50% - 8px)' }}
             >
-              <Input placeholder="CMND/CCCD" />
+              <Input placeholder="CMND / CCCD:" />
+            </Form.Item>
+            <Form.Item
+              name="mobile"
+              label="Số Điện Thoại:"
+              rules={[
+                // {
+                //   required: true,
+                //   message: 'Số điện thoại không được để trống!',
+                // },
+                {
+                  pattern: phoneNumberRegex,
+                  message: 'Số điện thoại không đúng định dạng',
+                },
+              ]}
+              style={{ display: 'inline-block', width: '50%', marginLeft: '8px' }}
+            >
+              <Input placeholder="Số Điện Thoại" />
             </Form.Item>
             <Form.Item
               name="email"
@@ -670,22 +692,7 @@ const ExpertPatientManager = () => {
             >
               <Input placeholder="Email" />
             </Form.Item>
-            <Form.Item
-              name="mobile"
-              label="Số Điện Thoại:"
-              rules={[
-                // {
-                //   required: true,
-                //   message: 'Số điện thoại không được để trống!',
-                // },
-                {
-                  pattern: phoneNumberRegex,
-                  message: 'Số điện thoại không đúng định dạng',
-                },
-              ]}
-            >
-              <Input placeholder="Số Điện Thoại" />
-            </Form.Item>
+
             {renderFormItemAddress}
           </Form>
         )}
