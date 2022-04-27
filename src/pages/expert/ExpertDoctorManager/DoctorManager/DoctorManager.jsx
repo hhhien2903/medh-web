@@ -399,7 +399,7 @@ const DoctorManager = () => {
         cancelText="Huỷ"
         className="add-doctor-modal-container"
         onCancel={handleCancelAddDoctor}
-        bodyStyle={{ overflowY: 'scroll', height: 600 }}
+        bodyStyle={{ overflowY: 'auto', height: 600 }}
         onOk={() => {
           if (modalUsedFor === 'addDoctor') {
             return handleAddDoctor();
@@ -454,21 +454,6 @@ const DoctorManager = () => {
             <Input placeholder="Họ Và Tên" />
           </Form.Item>
           <Form.Item
-            name="gender"
-            label="Giới Tính:"
-            rules={[
-              {
-                required: true,
-                message: 'Giới tính không được để trống!',
-              },
-            ]}
-          >
-            <Select placeholder="Vui lòng chọn giới tính">
-              <Select.Option value={true}>Nam</Select.Option>
-              <Select.Option value={false}>Nữ</Select.Option>
-            </Select>
-          </Form.Item>
-          <Form.Item
             name="dateOfBirth"
             label="Ngày Sinh:"
             rules={[
@@ -477,6 +462,7 @@ const DoctorManager = () => {
                 message: 'Ngày sinh không được để trống!',
               },
             ]}
+            style={{ display: 'inline-block', width: 'calc(50% - 8px)' }}
           >
             <DatePicker
               disabledDate={(current) => current > moment().subtract(18, 'year').endOf('year')}
@@ -487,15 +473,34 @@ const DoctorManager = () => {
               format={'DD/MM/YYYY'}
             />
           </Form.Item>
+
+          <Form.Item
+            name="gender"
+            label="Giới Tính:"
+            rules={[
+              {
+                required: true,
+                message: 'Giới tính không được để trống!',
+              },
+            ]}
+            style={{ display: 'inline-block', width: '50%', marginLeft: '8px' }}
+          >
+            <Select placeholder="Vui lòng chọn giới tính">
+              <Select.Option value={true}>Nam</Select.Option>
+              <Select.Option value={false}>Nữ</Select.Option>
+            </Select>
+          </Form.Item>
+
           <Form.Item
             name="cmnd"
-            label="CMND:"
+            label="CMND / CCCD:"
             rules={[
               {
                 required: true,
                 message: 'CMND không được để trống!',
               },
             ]}
+            style={{ display: 'inline-block', width: 'calc(50% - 8px)' }}
           >
             <Input placeholder="CMND" />
           </Form.Item>
@@ -513,9 +518,11 @@ const DoctorManager = () => {
                 message: 'Số điện thoại không đúng định dạng',
               },
             ]}
+            style={{ display: 'inline-block', width: '50%', marginLeft: '8px' }}
           >
             <Input placeholder="Số Điện Thoại" />
           </Form.Item>
+
           <Form.Item
             name="email"
             label="Email:"

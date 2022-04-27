@@ -1,4 +1,4 @@
-import { Empty, Form, Select } from 'antd';
+import { Empty, Form, message, Select } from 'antd';
 import React, { useState, useEffect } from 'react';
 import deviceAPI from '../../../api/deviceAPI';
 
@@ -23,11 +23,22 @@ const useFormItemDevice = () => {
     }
   };
   const getAllUnusedDevicesByHospitalId = async (hospitalId) => {
+    setDeviceSource([]);
     try {
       const deviceSourceResult = await deviceAPI.getAllUnusedDevicesByHospitalId(hospitalId);
       setDeviceSource(deviceSourceResult);
     } catch (error) {
-      console.log(error);
+      // setIsFormItemDeviceDisabled(true);
+      // message.warning(error.data.message, 8);
+    }
+  };
+
+  const onDropdownVisibleDeviceFormItem = (isDropdownVisible) => {
+    if (isDropdownVisible) {
+      if (deviceSource.length === 0) {
+        // setIsFormItemDeviceDisabled(true);
+        message.warning('Tất cả Thiết Bị của Bệnh Viện này đều đang được sử dụng.', 8);
+      }
     }
   };
   useEffect(() => {
@@ -65,6 +76,7 @@ const useFormItemDevice = () => {
             filterOption={(input, option) =>
               option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
             }
+            onDropdownVisibleChange={onDropdownVisibleDeviceFormItem}
           >
             {deviceSource.map((device) => {
               return <Select.Option value={device.id}>{device.name}</Select.Option>;
