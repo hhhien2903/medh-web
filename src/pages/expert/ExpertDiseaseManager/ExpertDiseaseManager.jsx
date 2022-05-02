@@ -29,7 +29,7 @@ const ExpertDiseaseManager = () => {
     {
       title: 'STT',
       key: 'index',
-      width: 40,
+      width: 60,
       align: 'center',
       render: (text, record) => diseaseSource.indexOf(record) + 1,
     },
@@ -337,6 +337,7 @@ const ExpertDiseaseManager = () => {
         renderLoadingSkeleton
       ) : (
         <Table
+          scroll={{ y: 475 }}
           locale={{
             emptyText: <Empty description="Không có dữ liệu." />,
           }}

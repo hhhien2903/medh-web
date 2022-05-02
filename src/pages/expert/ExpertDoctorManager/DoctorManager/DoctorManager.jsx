@@ -47,7 +47,7 @@ const DoctorManager = () => {
     {
       title: 'STT',
       key: 'index',
-      width: 40,
+      width: 60,
       align: 'center',
       className: 'index-row',
       render: (text, record) => doctorSource.indexOf(record) + 1,
@@ -613,6 +613,7 @@ const DoctorManager = () => {
         renderLoadingSkeleton
       ) : (
         <Table
+          scroll={{ y: 475 }}
           locale={{
             emptyText: <Empty description="Không có dữ liệu." />,
           }}

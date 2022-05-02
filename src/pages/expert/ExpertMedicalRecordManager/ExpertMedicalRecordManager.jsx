@@ -10,10 +10,16 @@ import {
   Modal,
   Table,
   Tag,
+  Select,
 } from 'antd';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
-import { AiOutlineFileDone, AiOutlineInfoCircle, AiOutlinePlus } from 'react-icons/ai';
+import {
+  AiOutlineFileDone,
+  AiOutlineInfoCircle,
+  AiOutlinePlus,
+  AiOutlineAreaChart,
+} from 'react-icons/ai';
 import { MdMoreHoriz } from 'react-icons/md';
 import medicalRecordAPI from '../../../api/medicalRecordAPI';
 import useFormItemDevice from '../../../components/shared/FormItemDevice/useFormItemDevice';
@@ -24,6 +30,9 @@ import useFormItemPatient from '../../../components/shared/FormItemPatient/useFo
 import useLoadingSkeleton from '../../../components/shared/LoadingSkeleton/useLoadingSkeleton';
 import getListFilterHospital from '../../../utils/ListFilterHospital';
 import './ExpertMedicalRecordManager.scss';
+import { Line } from 'react-chartjs-2';
+import { Chart as ChartJS, registerables } from 'chart.js';
+ChartJS.register(...registerables);
 
 const ExpertMedicalRecordManager = () => {
   const [isDetailModalVisible, setIsDetailModalVisible] = useState(false);
@@ -44,7 +53,12 @@ const ExpertMedicalRecordManager = () => {
   const { renderFormItemHospital } = useFormItemHospital();
   const [listFilterHospital, setListFilterHospital] = useState([]);
   const [isDisabledConcludeFormItem, setIsDisabledConcludeFormItem] = useState(true);
-
+  const [dateSelectedChart, setDateSelectedChart] = useState(null);
+  const [listTempDateChart, setListTempDateChart] = useState([]);
+  const [tempChart, setTempChart] = useState([]);
+  const [medicalReportSource, setMedicalReportSource] = useState([]);
+  const [patientNameChart, setPatientNameChart] = useState(null);
+  const [isVisibleChartModal, setIsVisibleChartModal] = useState(false);
   const tableColumns = [
     // {
     //   title: 'ID',
@@ -54,7 +68,7 @@ const ExpertMedicalRecordManager = () => {
     {
       title: 'STT',
       key: 'index',
-      width: 40,
+      width: 60,
       align: 'center',
       render: (text, record) => medicalRecordSource.indexOf(record) + 1,
     },
@@ -195,6 +209,13 @@ const ExpertMedicalRecordManager = () => {
                     Kết Thúc Điều Trị
                   </Menu.Item>
                 )}
+                <Menu.Item
+                  key="5"
+                  icon={<AiOutlineAreaChart size={15} />}
+                  onClick={() => handleVisibleChartModal(record)}
+                >
+                  Xem biểu đồ
+                </Menu.Item>
               </Menu>
             }
             trigger={['click']}
@@ -368,17 +389,6 @@ const ExpertMedicalRecordManager = () => {
   };
 
   const onChangeFormItem = async (fieldData) => {
-    // if (fieldData[0].name[0] === 'hospitalId') {
-    //   formAddEditMedicalRecord.resetFields(['deviceId', 'doctorId']);
-    //   await getAllDoctorByHospitalId(fieldData[0].value);
-    //   setIsFormItemDeviceDisabled(false);
-    //   setIsFormItemDoctorDisabled(false);
-    //   await getAllUnusedDevicesByHospitalId(fieldData[0].value).catch((error) => {
-    //     if (error.status === 404) {
-    //       setIsFormItemDeviceDisabled(true);
-    //     }
-    //   });
-    // }
     if (fieldData.hospitalId) {
       formAddEditMedicalRecord.resetFields(['deviceId', 'doctorId']);
       await getAllDoctorByHospitalId(fieldData.hospitalId);
@@ -386,19 +396,35 @@ const ExpertMedicalRecordManager = () => {
       setIsFormItemDoctorDisabled(false);
       await getAllUnusedDevicesByHospitalId(fieldData.hospitalId);
     }
-
-    // if (fieldData[0].name[0] === 'treated' && fieldData[0].value === true) {
-    //   setIsDisabledConcludeFormItem(false);
-    // }
-    // if (fieldData[0].name[0] === 'treated' && fieldData[0].value === false) {
-    //   setIsDisabledConcludeFormItem(true);
-    //   formAddEditMedicalRecord.resetFields(['conclude']);
-    // }
   };
 
   const handleVisibleDetailMedicalRecord = (record) => {
     setIsDetailModalVisible(true);
     setMedicalRecordDetail(record);
+  };
+
+  const handleVisibleChartModal = async (record) => {
+    try {
+      const medicalReportResult = await medicalRecordAPI.getReportByMedicalRecordId(record.id);
+      setMedicalReportSource(medicalReportResult);
+      setPatientNameChart(record.patient.fullName);
+      const filteredDates = medicalReportResult
+        .map((temp) => moment(temp.date).format('DD/MM/YYYY'))
+        .filter((date, index, arrayDate) => arrayDate.indexOf(date) === index);
+      setListTempDateChart(filteredDates);
+      setDateSelectedChart(null);
+      setIsVisibleChartModal(true);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleChangeDateChart = (selectedDate) => {
+    setDateSelectedChart(selectedDate);
+    const temp = medicalReportSource.filter(
+      (medicalReport) => moment(medicalReport.date).format('DD/MM/YYYY') === selectedDate
+    );
+    setTempChart(temp);
   };
 
   return (
@@ -523,30 +549,78 @@ const ExpertMedicalRecordManager = () => {
               </Form.Item>
             </>
           )}
-          {/* <Form.Item
-            name="treated"
-            label="Tình Trạng Bênh Án:"
-            rules={[
-              {
-                required: true,
-                message: 'Tình Trạng Bênh Án không được để trống!',
-              },
-            ]}
-          >
-            <Select showSearch placeholder="Tình Trạng Bênh Án">
-              <Select.Option value={false}>Đang Điều Trị</Select.Option>;
-              <Select.Option value={true}>Kết Thúc Điều Trị</Select.Option>;
-            </Select>
-          </Form.Item> */}
-          {/* {modalUsedFor === 'editMedicalRecord' && (
-            <>
-              <Form.Item name="conclude" label="Kết Luận:">
-                <Input disabled={isDisabledConcludeFormItem} placeholder="Kết Luận:" />
-              </Form.Item>
-            </>
-          )} */}
         </Form>
       </Modal>
+
+      {/* Temperature Chart Modal */}
+
+      <Modal
+        title="Biểu đồ"
+        visible={isVisibleChartModal}
+        cancelText="Đóng"
+        okButtonProps={{ style: { display: 'none' } }}
+        onCancel={() => {
+          setIsVisibleChartModal(false);
+          setTempChart([]);
+          setListTempDateChart([]);
+        }}
+      >
+        <h3>Tên Bệnh Nhân: {patientNameChart}</h3>
+        <Line
+          data={{
+            labels: tempChart?.map((temp) => temp.hour),
+            datasets: [
+              {
+                label: 'Nhiệt Độ (°C)',
+                data: tempChart?.map((temp) => temp.temperature),
+                backgroundColor: [
+                  'rgba(255, 99, 132, 0.2)',
+                  'rgba(54, 162, 235, 0.2)',
+                  'rgba(255, 206, 86, 0.2)',
+                  'rgba(75, 192, 192, 0.2)',
+                  'rgba(153, 102, 255, 0.2)',
+                  'rgba(255, 159, 64, 0.2)',
+                ],
+                borderColor: [
+                  'rgba(255, 99, 132, 1)',
+                  'rgba(54, 162, 235, 1)',
+                  'rgba(255, 206, 86, 1)',
+                  'rgba(75, 192, 192, 1)',
+                  'rgba(153, 102, 255, 1)',
+                  'rgba(255, 159, 64, 1)',
+                ],
+                borderWidth: 1,
+              },
+            ],
+          }}
+          height={400}
+          width={600}
+        />
+        <h3>Chọn Ngày:</h3>
+
+        <Select
+          notFoundContent={
+            <Empty
+              description="Không có dữ liệu."
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              style={{ height: 50 }}
+            />
+          }
+          style={{ width: '100%' }}
+          placeholder="Vui lòng chọn ngày"
+          onChange={handleChangeDateChart}
+          value={dateSelectedChart}
+        >
+          {listTempDateChart.map((tempDate) => {
+            return (
+              <Select.Option key={tempDate} value={tempDate}>
+                {tempDate}
+              </Select.Option>
+            );
+          })}
+        </Select>
+      </Modal>
+
       {/* Modal Detail Medical Record */}
       <Modal
         title="Thông Tin Chi Tiết"
@@ -596,6 +670,7 @@ const ExpertMedicalRecordManager = () => {
         renderLoadingSkeleton
       ) : (
         <Table
+          scroll={{ y: 475 }}
           locale={{
             filterReset: 'Đặt lại',
             emptyText: <Empty description="Không có dữ liệu." />,

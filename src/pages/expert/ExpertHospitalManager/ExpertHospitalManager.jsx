@@ -49,7 +49,7 @@ const ExpertHospitalManager = () => {
     {
       title: 'STT',
       key: 'index',
-      width: 40,
+      width: 80,
       align: 'center',
       render: (text, record) => hospitalSource.indexOf(record) + 1,
     },
@@ -299,6 +299,7 @@ const ExpertHospitalManager = () => {
         renderLoadingSkeleton
       ) : (
         <Table
+          scroll={{ y: 475 }}
           locale={{
             emptyText: <Empty description="Không có dữ liệu." />,
           }}
