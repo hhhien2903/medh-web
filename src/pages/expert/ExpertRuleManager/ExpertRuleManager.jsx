@@ -179,11 +179,17 @@ const ExpertRuleManager = () => {
               const ruleConditionSendData = {
                 name: ruleCondition.name,
                 temp: [ruleCondition.tempLow, ruleCondition.tempHigh],
-                time: [ruleCondition.time[0].minute(), ruleCondition.time[1].minute()],
+                time: [
+                  ruleCondition.timeStart,
+                  ruleCondition.timeEndUnit === 'minute'
+                    ? ruleCondition.timeEnd
+                    : ruleCondition.timeEnd * 60,
+                ],
                 treatment: ruleCondition.treatment,
                 illumination: ruleCondition.illumination,
                 rule: formValue.id,
               };
+
               await ruleConditionAPI.createRuleCondition(ruleConditionSendData);
             });
             message.success('Sửa Tập Luật Thành Công.', 5);
@@ -535,13 +541,14 @@ const ExpertRuleManager = () => {
                                 let currentField = getFieldValue('ruleConditions').find(
                                   (rule) => rule.indexRule === key
                                 );
-
-                                if (value > currentField.timeEnd) {
-                                  return Promise.reject(
-                                    new Error(
-                                      'Thời Gian Bắt Đầu không được lớn hơn hơn Thời Gian Kết Thúc'
-                                    )
-                                  );
+                                if (currentField.timeEndUnit === 'minute') {
+                                  if (value > currentField.timeEnd) {
+                                    return Promise.reject(
+                                      new Error(
+                                        'Thời Gian Bắt Đầu không được lớn hơn hơn Thời Gian Kết Thúc'
+                                      )
+                                    );
+                                  }
                                 }
 
                                 return Promise.resolve();
