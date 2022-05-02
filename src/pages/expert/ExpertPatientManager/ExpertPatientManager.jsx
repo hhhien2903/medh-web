@@ -1,6 +1,7 @@
 import {
   Button,
   DatePicker,
+  Descriptions,
   Dropdown,
   Empty,
   Form,
@@ -9,33 +10,23 @@ import {
   message,
   Modal,
   Select,
-  Table,
-  Descriptions,
   Skeleton,
-  Space,
+  Table,
 } from 'antd';
 import localeVN from 'antd/es/date-picker/locale/vi_VN';
 import moment from 'moment';
-import React, { useState, useEffect } from 'react';
-import {
-  AiOutlineDelete,
-  AiOutlineEdit,
-  AiOutlineInfoCircle,
-  AiOutlinePlus,
-  AiOutlineAreaChart,
-} from 'react-icons/ai';
+import React, { useEffect, useState } from 'react';
+import { AiOutlineDelete, AiOutlineEdit, AiOutlineInfoCircle, AiOutlinePlus } from 'react-icons/ai';
 import { MdMoreHoriz } from 'react-icons/md';
+import patientAPI from '../../../api/patientAPI';
+import useFormItemAddress from '../../../components/shared/FormItemAddress/useFormItemAddress';
+import useFormItemDevice from '../../../components/shared/FormItemDevice/useFormItemDevice';
+import useFormItemDoctor from '../../../components/shared/FormItemDoctor/useFormItemDoctor';
+import useFormItemHospital from '../../../components/shared/FormItemHospital/useFormItemHospital';
+import useLoadingSkeleton from '../../../components/shared/LoadingSkeleton/useLoadingSkeleton';
 import { emailRegex, phoneNumberRegex, vietnameseNameRegex } from '../../../utils/regex';
 import './ExpertPatientManager.scss';
-import useFormItemAddress from '../../../components/shared/FormItemAddress/useFormItemAddress';
-import patientAPI from '../../../api/patientAPI';
-import useFormItemHospital from '../../../components/shared/FormItemHospital/useFormItemHospital';
-import useFormItemDoctor from '../../../components/shared/FormItemDoctor/useFormItemDoctor';
-import useFormItemDevice from '../../../components/shared/FormItemDevice/useFormItemDevice';
-import useLoadingSkeleton from '../../../components/shared/LoadingSkeleton/useLoadingSkeleton';
-import { Line } from 'react-chartjs-2';
-import { Chart as ChartJS, registerables } from 'chart.js';
-ChartJS.register(...registerables);
+
 const ExpertPatientManager = () => {
   const [patientSource, setPatientSource] = useState([]);
   const [isAddEditPatientModalVisible, setIsAddEditPatientModalVisible] = useState(false);
@@ -53,191 +44,15 @@ const ExpertPatientManager = () => {
   const { renderFormItemDoctor, setIsDoctorFormItemRequired } = useFormItemDoctor();
   const { renderFormItemDevice, setIsDeviceFormItemRequired } = useFormItemDevice();
   const { renderLoadingSkeleton, setIsLoadingSkeleton, isLoadingSkeleton } = useLoadingSkeleton();
-  const [isVisibleChartModal, setIsVisibleChartModal] = useState(false);
   const [isDetailModalVisible, setIsDetailModalVisible] = useState(false);
   const [patientDetail, setPatientDetail] = useState({});
   const [isLoadingSkeletonForm, setIsLoadingSkeletonForm] = useState(false);
-  const [datePickerChart, setDatePickerChart] = useState(null);
-  const [tempData, setTempData] = useState([]);
-  const [patientNameChart, setPatientNameChart] = useState(null);
-  const tempTestData = [
-    {
-      date: '18/04/2022',
-      hour: '01:00',
-      temp: 38,
-    },
-    {
-      date: '18/04/2022',
-      hour: '02:00',
-      temp: 38,
-    },
-    {
-      date: '18/04/2022',
-      hour: '03:00',
-      temp: 39,
-    },
-    {
-      date: '18/04/2022',
-      hour: '04:00',
-      temp: 40,
-    },
-    {
-      date: '18/04/2022',
-      hour: '05:00',
-      temp: 39.5,
-    },
-    {
-      date: '18/04/2022',
-      hour: '06:00',
-      temp: 39,
-    },
-    {
-      date: '18/04/2022',
-      hour: '07:00',
-      temp: 39,
-    },
-    {
-      date: '18/04/2022',
-      hour: '08:00',
-      temp: 40,
-    },
-    {
-      date: '18/04/2022',
-      hour: '09:00',
-      temp: 39,
-    },
-    {
-      date: '18/04/2022',
-      hour: '10:00',
-      temp: 39.5,
-    },
-    {
-      date: '18/04/2022',
-      hour: '11:00',
-      temp: 39,
-    },
-    {
-      date: '18/04/2022',
-      hour: '12:00',
-      temp: 40,
-    },
-    {
-      date: '18/04/2022',
-      hour: '13:00',
-      temp: 39.5,
-    },
-    {
-      date: '18/04/2022',
-      hour: '14:00',
-      temp: 39.5,
-    },
-    {
-      date: '18/04/2022',
-      hour: '15:00',
-      temp: 39,
-    },
-    {
-      date: '18/04/2022',
-      hour: '16:00',
-      temp: 38.5,
-    },
-    {
-      date: '18/04/2022',
-      hour: '17:00',
-      temp: 38,
-    },
-    {
-      date: '19/04/2022',
-      hour: '01:00',
-      temp: 39.5,
-    },
-    {
-      date: '19/04/2022',
-      hour: '02:00',
-      temp: 40,
-    },
-    {
-      date: '19/04/2022',
-      hour: '03:00',
-      temp: 39.5,
-    },
-    {
-      date: '19/04/2022',
-      hour: '04:00',
-      temp: 39,
-    },
-    {
-      date: '19/04/2022',
-      hour: '05:00',
-      temp: 39,
-    },
-    {
-      date: '19/04/2022',
-      hour: '06:00',
-      temp: 39.5,
-    },
-    {
-      date: '19/04/2022',
-      hour: '07:00',
-      temp: 40,
-    },
-    {
-      date: '19/04/2022',
-      hour: '08:00',
-      temp: 40,
-    },
-    {
-      date: '19/04/2022',
-      hour: '09:00',
-      temp: 39.5,
-    },
-    {
-      date: '19/04/2022',
-      hour: '10:00',
-      temp: 39.5,
-    },
-    {
-      date: '19/04/2022',
-      hour: '11:00',
-      temp: 39,
-    },
-    {
-      date: '19/04/2022',
-      hour: '12:00',
-      temp: 39,
-    },
-    {
-      date: '19/04/2022',
-      hour: '13:00',
-      temp: 38.5,
-    },
-    {
-      date: '19/04/2022',
-      hour: '14:00',
-      temp: 38.5,
-    },
-    {
-      date: '19/04/2022',
-      hour: '15:00',
-      temp: 38,
-    },
-    {
-      date: '19/04/2022',
-      hour: '16:00',
-      temp: 37.5,
-    },
-    {
-      date: '19/04/2022',
-      hour: '17:00',
-      temp: 37,
-    },
-  ];
 
   const tableColumns = [
     {
       title: 'STT',
       key: 'index',
-      width: 40,
+      width: 60,
       align: 'center',
       className: 'index-row',
       render: (text, record) => patientSource.indexOf(record) + 1,
@@ -307,6 +122,7 @@ const ExpertPatientManager = () => {
     {
       title: 'Tác Vụ',
       key: 'action',
+      width: 70,
       render: (record) => {
         return (
           <Dropdown
@@ -335,17 +151,13 @@ const ExpertPatientManager = () => {
                 >
                   Xem chi tiết
                 </Menu.Item>
-                <Menu.Item
+                {/* <Menu.Item
                   key="4"
                   icon={<AiOutlineAreaChart size={15} />}
-                  onClick={() => {
-                    setPatientNameChart(record.fullName);
-                    setDatePickerChart(null);
-                    setIsVisibleChartModal(true);
-                  }}
+                  onClick={() => handleVisibleChartModal(record)}
                 >
                   Xem biểu đồ
-                </Menu.Item>
+                </Menu.Item> */}
               </Menu>
             }
             trigger={['click']}
@@ -515,16 +327,6 @@ const ExpertPatientManager = () => {
       gender: record.gender ? 'Nam' : 'Nữ',
       dateOfBirth: moment(record.dateOfBirth).format('DD/MM/YYYY'),
     });
-  };
-
-  const handleChangeDatePickerChart = (value) => {
-    setDatePickerChart(value);
-    let temp = tempTestData.filter(
-      (tempTest) => tempTest.date === moment(value).format('DD/MM/YYYY')
-    );
-    setTempData(temp);
-    // console.log([...temp.hour]);
-    // setTempLabel([...temp.hour])
   };
 
   return (
@@ -698,85 +500,6 @@ const ExpertPatientManager = () => {
         )}
       </Modal>
 
-      {/* Temperature Chart Modal */}
-
-      <Modal
-        title="Biểu đồ"
-        visible={isVisibleChartModal}
-        cancelText="Đóng"
-        okButtonProps={{ style: { display: 'none' } }}
-        onCancel={() => {
-          setIsVisibleChartModal(false);
-          setTempData([]);
-        }}
-      >
-        <h3>Tên Bệnh Nhân: {patientNameChart}</h3>
-        <Line
-          data={{
-            labels: tempData?.map((temp) => temp.hour),
-            datasets: [
-              {
-                label: 'Nhiệt Độ (°C)',
-                data: tempData?.map((temp) => temp.temp),
-                backgroundColor: [
-                  'rgba(255, 99, 132, 0.2)',
-                  'rgba(54, 162, 235, 0.2)',
-                  'rgba(255, 206, 86, 0.2)',
-                  'rgba(75, 192, 192, 0.2)',
-                  'rgba(153, 102, 255, 0.2)',
-                  'rgba(255, 159, 64, 0.2)',
-                ],
-                borderColor: [
-                  'rgba(255, 99, 132, 1)',
-                  'rgba(54, 162, 235, 1)',
-                  'rgba(255, 206, 86, 1)',
-                  'rgba(75, 192, 192, 1)',
-                  'rgba(153, 102, 255, 1)',
-                  'rgba(255, 159, 64, 1)',
-                ],
-                borderWidth: 1,
-              },
-              // {
-              //   label: 'Quantity',
-              //   data: [47, 52, 67, 58, 9, 50],
-              //   backgroundColor: 'orange',
-              //   borderColor: 'red',
-              // },
-            ],
-          }}
-          height={400}
-          width={600}
-          // options={{
-          //   maintainAspectRatio: false,
-          //   scales: {
-
-          //     yAxes: [
-          //       {
-          //         ticks: {
-          //           beginAtZero: true,
-          //         },
-          //       },
-          //     ],
-          //   },
-          //   legend: {
-          //     labels: {
-          //       fontSize: 25,
-          //     },
-          //   },
-          // }}
-        />
-        <h3>Chọn Ngày:</h3>
-        <DatePicker
-          disabledDate={(current) => current > moment()}
-          placeholder="Vui lòng chọn Ngày"
-          style={{ width: '100%' }}
-          locale={localeVN}
-          format={'DD/MM/YYYY'}
-          value={datePickerChart}
-          onChange={handleChangeDatePickerChart}
-        />
-      </Modal>
-
       {/* Patient Detail Modal */}
       <Modal
         title="Thông Tin Chi Tiết"
@@ -815,6 +538,8 @@ const ExpertPatientManager = () => {
         renderLoadingSkeleton
       ) : (
         <Table
+          scroll={{ y: 475 }}
+          //scroll={{ y: 475 }}
           locale={{
             emptyText: <Empty description="Không có dữ liệu." />,
           }}

@@ -30,7 +30,7 @@ const ExpertDeviceManager = () => {
     {
       title: 'STT',
       key: 'index',
-      width: 40,
+      width: 60,
       align: 'center',
       className: 'index-row',
       render: (text, record) => deviceSource.indexOf(record) + 1,
@@ -437,6 +437,7 @@ const ExpertDeviceManager = () => {
         renderLoadingSkeleton
       ) : (
         <Table
+          scroll={{ y: 475 }}
           locale={{
             filterReset: 'Đặt lại',
             emptyText: <Empty description="Không có dữ liệu." />,

@@ -25,11 +25,16 @@ import {
 } from 'react-icons/ai';
 import { MdMoreHoriz } from 'react-icons/md';
 import ruleAPI from '../../../api/ruleAPI';
-import { onePrecisionDecimalsRegex, vietnameseNameRegex } from '../../../utils/regex';
+import {
+  maxTwoDigitRegex,
+  onePrecisionDecimalsRegex,
+  vietnameseNameRegex,
+} from '../../../utils/regex';
 import './ExpertRuleManager.scss';
 import moment from 'moment';
 import ruleConditionAPI from '../../../api/ruleConditionAPI';
 import useLoadingSkeleton from '../../../components/shared/LoadingSkeleton/useLoadingSkeleton';
+import FormItem from 'antd/lib/form/FormItem';
 const ExpertRuleManager = () => {
   const [ruleSource, setRuleSource] = useState([]);
   const [isAddEditRuleModalVisible, setAddEditRuleModalVisible] = useState(false);
@@ -237,6 +242,7 @@ const ExpertRuleManager = () => {
     });
   };
   const handleAddRule = () => {
+    // console.log(formAddEditRule.getFieldValue('ruleConditions')[0]);
     formAddEditRule.validateFields().then(async (formValue) => {
       console.log(formValue);
       setIsConfirmLoadingAddEditRuleModal(true);
@@ -250,7 +256,12 @@ const ExpertRuleManager = () => {
           const ruleConditionSendData = {
             name: ruleCondition.name,
             temp: [ruleCondition.tempLow, ruleCondition.tempHigh],
-            time: [ruleCondition.time[0].minute(), ruleCondition.time[1].minute()],
+            time: [
+              ruleCondition.timeStart,
+              ruleCondition.timeEndUnit === 'minute'
+                ? ruleCondition.timeEnd
+                : ruleCondition.timeEnd * 60,
+            ],
             treatment: ruleCondition.treatment,
             illumination: ruleCondition.illumination,
             rule: ruleCreateResult.id,
@@ -307,6 +318,7 @@ const ExpertRuleManager = () => {
   const handleCancelRuleModal = () => {
     setAddEditRuleModalVisible(false);
     formAddEditRule.resetFields();
+    formAddEditRule.setFieldsValue({ ruleConditions: [] });
     setIsConfirmLoadingAddEditRuleModal(false);
   };
 
@@ -336,13 +348,14 @@ const ExpertRuleManager = () => {
       </div>
       <Modal
         title={modalTitle}
+        bodyStyle={{ overflowY: 'auto', maxHeight: 580 }}
         visible={isAddEditRuleModalVisible}
         okText="Xác Nhận"
         cancelText="Huỷ"
         confirmLoading={isConfirmLoadingAddEditRuleModal}
         className="add-rule-modal-container"
         onCancel={handleCancelRuleModal}
-        // bodyStyle={{ overflowY: 'scroll' }}
+        width={540}
         onOk={() => {
           if (modalUsedFor === 'addRule') {
             return handleAddRule();
@@ -404,6 +417,14 @@ const ExpertRuleManager = () => {
                       style={{ display: 'flex' }}
                     >
                       <Form.Item
+                        initialValue={key}
+                        noStyle
+                        {...restField}
+                        name={[name, 'indexRule']}
+                      >
+                        <Input type="hidden" />
+                      </Form.Item>
+                      <Form.Item
                         {...restField}
                         name={[name, 'name']}
                         rules={[
@@ -413,102 +434,109 @@ const ExpertRuleManager = () => {
                           },
                         ]}
                       >
-                        <Input placeholder="Tên Luật Y Tế" />
+                        <Input value="123" placeholder="Tên Luật Y Tế" />
                       </Form.Item>
                       <Form.Item>
-                        <Input.Group compact>
-                          <Form.Item
-                            {...restField}
-                            name={[name, 'tempLow']}
-                            noStyle
-                            rules={[
-                              {
-                                required: true,
-                                message: 'Nhiệt Độ Thấp không được để trống.',
-                              },
-                              {
-                                required: true,
-                                type: 'number',
-                                min: 10,
-                                max: 50,
-                                message: 'Nhiệt Độ phải trong ngưỡng 10 - 50°C.',
-                              },
+                        <Form.Item
+                          {...restField}
+                          name={[name, 'tempLow']}
+                          noStyle
+                          rules={[
+                            {
+                              required: true,
+                              message: 'Nhiệt Độ Thấp không được để trống.',
+                            },
+                            {
+                              required: true,
+                              type: 'number',
+                              min: 10,
+                              max: 50,
+                              message: 'Nhiệt Độ phải trong ngưỡng 10 - 50°C.',
+                            },
 
-                              // {
-                              //   validator(_, value) {
-                              //     if (!formAddEditRule.getFieldValue('tempHigh')) {
-                              //       return Promise.resolve();
-                              //     }
-                              //     if (value < formAddEditRule.getFieldValue('tempHigh')) {
-                              //       return Promise.resolve();
-                              //     }
-                              //     return Promise.reject('Nhiệt Độ Thấp phải nhỏ hơn Nhiệt Độ Cao.');
-                              //   },
-                              // },
-                              {
-                                required: true,
-                                pattern: onePrecisionDecimalsRegex,
-                                message: 'Nhiệt Độ bao gồm tối đa một chữ số thập phân.',
-                              },
-                            ]}
-                          >
-                            <InputNumber
-                              controls={false}
-                              className="input-temp"
-                              style={{ width: `calc(50% - 15px)`, textAlign: 'center' }}
-                              placeholder="Nhiệt Độ Thấp (°C)"
-                            />
-                          </Form.Item>
-                          <Input
-                            className="site-input-split"
-                            style={{
-                              width: 30,
-                              borderLeft: 0,
-                              borderRight: 0,
-                              pointerEvents: 'none',
-                            }}
-                            placeholder="-"
-                            disabled
+                            {
+                              required: true,
+                              pattern: onePrecisionDecimalsRegex,
+                              message: 'Nhiệt Độ bao gồm tối đa một chữ số thập phân.',
+                            },
+                          ]}
+                        >
+                          <InputNumber
+                            addonAfter="°C"
+                            controls={false}
+                            className="input-temp"
+                            style={{ width: `calc(50% - 18px)`, textAlign: 'center' }}
+                            placeholder="Nhiệt Độ Thấp"
                           />
-                          <Form.Item
-                            {...restField}
-                            name={[name, 'tempHigh']}
-                            noStyle
-                            rules={[
-                              {
-                                required: true,
-                                message: 'Nhiệt Độ Cao không được để trống.',
+                        </Form.Item>
+                        <Input
+                          className="site-input-split"
+                          style={{
+                            width: 30,
+                            borderLeft: 0,
+                            borderRight: 0,
+                            pointerEvents: 'none',
+                            background: '#FFFFFF',
+                            borderColor: '#FFFFFF',
+                            marginLeft: 3,
+                            marginRight: 3,
+                          }}
+                          placeholder="-"
+                          disabled
+                        />
+                        <Form.Item
+                          {...restField}
+                          name={[name, 'tempHigh']}
+                          noStyle
+                          rules={[
+                            {
+                              required: true,
+                              message: 'Nhiệt Độ Cao không được để trống.',
+                            },
+                            {
+                              required: true,
+                              type: 'number',
+                              min: 10,
+                              max: 50,
+                              message: 'Nhiệt Độ phải trong ngưỡng 10 - 50°C.',
+                            },
+                            {
+                              required: true,
+                              pattern: onePrecisionDecimalsRegex,
+                              message: 'Nhiệt Độ bao gồm tối đa một chữ số thập phân.',
+                            },
+                            ({ getFieldValue }) => ({
+                              validator(_, value) {
+                                let currentField = getFieldValue('ruleConditions').find(
+                                  (rule) => rule.indexRule === key
+                                );
+
+                                if (value < currentField.tempLow) {
+                                  return Promise.reject(
+                                    new Error('Nhiệt Độ Cao không được nhỏ hơn Nhiệt Độ Thấp')
+                                  );
+                                }
+
+                                return Promise.resolve();
                               },
-                              {
-                                required: true,
-                                type: 'number',
-                                min: 10,
-                                max: 50,
-                                message: 'Nhiệt Độ phải trong ngưỡng 10 - 50°C.',
-                              },
-                              {
-                                required: true,
-                                pattern: onePrecisionDecimalsRegex,
-                                message: 'Nhiệt Độ bao gồm tối đa một chữ số thập phân.',
-                              },
-                            ]}
-                          >
-                            <InputNumber
-                              className="input-temp temp-high"
-                              style={{
-                                width: `calc(50% - 15px)`,
-                                textAlign: 'center',
-                              }}
-                              type="number"
-                              addonAfter="°C"
-                              placeholder="Nhiệt Độ Cao (°C)"
-                              controls={false}
-                            />
-                          </Form.Item>
-                        </Input.Group>
+                            }),
+                          ]}
+                        >
+                          <InputNumber
+                            className="input-temp temp-high"
+                            style={{
+                              width: `calc(50% - 18px)`,
+                              textAlign: 'center',
+                            }}
+                            type="number"
+                            addonAfter="°C"
+                            placeholder="Nhiệt Độ Cao"
+                            controls={false}
+                          />
+                        </Form.Item>
                       </Form.Item>
-                      <Form.Item {...restField} name={[name, 'time']}>
-                        <TimePicker.RangePicker
+                      <Form.Item>
+                        {/* <TimePicker.RangePicker
                           style={{ width: '100%' }}
                           allowClear
                           placeholder={['Thời Gian Bắt Đầu (Phút)', 'Thời Gian Kết Thúc (Phút)']}
@@ -516,7 +544,142 @@ const ExpertRuleManager = () => {
                           showSecond={false}
                           format="mm"
                           className="timepicker"
+                        /> */}
+
+                        <Form.Item
+                          {...restField}
+                          name={[name, 'timeStart']}
+                          noStyle
+                          rules={[
+                            {
+                              required: true,
+                              message: 'Thời Gian Bắt Đầu không được để trống.',
+                            },
+                            {
+                              required: true,
+                              type: 'number',
+                              min: 0,
+                              max: 59,
+                              message: 'Thời Gian Bắt Đầu phải trong khoảng 0 - 59 Phút',
+                            },
+                            {
+                              required: true,
+                              pattern: maxTwoDigitRegex,
+                              message: 'Thời Gian Bắt Đầu không được bao gồm số thập phân',
+                            },
+                            ({ getFieldValue }) => ({
+                              validator(_, value) {
+                                let currentField = getFieldValue('ruleConditions').find(
+                                  (rule) => rule.indexRule === key
+                                );
+
+                                if (value > currentField.timeEnd) {
+                                  return Promise.reject(
+                                    new Error(
+                                      'Thời Gian Bắt Đầu không được lớn hơn hơn Thời Gian Kết Thúc'
+                                    )
+                                  );
+                                }
+
+                                return Promise.resolve();
+                              },
+                            }),
+                          ]}
+                        >
+                          <InputNumber
+                            controls={false}
+                            className="input-temp"
+                            addonAfter="Phút"
+                            style={{ width: `calc(50% - 18px)`, textAlign: 'center' }}
+                            placeholder="Thời Gian Bắt Đầu"
+                          />
+                        </Form.Item>
+                        <Input
+                          className="site-input-split"
+                          style={{
+                            width: 30,
+                            borderLeft: 0,
+                            borderRight: 0,
+                            pointerEvents: 'none',
+                            background: '#FFFFFF',
+                            borderColor: '#FFFFFF',
+                            marginLeft: 3,
+                            marginRight: 3,
+                          }}
+                          placeholder="-"
+                          disabled
                         />
+
+                        <Form.Item
+                          {...restField}
+                          name={[name, 'timeEnd']}
+                          noStyle
+                          rules={[
+                            {
+                              required: true,
+                              message: 'Thời Gian Kết Thúc không được để trống.',
+                            },
+
+                            ({ getFieldValue }) => ({
+                              validator(_, value) {
+                                let currentField = getFieldValue('ruleConditions').find(
+                                  (rule) => rule.indexRule === key
+                                );
+                                if (currentField.timeEndUnit === 'minute') {
+                                  if (value < 0 || value > 59) {
+                                    return Promise.reject(
+                                      new Error('Thời Gian Kết Thúc phải trong khoảng 0 - 59 Phút')
+                                    );
+                                  }
+                                  if (!maxTwoDigitRegex.test(value)) {
+                                    return Promise.reject(
+                                      new Error(
+                                        'Thời Gian Kết Thúc không được bao gồm số thập phân khi đơn vị là Phút'
+                                      )
+                                    );
+                                  }
+                                  if (value < currentField.timeStart) {
+                                    return Promise.reject(
+                                      new Error(
+                                        'Thời Gian Kết Thúc không được nhỏ hơn Thời Gian Bắt Đầu'
+                                      )
+                                    );
+                                  }
+                                }
+                                // if (currentField.timeEndUnit === 'hour'){
+                                //   if()
+                                // }
+                                return Promise.resolve();
+                              },
+                            }),
+                          ]}
+                        >
+                          <InputNumber
+                            controls={false}
+                            className="input-temp"
+                            addonAfter={
+                              <Form.Item initialValue="minute" noStyle name={[name, 'timeEndUnit']}>
+                                <Select
+                                  onChange={async () => {
+                                    const fields = formAddEditRule.getFieldsValue();
+                                    const { ruleConditions } = fields;
+
+                                    await Object.assign(
+                                      ruleConditions.find((rule) => rule.indexRule === key),
+                                      { timeEnd: '' }
+                                    );
+                                    formAddEditRule.setFieldsValue({ ruleConditions });
+                                  }}
+                                >
+                                  <Select.Option value="minute">Phút</Select.Option>
+                                  <Select.Option value="hour">Giờ</Select.Option>
+                                </Select>
+                              </Form.Item>
+                            }
+                            style={{ width: `calc(50% - 18px)`, textAlign: 'center' }}
+                            placeholder="Thời Gian Kết Thúc"
+                          />
+                        </Form.Item>
                       </Form.Item>
 
                       <Form.Item
@@ -626,6 +789,7 @@ const ExpertRuleManager = () => {
           <Descriptions.Item label="Mô Tả:">{ruleDetail.description}</Descriptions.Item>
         </Descriptions>
         <Table
+          //scroll={{ y: 475 }}
           pagination={false}
           bordered
           locale={{
@@ -636,7 +800,7 @@ const ExpertRuleManager = () => {
             {
               title: 'STT',
               key: 'index',
-              width: 40,
+              width: 60,
               align: 'center',
               render: (text, record) => ruleDetail.ruleConditions.indexOf(record) + 1,
             },
@@ -653,11 +817,14 @@ const ExpertRuleManager = () => {
               render: (_text, record) => record.temp[0] + ' - ' + record.temp[1],
             },
             {
-              title: 'Ngưỡng Thời Gian (Phút)',
+              title: 'Ngưỡng Thời Gian',
               dataIndex: 'time',
               key: 'time',
               render: (time) => {
-                return time[0] + ' - ' + time[1];
+                if (time[1] > 59) {
+                  return time[0] + ' phút - ' + time[1] / 60 + ' giờ';
+                }
+                return time[0] + ' phút - ' + time[1] + ' phút';
               },
             },
             {

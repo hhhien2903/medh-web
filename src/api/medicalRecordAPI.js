@@ -35,6 +35,10 @@ const medicalRecordAPI = {
     const url = `${API_ENDPOINT}`;
     return axiosClient.put(url, data);
   },
+  getReportByMedicalRecordId: (id) => {
+    const url = `${API_ENDPOINT}/collect/report?id=${id}`;
+    return axiosClient.get(url);
+  },
 };
 
 export default medicalRecordAPI;
