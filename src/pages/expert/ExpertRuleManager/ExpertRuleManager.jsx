@@ -1,6 +1,8 @@
 import {
   Button,
+  Descriptions,
   Dropdown,
+  Empty,
   Form,
   Input,
   InputNumber,
@@ -10,31 +12,22 @@ import {
   Select,
   Space,
   Table,
-  TimePicker,
-  Descriptions,
-  Empty,
 } from 'antd';
 import React, { useEffect, useState } from 'react';
 import {
   AiOutlineDelete,
   AiOutlineEdit,
-  AiOutlinePlus,
-  AiOutlineMinusCircle,
-  AiOutlinePlusCircle,
   AiOutlineInfoCircle,
+  AiOutlineMinusCircle,
+  AiOutlinePlus,
+  AiOutlinePlusCircle,
 } from 'react-icons/ai';
 import { MdMoreHoriz } from 'react-icons/md';
 import ruleAPI from '../../../api/ruleAPI';
-import {
-  maxTwoDigitRegex,
-  onePrecisionDecimalsRegex,
-  vietnameseNameRegex,
-} from '../../../utils/regex';
-import './ExpertRuleManager.scss';
-import moment from 'moment';
 import ruleConditionAPI from '../../../api/ruleConditionAPI';
 import useLoadingSkeleton from '../../../components/shared/LoadingSkeleton/useLoadingSkeleton';
-import FormItem from 'antd/lib/form/FormItem';
+import { maxTwoDigitRegex, onePrecisionDecimalsRegex } from '../../../utils/regex';
+import './ExpertRuleManager.scss';
 const ExpertRuleManager = () => {
   const [ruleSource, setRuleSource] = useState([]);
   const [isAddEditRuleModalVisible, setAddEditRuleModalVisible] = useState(false);
@@ -46,40 +39,7 @@ const ExpertRuleManager = () => {
   const [isDetailModalVisible, setIsDetailModalVisible] = useState(false);
   const [ruleDetail, setRuleDetail] = useState({});
   const { renderLoadingSkeleton, setIsLoadingSkeleton, isLoadingSkeleton } = useLoadingSkeleton();
-  const dataSourceTest = [
-    {
-      id: 3,
-      uuid: '362e2851-f148-4642-8660-83d65b014460',
-      createdAt: '2022-03-27T00:00:00.000Z',
-      updatedAt: '2022-03-27T00:00:00.000Z',
-      name: 'Tập luật COVID-19',
-      description: 'Không',
-      rule_condition: [
-        {
-          id: 2,
-          uuid: 'd2831c9b-96e0-4c20-b6db-b93a39d3a035',
-          createdAt: '2022-03-27T00:00:00.000Z',
-          updatedAt: '2022-03-27T00:00:00.000Z',
-          name: 'COVID -19 (Nặng)',
-          temp: [39, 41],
-          time: [25, 40],
-          treatment: 'Yêu cầu Bác Sĩ',
-          illumination: 4,
-        },
-        {
-          id: 4,
-          uuid: 'bd4d39ee-9863-4ac2-ba0f-a21a91e7e84f',
-          createdAt: '2022-04-02T00:00:00.000Z',
-          updatedAt: '2022-04-02T00:00:00.000Z',
-          name: 'COVID -19 (Nhẹ)',
-          temp: [30, 40],
-          time: [20, 30],
-          treatment: 'string',
-          illumination: 1,
-        },
-      ],
-    },
-  ];
+
   const tableColumns = [
     // {
     //   title: 'ID',
@@ -296,13 +256,16 @@ const ExpertRuleManager = () => {
       name: findRuleResult.name,
       description: findRuleResult.description,
       ruleConditions: findRuleResult.ruleConditions.map((ruleCondition) => {
+        console.log(ruleCondition);
         return {
           name: ruleCondition.name,
           illumination: ruleCondition.illumination,
           id: ruleCondition.id,
           tempLow: ruleCondition.temp[0],
           tempHigh: ruleCondition.temp[1],
-          time: [moment().minute(ruleCondition.time[0]), moment().minute(ruleCondition.time[1])],
+          timeStart: ruleCondition.time[0],
+          timeEnd: ruleCondition.time[1] < 60 ? ruleCondition.time[1] : ruleCondition.time[1] / 60,
+          timeEndUnit: ruleCondition.time[1] < 60 ? 'minute' : 'hour',
           treatment: ruleCondition.treatment,
         };
       }),
@@ -692,7 +655,7 @@ const ExpertRuleManager = () => {
                           },
                         ]}
                       >
-                        <Input placeholder="Hành Động" />
+                        <Input.TextArea placeholder="Hành Động" />
                       </Form.Item>
                       <Form.Item
                         {...restField}
