@@ -9,8 +9,10 @@ import { useEffect, useState } from 'react';
 import patientAPI from '../../../api/patientAPI';
 import deviceAPI from '../../../api/deviceAPI';
 import diseaseAPI from '../../../api/diseaseAPI';
-import ruleConditionAPI from '../../../api/ruleConditionAPI';
+import ruleConditionAPI from '../../../api/ruleAPI';
 import hospitalAPI from '../../../api/hospitalAPI';
+import ruleAPI from '../../../api/ruleAPI';
+import { Link } from 'react-router-dom';
 const ExpertDashboard = () => {
   const { renderLoadingSkeleton, setIsLoadingSkeleton, isLoadingSkeleton } = useLoadingSkeleton();
 
@@ -23,7 +25,7 @@ const ExpertDashboard = () => {
       const patientSourceResult = await patientAPI.getAllPatients();
       const deviceSourceResult = await deviceAPI.getAllDevices();
       const diseaseSourceResult = await diseaseAPI.getAllDiseases();
-      const ruleSourceResult = await ruleConditionAPI.getAllRuleConditions();
+      const ruleSourceResult = await ruleAPI.getAllRules();
       const hospitalSourceResult = await hospitalAPI.getAllHospital();
       setStatisticSource({
         doctor: doctorSourceResult.length,
@@ -52,6 +54,7 @@ const ExpertDashboard = () => {
         <Row gutter={[20, 20]}>
           <Col span={6}>
             <CardStatistic
+              link="/expert/doctor"
               number={statisticSource?.doctor}
               type={'Bác Sĩ'}
               icon={<FaUserMd opacity={0.5} size={70} />}
@@ -61,6 +64,7 @@ const ExpertDashboard = () => {
           </Col>
           <Col span={6}>
             <CardStatistic
+              link="/expert/patient"
               type={'Bệnh Nhân'}
               number={statisticSource?.patient}
               icon={<FaUserFriends opacity={0.5} size={85} />}
@@ -72,6 +76,7 @@ const ExpertDashboard = () => {
           <Col span={6}>
             <CardStatistic
               type={'Thiết Bị'}
+              link="/expert/device"
               number={statisticSource?.device}
               icon={<FaMicrochip opacity={0.5} size={70} />}
               iconBottom="-15px"
@@ -81,6 +86,7 @@ const ExpertDashboard = () => {
           </Col>
           <Col span={6}>
             <CardStatistic
+              link="/expert/disease"
               type={'Mầm Bệnh'}
               number={statisticSource?.disease}
               icon={<FaDisease opacity={0.5} size={85} />}
@@ -91,6 +97,7 @@ const ExpertDashboard = () => {
           </Col>
           <Col span={6}>
             <CardStatistic
+              link="/expert/rule"
               type={'Tập Luật Y Tế'}
               number={statisticSource?.rule}
               icon={<BsFileEarmarkMedicalFill opacity={0.5} size={75} />}
@@ -101,6 +108,7 @@ const ExpertDashboard = () => {
           </Col>
           <Col span={6}>
             <CardStatistic
+              link="/expert/hospital"
               type={'Bệnh Viện'}
               number={statisticSource?.hospital}
               icon={<RiHospitalFill opacity={0.5} size={70} />}
