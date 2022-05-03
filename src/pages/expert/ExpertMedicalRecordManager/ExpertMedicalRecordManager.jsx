@@ -414,6 +414,7 @@ const ExpertMedicalRecordManager = () => {
       setListTempDateChart(filteredDates);
       setDateSelectedChart(null);
       setIsVisibleChartModal(true);
+      setPatientNameChart(`${record?.patient.surname} ${record?.patient.name}`);
     } catch (error) {
       console.log(error);
     }
@@ -545,7 +546,7 @@ const ExpertMedicalRecordManager = () => {
                 ]}
                 label="Kết Luận:"
               >
-                <Input placeholder="Kết Luận:" />
+                <Input.TextArea rows={3} placeholder="Kết Luận:" />
               </Form.Item>
             </>
           )}
@@ -555,6 +556,7 @@ const ExpertMedicalRecordManager = () => {
       {/* Temperature Chart Modal */}
 
       <Modal
+        // bodyStyle={{ maxHeight: 500, top: 20 }}
         title="Biểu đồ"
         visible={isVisibleChartModal}
         cancelText="Đóng"
@@ -564,6 +566,8 @@ const ExpertMedicalRecordManager = () => {
           setTempChart([]);
           setListTempDateChart([]);
         }}
+        width={600}
+        style={{ top: 30 }}
       >
         <h3>Tên Bệnh Nhân: {patientNameChart}</h3>
         <Line
@@ -637,7 +641,7 @@ const ExpertMedicalRecordManager = () => {
           column={1}
           size="middle"
           style={{ marginTop: 20 }}
-          labelStyle={{ width: 230 }}
+          labelStyle={{ width: 250 }}
         >
           <Descriptions.Item label="ID Bệnh Án:">{medicalRecordDetail?.id}</Descriptions.Item>
           <Descriptions.Item label="Tên Bệnh Nhân:">
@@ -647,6 +651,7 @@ const ExpertMedicalRecordManager = () => {
             {medicalRecordDetail.doctor?.hospital?.name}
           </Descriptions.Item>
           <Descriptions.Item label="Bệnh:">{medicalRecordDetail.diseases?.name}</Descriptions.Item>
+          <Descriptions.Item label="Chuẩn Đoán:">{medicalRecordDetail.diagnose}</Descriptions.Item>
           <Descriptions.Item label="Bác Sĩ Phụ Trách:">
             {medicalRecordDetail.doctor?.name}
           </Descriptions.Item>
@@ -670,7 +675,7 @@ const ExpertMedicalRecordManager = () => {
         renderLoadingSkeleton
       ) : (
         <Table
-          scroll={{ y: 475 }}
+          scroll={{ y: 705 }}
           locale={{
             filterReset: 'Đặt lại',
             emptyText: <Empty description="Không có dữ liệu." />,

@@ -299,7 +299,7 @@ const ExpertHospitalManager = () => {
         renderLoadingSkeleton
       ) : (
         <Table
-          scroll={{ y: 475 }}
+          scroll={{ y: 705 }}
           locale={{
             emptyText: <Empty description="Không có dữ liệu." />,
           }}

@@ -613,7 +613,7 @@ const DoctorManager = () => {
         renderLoadingSkeleton
       ) : (
         <Table
-          scroll={{ y: 475 }}
+          scroll={{ y: 705 }}
           locale={{
             emptyText: <Empty description="Không có dữ liệu." />,
           }}
@@ -621,7 +621,6 @@ const DoctorManager = () => {
           columns={tableColumns}
           dataSource={doctorSource}
           pagination={{ pageSize: 10 }}
-          scroll={{ x: 1200 }}
         />
       )}
     </div>

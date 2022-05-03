@@ -437,7 +437,7 @@ const ExpertDeviceManager = () => {
         renderLoadingSkeleton
       ) : (
         <Table
-          scroll={{ y: 475 }}
+          scroll={{ y: 705 }}
           locale={{
             filterReset: 'Đặt lại',
             emptyText: <Empty description="Không có dữ liệu." />,

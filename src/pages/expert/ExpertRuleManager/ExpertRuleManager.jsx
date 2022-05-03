@@ -759,7 +759,7 @@ const ExpertRuleManager = () => {
           <Descriptions.Item label="Mô Tả:">{ruleDetail.description}</Descriptions.Item>
         </Descriptions>
         <Table
-          //scroll={{ y: 475 }}
+          //scroll={{ y: 705 }}
           pagination={false}
           bordered
           locale={{
