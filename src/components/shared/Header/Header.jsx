@@ -31,6 +31,8 @@ import {
   AiOutlineUser,
   AiOutlineLogout,
 } from 'react-icons/ai';
+import { FiChevronDown, FiChevronUp } from 'react-icons/fi';
+const CARET_DOWN = false;
 const Header = () => {
   const { menuToggleCollapsed, setMenuToggleCollapsed } = useContext(AppContext);
   const { currentUser, setCurrentUser } = useContext(AuthContext);
@@ -39,6 +41,8 @@ const Header = () => {
   const history = useHistory();
   const [avatarUploadPreview, setAvatarUploadPreview] = useState(null);
   const [avatarUploadSource, setAvatarUploadSource] = useState(null);
+  const [caretIconState, setCaretIconState] = useState(CARET_DOWN);
+
   const getPageTitle = () => {
     const title = history.location.pathname;
     // if (title.match(new RegExp(/\/expert\/patient\/[0-9]+/))) {
@@ -98,6 +102,7 @@ const Header = () => {
             },
             onCancel() {
               confirmLogoutModal.destroy();
+              setCaretIconState(CARET_DOWN);
             },
           });
         }}
@@ -210,6 +215,7 @@ const Header = () => {
     setIsModalVisible(false);
     setAvatarUploadPreview(null);
     setAvatarUploadSource(null);
+    setCaretIconState(CARET_DOWN);
   };
   return (
     <Layout.Header className="site-layout-background header-container">
@@ -227,13 +233,23 @@ const Header = () => {
           overlay={menu}
           placement="bottomRight"
           trigger={['hover']}
-          // overlayStyle={{ left: 300 }}
+          onVisibleChange={(state) => setCaretIconState(state)}
         >
           <div>
             <Avatar size={45} src={currentUser?.avatar}>
               {!currentUser.avatar ? currentUser.name : ''}
             </Avatar>
-            &nbsp;&nbsp;{currentUser.name}
+            <p
+              style={{ margin: 0, padding: 0, fontWeight: 600, fontSize: 15 }}
+              className="header-user-name"
+            >
+              &nbsp;&nbsp;{currentUser.name}
+            </p>
+            {caretIconState === CARET_DOWN ? (
+              <FiChevronDown size={20} style={{ marginLeft: 2 }} />
+            ) : (
+              <FiChevronUp size={20} style={{ marginLeft: 2 }} />
+            )}
           </div>
         </Dropdown>
         <div>
