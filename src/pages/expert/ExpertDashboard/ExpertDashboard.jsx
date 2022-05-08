@@ -1,18 +1,17 @@
 import { Col, Row } from 'antd';
-import { FaUserFriends, FaDisease, FaMicrochip, FaUserMd } from 'react-icons/fa';
-import { RiHospitalFill } from 'react-icons/ri';
-import { BsFileEarmarkMedicalFill } from 'react-icons/bs';
-import doctorAPI from '../../../api/doctorAPI';
-import CardStatistic from '../../../components/shared/CardStatistic/CardStatistic';
-import useLoadingSkeleton from '../../../components/shared/LoadingSkeleton/useLoadingSkeleton';
 import { useEffect, useState } from 'react';
-import patientAPI from '../../../api/patientAPI';
+import { BsFileEarmarkMedicalFill } from 'react-icons/bs';
+import { FaDisease, FaMicrochip, FaUserFriends, FaUserMd, FaNotesMedical } from 'react-icons/fa';
+import { RiHospitalFill } from 'react-icons/ri';
 import deviceAPI from '../../../api/deviceAPI';
 import diseaseAPI from '../../../api/diseaseAPI';
-import ruleConditionAPI from '../../../api/ruleAPI';
+import doctorAPI from '../../../api/doctorAPI';
 import hospitalAPI from '../../../api/hospitalAPI';
+import medicalRecordAPI from '../../../api/medicalRecordAPI';
+import patientAPI from '../../../api/patientAPI';
 import ruleAPI from '../../../api/ruleAPI';
-import { Link } from 'react-router-dom';
+import CardStatistic from '../../../components/shared/CardStatistic/CardStatistic';
+import useLoadingSkeleton from '../../../components/shared/LoadingSkeleton/useLoadingSkeleton';
 const ExpertDashboard = () => {
   const { renderLoadingSkeleton, setIsLoadingSkeleton, isLoadingSkeleton } = useLoadingSkeleton();
 
@@ -25,6 +24,7 @@ const ExpertDashboard = () => {
       const patientSourceResult = await patientAPI.getAllPatients();
       const deviceSourceResult = await deviceAPI.getAllDevices();
       const diseaseSourceResult = await diseaseAPI.getAllDiseases();
+      const medicalRecordSourceResult = await medicalRecordAPI.getAllMedicalRecord();
       const ruleSourceResult = await ruleAPI.getAllRules();
       const hospitalSourceResult = await hospitalAPI.getAllHospital();
       setStatisticSource({
@@ -34,6 +34,9 @@ const ExpertDashboard = () => {
         disease: diseaseSourceResult.length,
         rule: ruleSourceResult.length,
         hospital: hospitalSourceResult.length,
+        medicalRecord: medicalRecordSourceResult.filter(
+          (medicalRecord) => medicalRecord.treated === false
+        ).length,
       });
       setIsLoadingSkeleton(false);
     } catch (error) {
@@ -41,6 +44,17 @@ const ExpertDashboard = () => {
       console.log(error);
     }
   };
+
+  const cardStatistics = [
+    {
+      link: '/expert/doctor',
+      number: statisticSource?.doctor,
+      type: 'Bác Sĩ',
+      icon: <FaUserMd opacity={0.5} size={70} />,
+      iconBottom: '-10px',
+      iconRight: '-10px',
+    },
+  ];
 
   useEffect(() => {
     getAllInfoStatistic();
@@ -52,7 +66,7 @@ const ExpertDashboard = () => {
         renderLoadingSkeleton
       ) : (
         <Row gutter={[20, 20]}>
-          <Col span={6}>
+          <Col span={6} sm={12} lg={6} xs={24}>
             <CardStatistic
               link="/expert/doctor"
               number={statisticSource?.doctor}
@@ -62,7 +76,7 @@ const ExpertDashboard = () => {
               iconRight="-10px"
             />
           </Col>
-          <Col span={6}>
+          <Col span={6} sm={12} lg={6} xs={24}>
             <CardStatistic
               link="/expert/patient"
               type={'Bệnh Nhân'}
@@ -73,7 +87,7 @@ const ExpertDashboard = () => {
               cardBackground="linear-gradient(to right, #fdc830, #f37335)"
             />
           </Col>
-          <Col span={6}>
+          <Col span={6} sm={12} lg={6} xs={24}>
             <CardStatistic
               type={'Thiết Bị'}
               link="/expert/device"
@@ -84,7 +98,7 @@ const ExpertDashboard = () => {
               cardBackground="linear-gradient(to left, #348f50, #56b4d3)"
             />
           </Col>
-          <Col span={6}>
+          <Col span={6} sm={12} lg={6} xs={24}>
             <CardStatistic
               link="/expert/disease"
               type={'Mầm Bệnh'}
@@ -95,7 +109,7 @@ const ExpertDashboard = () => {
               cardBackground="linear-gradient(to right, #cc2b5e, #753a88)"
             />
           </Col>
-          <Col span={6}>
+          <Col span={6} sm={12} lg={8} xs={24}>
             <CardStatistic
               link="/expert/rule"
               type={'Tập Luật Y Tế'}
@@ -106,7 +120,18 @@ const ExpertDashboard = () => {
               cardBackground="linear-gradient(to left, #203a43, #2c5364)"
             />
           </Col>
-          <Col span={6}>
+          <Col span={6} sm={12} lg={8} xs={24}>
+            <CardStatistic
+              link="/expert/medical-record"
+              type={'Bệnh Án'}
+              number={statisticSource?.medicalRecord}
+              icon={<FaNotesMedical opacity={0.5} size={70} />}
+              iconBottom="-10px"
+              iconRight="-10px"
+              cardBackground="linear-gradient(to left, #636363, #a2ab58)"
+            />
+          </Col>
+          <Col span={6} sm={12} lg={8} xs={24}>
             <CardStatistic
               link="/expert/hospital"
               type={'Bệnh Viện'}

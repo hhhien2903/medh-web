@@ -199,6 +199,13 @@ const ExpertMedicalRecordManager = () => {
                 >
                   Xem chi tiết
                 </Menu.Item>
+                <Menu.Item
+                  key="5"
+                  icon={<AiOutlineAreaChart size={15} />}
+                  onClick={() => handleVisibleChartModal(record)}
+                >
+                  Xem biểu đồ
+                </Menu.Item>
                 {!record.treated && (
                   <Menu.Item
                     key="4"
@@ -209,13 +216,6 @@ const ExpertMedicalRecordManager = () => {
                     Kết Thúc Điều Trị
                   </Menu.Item>
                 )}
-                <Menu.Item
-                  key="5"
-                  icon={<AiOutlineAreaChart size={15} />}
-                  onClick={() => handleVisibleChartModal(record)}
-                >
-                  Xem biểu đồ
-                </Menu.Item>
               </Menu>
             }
             trigger={['click']}
@@ -650,11 +650,11 @@ const ExpertMedicalRecordManager = () => {
           <Descriptions.Item label="Bệnh Viện:">
             {medicalRecordDetail.doctor?.hospital?.name}
           </Descriptions.Item>
-          <Descriptions.Item label="Bệnh:">{medicalRecordDetail.diseases?.name}</Descriptions.Item>
-          <Descriptions.Item label="Chuẩn Đoán:">{medicalRecordDetail.diagnose}</Descriptions.Item>
           <Descriptions.Item label="Bác Sĩ Phụ Trách:">
             {medicalRecordDetail.doctor?.name}
           </Descriptions.Item>
+          <Descriptions.Item label="Bệnh:">{medicalRecordDetail.diseases?.name}</Descriptions.Item>
+          <Descriptions.Item label="Chuẩn Đoán:">{medicalRecordDetail.diagnose}</Descriptions.Item>
           <Descriptions.Item label="Ngày Lập Bệnh Án:">
             {moment(medicalRecordDetail?.createdAt).format('DD/MM/YYYY')}
           </Descriptions.Item>
