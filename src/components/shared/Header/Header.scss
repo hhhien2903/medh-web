@@ -93,10 +93,16 @@
   .header-user-name {
     display: none;
   }
+  .caret-user {
+    display: none;
+  }
 }
 
 @media only screen and (min-width: 768px) {
   .header-user-name {
-    display: contents;
+    display: inline-block;
+  }
+  .caret-user {
+    display: inline-block;
   }
 }

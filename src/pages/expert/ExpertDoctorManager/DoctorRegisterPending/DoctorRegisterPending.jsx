@@ -1,11 +1,13 @@
-import { Button, Empty, Input, message, Modal, Space, Table, Tooltip } from 'antd';
+import { Avatar, Button, Empty, Input, message, Modal, Space, Table, Tooltip } from 'antd';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 import { AiOutlineCheck, AiOutlineDelete } from 'react-icons/ai';
 import doctorAPI from '../../../../api/doctorAPI';
+import useLoadingSkeleton from '../../../../components/shared/LoadingSkeleton/useLoadingSkeleton';
 import './DoctorRegisterPending.scss';
 const DoctorRegisterPending = () => {
   const [doctorPendingSource, setDoctorPendingSource] = useState([]);
+  const { renderLoadingSkeleton, setIsLoadingSkeleton, isLoadingSkeleton } = useLoadingSkeleton();
 
   const tableColumns = [
     {
@@ -18,15 +20,11 @@ const DoctorRegisterPending = () => {
     {
       title: 'Ảnh',
       dataIndex: 'avatar',
-      render: (avatar) => (
-        <img
-          src={
-            avatar
-              ? avatar
-              : 'https://eitrawmaterials.eu/wp-content/uploads/2016/09/person-icon.png'
-          }
-          style={{ width: '60px' }}
-        />
+      align: 'center',
+      render: (_text, record) => (
+        <Avatar src={record?.avatar} size={50}>
+          {record.name.substring(0, 1)}
+        </Avatar>
       ),
     },
     {
@@ -67,12 +65,12 @@ const DoctorRegisterPending = () => {
       key: 'mobile',
     },
 
-    // {
-    //   title: 'Bệnh Viện Công Tác',
-    //   dataIndex: 'hospital',
-    //   key: 'hospital',
-    //   render: (hospital) => hospital.name,
-    // },
+    {
+      title: 'Bệnh Viện Công Tác',
+      dataIndex: 'hospital',
+      key: 'hospital',
+      render: (hospital) => hospital.name,
+    },
 
     {
       title: 'Tác Vụ',
@@ -117,8 +115,10 @@ const DoctorRegisterPending = () => {
   ];
   const getAllPendingDoctors = async () => {
     try {
+      setIsLoadingSkeleton(true);
       const pendingDoctorsResult = await doctorAPI.getPendingDoctors();
       setDoctorPendingSource(pendingDoctorsResult);
+      setIsLoadingSkeleton(false);
     } catch (error) {
       console.log(error);
     }
@@ -179,14 +179,18 @@ const DoctorRegisterPending = () => {
           size="large"
         />
       </div>
-      <Table
-        locale={{
-          emptyText: <Empty description="Không có dữ liệu." />,
-        }}
-        columns={tableColumns}
-        dataSource={doctorPendingSource}
-        pagination={{ pageSize: 10 }}
-      />
+      {isLoadingSkeleton ? (
+        renderLoadingSkeleton
+      ) : (
+        <Table
+          locale={{
+            emptyText: <Empty description="Không có dữ liệu." />,
+          }}
+          columns={tableColumns}
+          dataSource={doctorPendingSource}
+          pagination={{ pageSize: 10 }}
+        />
+      )}
     </div>
   );
 };

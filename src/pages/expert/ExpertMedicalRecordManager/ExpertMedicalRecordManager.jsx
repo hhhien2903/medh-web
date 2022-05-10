@@ -19,6 +19,7 @@ import {
   AiOutlineInfoCircle,
   AiOutlinePlus,
   AiOutlineAreaChart,
+  AiOutlineEdit,
 } from 'react-icons/ai';
 import { MdMoreHoriz } from 'react-icons/md';
 import medicalRecordAPI from '../../../api/medicalRecordAPI';
@@ -32,6 +33,8 @@ import getListFilterHospital from '../../../utils/ListFilterHospital';
 import './ExpertMedicalRecordManager.scss';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, registerables } from 'chart.js';
+import patientAPI from '../../../api/patientAPI';
+import deviceAPI from '../../../api/deviceAPI';
 ChartJS.register(...registerables);
 
 const ExpertMedicalRecordManager = () => {
@@ -45,14 +48,17 @@ const ExpertMedicalRecordManager = () => {
   const { renderLoadingSkeleton, setIsLoadingSkeleton, isLoadingSkeleton } = useLoadingSkeleton();
   const { renderFormItemDoctor, setIsFormItemDoctorDisabled, getAllDoctorByHospitalId } =
     useFormItemDoctor();
-  const { renderFormItemDisease, setIsFormItemDiseaseDisabled } = useFormItemDisease();
-  const { renderFormItemPatient, setIsFormItemPatientDisabled, getAllPatientIsTreated } =
+  const { renderFormItemDisease } = useFormItemDisease();
+  const { renderFormItemPatient, getAllPatientIsTreated, setPatientSource, patientSource } =
     useFormItemPatient();
-  const { renderFormItemDevice, setIsFormItemDeviceDisabled, getAllUnusedDevicesByHospitalId } =
-    useFormItemDevice();
+  const {
+    renderFormItemDevice,
+    setIsFormItemDeviceDisabled,
+    getAllUnusedDevicesByHospitalId,
+    setDeviceSource,
+  } = useFormItemDevice();
   const { renderFormItemHospital } = useFormItemHospital();
   const [listFilterHospital, setListFilterHospital] = useState([]);
-  const [isDisabledConcludeFormItem, setIsDisabledConcludeFormItem] = useState(true);
   const [dateSelectedChart, setDateSelectedChart] = useState(null);
   const [listTempDateChart, setListTempDateChart] = useState([]);
   const [tempChart, setTempChart] = useState([]);
@@ -176,14 +182,17 @@ const ExpertMedicalRecordManager = () => {
           <Dropdown
             overlay={
               <Menu>
-                {/* <Menu.Item
-                  key="1"
-                  icon={<AiOutlineEdit size={15} color="#1890FF" />}
-                  style={{ color: '#1890FF' }}
-                  onClick={() => handleVisibleEditMedicalRecord(record)}
-                >
-                  Sửa thông tin
-                </Menu.Item> */}
+                {!record.treated && (
+                  <Menu.Item
+                    key="1"
+                    icon={<AiOutlineEdit size={15} color="#1890FF" />}
+                    style={{ color: '#1890FF' }}
+                    onClick={() => handleVisibleEditMedicalRecord(record)}
+                  >
+                    Sửa thông tin
+                  </Menu.Item>
+                )}
+
                 {/* <Menu.Item
                   key="2"
                   icon={<AiOutlineDelete size={15} color="#FF4D4F" />}
@@ -201,6 +210,7 @@ const ExpertMedicalRecordManager = () => {
                 </Menu.Item>
                 <Menu.Item
                   key="5"
+                  style={{ color: '#034C3C' }}
                   icon={<AiOutlineAreaChart size={15} />}
                   onClick={() => handleVisibleChartModal(record)}
                 >
@@ -362,22 +372,35 @@ const ExpertMedicalRecordManager = () => {
   };
 
   const handleVisibleEditMedicalRecord = async (record) => {
-    setModalUsedFor('editMedicalRecord');
-    setModalTitle('Sửa Thông Tin Bệnh Án');
-    await formAddEditMedicalRecord.setFieldsValue({
-      id: record?.id,
-      diagnose: record?.diagnose,
-      patientId: record.patient?.id,
-      doctorId: record.doctor?.id,
-      diseasesId: record.diseases?.id,
-      deviceId: record.medicalRecordDevice?.device?.id,
-      treated: record?.treated,
-      conclude: record?.conclude,
-      hospitalId: record.doctor?.hospital?.id,
-    });
-    setIsFormItemDeviceDisabled(false);
-    setIsFormItemDoctorDisabled(false);
-    setAddEditMedicalRecordModalVisible(true);
+    try {
+      const patientSourceResult = await patientAPI.getAllPatientsIsTreated();
+      patientSourceResult.unshift(record.patient);
+      setPatientSource(patientSourceResult);
+      const deviceSourceResult = await deviceAPI.getAllUnusedDevicesByHospitalId(
+        record.doctor?.hospital?.id
+      );
+      deviceSourceResult.unshift(record.medicalRecordDevice?.device);
+      setDeviceSource(deviceSourceResult);
+
+      setModalUsedFor('editMedicalRecord');
+      setModalTitle('Sửa Thông Tin Bệnh Án');
+      await formAddEditMedicalRecord.setFieldsValue({
+        id: record?.id,
+        diagnose: record?.diagnose,
+        patientId: record.patient?.id,
+        doctorId: record.doctor?.id,
+        diseasesId: record.diseases?.id,
+        deviceId: record.medicalRecordDevice?.device?.id,
+        treated: record?.treated,
+        conclude: record?.conclude,
+        hospitalId: record.doctor?.hospital?.id,
+      });
+      setIsFormItemDeviceDisabled(false);
+      setIsFormItemDoctorDisabled(false);
+      setAddEditMedicalRecordModalVisible(true);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const handleCancelMedicalRecordModal = () => {
@@ -385,7 +408,6 @@ const ExpertMedicalRecordManager = () => {
     formAddEditMedicalRecord.resetFields();
     setIsFormItemDeviceDisabled(true);
     setIsFormItemDoctorDisabled(true);
-    setIsDisabledConcludeFormItem(true);
   };
 
   const onChangeFormItem = async (fieldData) => {
@@ -408,6 +430,8 @@ const ExpertMedicalRecordManager = () => {
       const medicalReportResult = await medicalRecordAPI.getReportByMedicalRecordId(record.id);
       setMedicalReportSource(medicalReportResult);
       setPatientNameChart(record.patient.fullName);
+
+      //create array of temperature date not duplicate
       const filteredDates = medicalReportResult
         .map((temp) => moment(temp.date).format('DD/MM/YYYY'))
         .filter((date, index, arrayDate) => arrayDate.indexOf(date) === index);

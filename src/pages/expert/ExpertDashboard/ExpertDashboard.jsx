@@ -1,5 +1,5 @@
 import { Col, Row } from 'antd';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import { BsFileEarmarkMedicalFill } from 'react-icons/bs';
 import { FaDisease, FaMicrochip, FaUserFriends, FaUserMd, FaNotesMedical } from 'react-icons/fa';
 import { RiHospitalFill } from 'react-icons/ri';
@@ -12,14 +12,17 @@ import patientAPI from '../../../api/patientAPI';
 import ruleAPI from '../../../api/ruleAPI';
 import CardStatistic from '../../../components/shared/CardStatistic/CardStatistic';
 import useLoadingSkeleton from '../../../components/shared/LoadingSkeleton/useLoadingSkeleton';
+import { AppContext } from '../../../contexts/AppProvider';
 const ExpertDashboard = () => {
   const { renderLoadingSkeleton, setIsLoadingSkeleton, isLoadingSkeleton } = useLoadingSkeleton();
-
-  const [statisticSource, setStatisticSource] = useState([]);
+  const { statisticSource, setStatisticSource } = useContext(AppContext);
 
   const getAllInfoStatistic = async () => {
     try {
-      setIsLoadingSkeleton(true);
+      if (!statisticSource) {
+        setIsLoadingSkeleton(true);
+      }
+
       const doctorSourceResult = await doctorAPI.getAllDoctors();
       const patientSourceResult = await patientAPI.getAllPatients();
       const deviceSourceResult = await deviceAPI.getAllDevices();
@@ -44,17 +47,6 @@ const ExpertDashboard = () => {
       console.log(error);
     }
   };
-
-  const cardStatistics = [
-    {
-      link: '/expert/doctor',
-      number: statisticSource?.doctor,
-      type: 'Bác Sĩ',
-      icon: <FaUserMd opacity={0.5} size={70} />,
-      iconBottom: '-10px',
-      iconRight: '-10px',
-    },
-  ];
 
   useEffect(() => {
     getAllInfoStatistic();

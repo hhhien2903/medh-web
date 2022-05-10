@@ -42,13 +42,13 @@ const Header = () => {
   const [avatarUploadPreview, setAvatarUploadPreview] = useState(null);
   const [avatarUploadSource, setAvatarUploadSource] = useState(null);
   const [caretIconState, setCaretIconState] = useState(CARET_DOWN);
-
+  // console.log(history.location.pathname);
   const getPageTitle = () => {
-    const title = history.location.pathname;
+    const pathnameURL = history.location.pathname;
     // if (title.match(new RegExp(/\/expert\/patient\/[0-9]+/))) {
     //   return 'Chi Tiết Bệnh Nhân';
     // }
-    switch (title) {
+    switch (pathnameURL) {
       case '/expert/dashboard':
         return 'Dashboard';
       case '/expert/doctor':
@@ -236,19 +236,19 @@ const Header = () => {
           onVisibleChange={(state) => setCaretIconState(state)}
         >
           <div>
-            <Avatar size={45} src={currentUser?.avatar}>
+            <Avatar size={45} src={currentUser?.avatar} style={{ marginRight: 3 }}>
               {!currentUser.avatar ? currentUser.name : ''}
             </Avatar>
             <p
-              style={{ margin: 0, padding: 0, fontWeight: 600, fontSize: 15 }}
+              style={{ margin: 0, padding: 0, fontWeight: 600, fontSize: 15, marginLeft: 1 }}
               className="header-user-name"
             >
-              &nbsp;&nbsp;{currentUser.name}
+              {currentUser.name}
             </p>
             {caretIconState === CARET_DOWN ? (
-              <FiChevronDown size={20} style={{ marginLeft: 2 }} />
+              <FiChevronDown size={20} className="caret-user" />
             ) : (
-              <FiChevronUp size={20} style={{ marginLeft: 2 }} />
+              <FiChevronUp size={20} className="caret-user" />
             )}
           </div>
         </Dropdown>

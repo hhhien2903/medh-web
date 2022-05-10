@@ -17,7 +17,6 @@ const useFormItemPatient = () => {
   const getAllPatientIsTreated = async () => {
     try {
       const patientSourceResult = await patientAPI.getAllPatientsIsTreated();
-      console.log(patientSourceResult);
       setPatientSource(patientSourceResult);
     } catch (error) {
       console.log(error);
@@ -31,6 +30,8 @@ const useFormItemPatient = () => {
   return {
     getAllPatientIsTreated,
     setIsFormItemPatientDisabled,
+    setPatientSource,
+    patientSource,
     renderFormItemPatient: (
       <>
         <Form.Item
