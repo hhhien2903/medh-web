@@ -1,5 +1,5 @@
 import { Row, Spin } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useHistory } from 'react-router-dom';
 import expertAPI from '../api/expertAPI';
 import { firebaseAuth } from '../config/firebase';
@@ -28,10 +28,15 @@ export default function AuthProvider({ children }) {
         const expertData = await expertAPI.checkAccountRegistered(phoneNumber, email);
         setCurrentUser(expertData);
         console.log(expertData);
-        localStorage.setItem('isLoggedIn', true);
-        history.push('/expert');
-        setIsLoading(false);
         console.log(firebaseUser);
+        // localStorage.setItem('isLoggedIn', true);
+        console.log(sessionStorage.getItem('pathnameURL'));
+        if (sessionStorage.getItem('pathnameURL') !== null) {
+          history.push(sessionStorage.getItem('pathnameURL'));
+        } else {
+          history.push('/expert');
+        }
+        setIsLoading(false);
       } catch (error) {
         console.log(error);
         setIsLoading(false);
@@ -51,8 +56,6 @@ export default function AuthProvider({ children }) {
     return () => {
       unsubscribed();
     };
-    // setIsLoading(false);
-    // history.push('/register');
   }, [history]);
 
   return (

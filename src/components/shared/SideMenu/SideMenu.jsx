@@ -26,11 +26,13 @@ const SideMenu = (props) => {
       width={230}
     >
       <div className="logo">
-        <Image
-          src={menuToggleCollapsed ? onlyLogo : fullLogo}
-          preview={false}
-          height={menuToggleCollapsed ? 45 : 50}
-        />
+        <Link to={'/expert/dashboard'}>
+          <Image
+            src={menuToggleCollapsed ? onlyLogo : fullLogo}
+            preview={false}
+            height={menuToggleCollapsed ? 45 : 50}
+          />
+        </Link>
       </div>
       <Menu
         defaultOpenKeys={['tmp_key-1']}

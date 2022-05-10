@@ -8,7 +8,6 @@ import ProtectedRoute from './components/shared/ProtectedRoute/ProtectedRoute';
 import Logout from './pages/Logout/Logout';
 import AuthProvider from './contexts/AuthProvider';
 import AppProvider from './contexts/AppProvider';
-import Home from './pages/Home/Home';
 function App() {
   return (
     <Router>

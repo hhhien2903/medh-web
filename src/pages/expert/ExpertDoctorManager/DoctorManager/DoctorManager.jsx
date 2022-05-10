@@ -54,19 +54,13 @@ const DoctorManager = () => {
     },
     {
       title: 'Ảnh',
-      dataIndex: 'avatar',
       align: 'center',
       width: 80,
       key: 'avatar',
-      render: (avatar) => (
-        <img
-          src={
-            avatar
-              ? avatar
-              : 'https://eitrawmaterials.eu/wp-content/uploads/2016/09/person-icon.png'
-          }
-          style={{ width: '60px' }}
-        />
+      render: (_text, record) => (
+        <Avatar src={record?.avatar} size={55}>
+          {record.name.substring(0, 1)}
+        </Avatar>
       ),
     },
     {

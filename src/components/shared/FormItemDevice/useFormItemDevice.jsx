@@ -23,11 +23,12 @@ const useFormItemDevice = () => {
     }
   };
   const getAllUnusedDevicesByHospitalId = async (hospitalId) => {
-    setDeviceSource([]);
     try {
+      console.log(hospitalId);
       const deviceSourceResult = await deviceAPI.getAllUnusedDevicesByHospitalId(hospitalId);
       setDeviceSource(deviceSourceResult);
     } catch (error) {
+      setDeviceSource([]);
       // setIsFormItemDeviceDisabled(true);
       // message.warning(error.data.message, 8);
     }
@@ -37,7 +38,7 @@ const useFormItemDevice = () => {
     if (isDropdownVisible) {
       if (deviceSource.length === 0) {
         // setIsFormItemDeviceDisabled(true);
-        message.warning('Tất cả Thiết Bị của Bệnh Viện này đều đang được sử dụng.', 8);
+        message.warning('Tất cả Thiết Bị của Bệnh Viện này đều đang được sử dụng.', 5);
       }
     }
   };
@@ -50,6 +51,8 @@ const useFormItemDevice = () => {
     getAllDevicesByHospitalId,
     setIsDeviceFormItemRequired,
     setIsFormItemDeviceDisabled,
+    setDeviceSource,
+    deviceSource,
     renderFormItemDevice: (
       <>
         <Form.Item

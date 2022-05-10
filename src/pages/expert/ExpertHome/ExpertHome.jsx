@@ -9,9 +9,8 @@ import {
   FaNotesMedical,
 } from 'react-icons/fa';
 import { RiHospitalFill } from 'react-icons/ri';
-import { Redirect, Route, Switch } from 'react-router-dom';
+import { Redirect, Route, Switch, useHistory } from 'react-router-dom';
 import backgroundImage from '../../../assets/images/background-1.jpg';
-import Breadcrumb from '../../../components/shared/Breadcrumb/Breadcrumb';
 import Layout from '../../../components/shared/Layout/Layout';
 import ExpertDashboard from '../ExpertDashboard/ExpertDashboard';
 import ExpertDeviceManager from '../ExpertDeviceManager/ExpertDeviceManager';
@@ -24,7 +23,9 @@ import ExpertPatientManager from '../ExpertPatientManager/ExpertPatientManager';
 import ExpertRuleConditionManager from '../ExpertRuleConditionManager/ExpertRuleConditionManager';
 import ExpertRuleManager from '../ExpertRuleManager/ExpertRuleManager';
 import './ExpertHome.scss';
+import { useEffect } from 'react';
 const ExpertHome = () => {
+  const history = useHistory();
   const sideMenuItems = [
     {
       title: 'Dashboard',
@@ -106,6 +107,11 @@ const ExpertHome = () => {
       subMenuItems: [],
     },
   ];
+
+  useEffect(() => {
+    let pathnameURL = history.location.pathname;
+    sessionStorage.setItem('pathnameURL', pathnameURL);
+  }, [history.location.pathname]);
 
   return (
     <Layout sideMenuItems={sideMenuItems}>
