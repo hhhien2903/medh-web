@@ -43,6 +43,10 @@ const doctorAPI = {
     const url = `${API_ENDPOINT}/${id}`;
     return axiosClient.get(url);
   },
+  searchDoctorByHospitalIdText: (hospitalId, search) => {
+    const url = `${API_ENDPOINT}?hospitalId=${hospitalId}&text=${search}`;
+    return axiosClient.get(url);
+  },
 };
 
 export default doctorAPI;

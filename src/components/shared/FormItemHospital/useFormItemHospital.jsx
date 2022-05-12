@@ -33,6 +33,7 @@ const useFormItemHospital = () => {
           ]}
         >
           <Select
+            showSearch
             disabled={isFormItemHospitalDisabled}
             notFoundContent={
               <Empty
@@ -40,6 +41,9 @@ const useFormItemHospital = () => {
                 image={Empty.PRESENTED_IMAGE_SIMPLE}
                 style={{ height: 50 }}
               />
+            }
+            filterOption={(input, option) =>
+              option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
             }
             placeholder="Vui lòng chọn Bệnh Viện "
           >

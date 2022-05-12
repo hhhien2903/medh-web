@@ -35,6 +35,9 @@ import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, registerables } from 'chart.js';
 import patientAPI from '../../../api/patientAPI';
 import deviceAPI from '../../../api/deviceAPI';
+import FormItem from 'antd/lib/form/FormItem';
+import AsyncSelect from '../../../components/shared/AsyncSelect';
+import doctorAPI from '../../../api/doctorAPI';
 ChartJS.register(...registerables);
 
 const ExpertMedicalRecordManager = () => {
@@ -46,11 +49,11 @@ const ExpertMedicalRecordManager = () => {
   const [modalTitle, setModalTitle] = useState('');
   const [modalUsedFor, setModalUsedFor] = useState('');
   const { renderLoadingSkeleton, setIsLoadingSkeleton, isLoadingSkeleton } = useLoadingSkeleton();
-  const { renderFormItemDoctor, setIsFormItemDoctorDisabled, getAllDoctorByHospitalId } =
-    useFormItemDoctor();
+  // const { renderFormItemDoctor, setIsFormItemDoctorDisabled, getAllDoctorByHospitalId } =
+  //   useFormItemDoctor();
   const { renderFormItemDisease } = useFormItemDisease();
-  const { renderFormItemPatient, getAllPatientIsTreated, setPatientSource, patientSource } =
-    useFormItemPatient();
+  // const { renderFormItemPatient, getAllPatientIsTreated, setPatientSource, patientSource } =
+  //   useFormItemPatient();
   const {
     renderFormItemDevice,
     setIsFormItemDeviceDisabled,
@@ -65,12 +68,10 @@ const ExpertMedicalRecordManager = () => {
   const [medicalReportSource, setMedicalReportSource] = useState([]);
   const [patientNameChart, setPatientNameChart] = useState(null);
   const [isVisibleChartModal, setIsVisibleChartModal] = useState(false);
+  const [isFormItemDoctorDisabled, setIsFormItemDoctorDisabled] = useState(false);
+  const [isFormItemPatientDisabled, setIsFormItemPatientDisabled] = useState(false);
+
   const tableColumns = [
-    // {
-    //   title: 'ID',
-    //   dataIndex: 'id',
-    //   key: 'id',
-    // },
     {
       title: 'STT',
       key: 'index',
@@ -192,15 +193,6 @@ const ExpertMedicalRecordManager = () => {
                     Sửa thông tin
                   </Menu.Item>
                 )}
-
-                {/* <Menu.Item
-                  key="2"
-                  icon={<AiOutlineDelete size={15} color="#FF4D4F" />}
-                  style={{ color: '#FF4D4F' }}
-                  onClick={() => handleDeleteMedicalRecord(record)}
-                >
-                  Xoá
-                </Menu.Item> */}
                 <Menu.Item
                   key="3"
                   icon={<AiOutlineInfoCircle size={15} />}
@@ -290,33 +282,42 @@ const ExpertMedicalRecordManager = () => {
 
   const handleEditMedicalRecord = () => {
     formAddEditMedicalRecord.validateFields().then((formValue) => {
-      console.log(formValue);
-      // const confirmUpdateMedicalRecordModal = Modal.confirm({
-      //   title: 'Xác Nhận',
-      //   content: 'Bạn có chắc chắn với các thông tin đã nhập?',
-      //   okText: 'Xác Nhận',
-      //   cancelText: 'Không',
-      //   onOk: async () => {
-      //     try {
-      //       await medicalRecordAPI.updateMedicalRecord({ ...formValue, status: true });
-      //       message.success('Sửa Bệnh Án Thành Công.', 5);
-      //       getAllMedicalRecord();
-      //       handleCancelMedicalRecordModal();
-      //     } catch (error) {
-      //       console.log(error);
-      //       message.error('Sửa Bệnh Án Không Thành Công.', 5);
-      //     }
-      //   },
-      //   onCancel() {
-      //     confirmUpdateMedicalRecordModal.destroy();
-      //   },
-      // });
+      const confirmUpdateMedicalRecordModal = Modal.confirm({
+        title: 'Xác Nhận',
+        content: 'Bạn có chắc chắn với các thông tin đã nhập?',
+        okText: 'Xác Nhận',
+        cancelText: 'Không',
+        onOk: async () => {
+          try {
+            await medicalRecordAPI.updateMedicalRecord({
+              ...formValue,
+              treated: false,
+              doctorId: formValue.doctorId.value,
+              patientId: formValue.patientId.value,
+            });
+            message.success('Sửa Bệnh Án Thành Công.', 5);
+            getAllMedicalRecord();
+            handleCancelMedicalRecordModal();
+          } catch (error) {
+            console.log(error);
+            message.error('Sửa Bệnh Án Không Thành Công.', 5);
+          }
+        },
+        onCancel() {
+          confirmUpdateMedicalRecordModal.destroy();
+        },
+      });
     });
   };
   const handleAddMedicalRecord = () => {
     formAddEditMedicalRecord.validateFields().then(async (formValue) => {
       try {
-        await medicalRecordAPI.createMedicalRecord({ ...formValue, treated: false });
+        await medicalRecordAPI.createMedicalRecord({
+          ...formValue,
+          treated: false,
+          doctorId: formValue.doctorId.value,
+          patientId: formValue.patientId.value,
+        });
         message.success('Tạo Bệnh Án thành công.', 5);
         getAllMedicalRecord();
         handleCancelMedicalRecordModal();
@@ -354,14 +355,14 @@ const ExpertMedicalRecordManager = () => {
   };
 
   const handleVisibleAddMedicalRecord = async () => {
-    await getAllPatientIsTreated();
+    // await getAllPatientIsTreated();
     formAddEditMedicalRecord.setFieldsValue({ treated: false });
     setAddEditMedicalRecordModalVisible(true);
     setModalUsedFor('addMedicalRecord');
     setModalTitle('Thêm Bệnh Án');
     setIsFormItemDeviceDisabled(true);
     setIsFormItemDoctorDisabled(true);
-    // setIsFormItemDiseaseDisabled(true);
+    setIsFormItemPatientDisabled(false);
   };
 
   const handleVisibleEndFollowMedicalRecord = async (record) => {
@@ -373,32 +374,38 @@ const ExpertMedicalRecordManager = () => {
 
   const handleVisibleEditMedicalRecord = async (record) => {
     try {
-      const patientSourceResult = await patientAPI.getAllPatientsIsTreated();
-      patientSourceResult.unshift(record.patient);
-      setPatientSource(patientSourceResult);
-      const deviceSourceResult = await deviceAPI.getAllUnusedDevicesByHospitalId(
-        record.doctor?.hospital?.id
-      );
-      deviceSourceResult.unshift(record.medicalRecordDevice?.device);
-      setDeviceSource(deviceSourceResult);
-
+      setIsFormItemPatientDisabled(true);
       setModalUsedFor('editMedicalRecord');
       setModalTitle('Sửa Thông Tin Bệnh Án');
       await formAddEditMedicalRecord.setFieldsValue({
         id: record?.id,
         diagnose: record?.diagnose,
-        patientId: record.patient?.id,
-        doctorId: record.doctor?.id,
+        patientId: {
+          label: record.patient.surname + ' ' + record.patient.name,
+          value: record.patient.id,
+        },
+        doctorId: {
+          label: record.doctor?.name,
+          value: record.doctor?.id,
+        },
         diseasesId: record.diseases?.id,
         deviceId: record.medicalRecordDevice?.device?.id,
         treated: record?.treated,
         conclude: record?.conclude,
         hospitalId: record.doctor?.hospital?.id,
       });
+
       setIsFormItemDeviceDisabled(false);
       setIsFormItemDoctorDisabled(false);
+      const deviceSourceResult = await deviceAPI.getAllUnusedDevicesByHospitalId(
+        record.doctor?.hospital?.id
+      );
+      deviceSourceResult.unshift(record.medicalRecordDevice?.device);
+      setDeviceSource(deviceSourceResult);
       setAddEditMedicalRecordModalVisible(true);
     } catch (error) {
+      setDeviceSource([record.medicalRecordDevice?.device]);
+      setAddEditMedicalRecordModalVisible(true);
       console.log(error);
     }
   };
@@ -408,12 +415,13 @@ const ExpertMedicalRecordManager = () => {
     formAddEditMedicalRecord.resetFields();
     setIsFormItemDeviceDisabled(true);
     setIsFormItemDoctorDisabled(true);
+    setIsFormItemPatientDisabled(false);
   };
 
   const onChangeFormItem = async (fieldData) => {
     if (fieldData.hospitalId) {
       formAddEditMedicalRecord.resetFields(['deviceId', 'doctorId']);
-      await getAllDoctorByHospitalId(fieldData.hospitalId);
+      // await getAllDoctorByHospitalId(fieldData.hospitalId);
       setIsFormItemDeviceDisabled(false);
       setIsFormItemDoctorDisabled(false);
       await getAllUnusedDevicesByHospitalId(fieldData.hospitalId);
@@ -450,6 +458,37 @@ const ExpertMedicalRecordManager = () => {
       (medicalReport) => moment(medicalReport.date).format('DD/MM/YYYY') === selectedDate
     );
     setTempChart(temp);
+  };
+
+  const fetchPatient = async (search) => {
+    try {
+      if (!search) {
+        return [];
+      }
+      const patientSearchResult = await patientAPI.searchAllPatients(true, search);
+      console.log(patientSearchResult);
+      return patientSearchResult;
+    } catch (error) {
+      console.log(error);
+      return [];
+    }
+  };
+
+  const fetchDoctor = async (search) => {
+    try {
+      if (!search) {
+        return [];
+      }
+      const doctorSearchResult = await doctorAPI.searchDoctorByHospitalIdText(
+        formAddEditMedicalRecord.getFieldValue('hospitalId'),
+        search
+      );
+
+      return doctorSearchResult;
+    } catch (error) {
+      console.log(error);
+      return [];
+    }
   };
 
   return (
@@ -531,9 +570,49 @@ const ExpertMedicalRecordManager = () => {
             </Form.Item> */}
           {modalUsedFor === 'editMedicalRecord' || modalUsedFor === 'addMedicalRecord' ? (
             <>
-              {renderFormItemPatient}
+              {/* {renderFormItemPatient} */}
+              <Form.Item
+                name="patientId"
+                label="Bệnh Nhân:"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Bệnh Nhân không được để trống!',
+                  },
+                ]}
+              >
+                <AsyncSelect
+                  disabled={isFormItemPatientDisabled}
+                  placeholder="Vui lòng chọn Bệnh Nhân"
+                  fetchOptions={fetchPatient}
+                  dropdownRender={(node) => node}
+                  findContentLabel="Nhập Tên, SĐT hoặc CMND để tìm kiếm."
+                  optionLabelKey="fullName"
+                  optionValueKey="id"
+                />
+              </Form.Item>
               {renderFormItemHospital}
-              {renderFormItemDoctor}
+              <Form.Item
+                name="doctorId"
+                label="Bác Sĩ:"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Bác Sĩ không được để trống!',
+                  },
+                ]}
+              >
+                <AsyncSelect
+                  disabled={isFormItemDoctorDisabled}
+                  placeholder="Vui lòng chọn Bác Sĩ"
+                  fetchOptions={fetchDoctor}
+                  dropdownRender={(node) => node}
+                  findContentLabel="Nhập Tên, SĐT hoặc CMND để tìm kiếm."
+                  optionValueKey="id"
+                  optionLabelKey="name"
+                />
+              </Form.Item>
+              {/* {renderFormItemDoctor} */}
               {renderFormItemDisease}
               {renderFormItemDevice}
 

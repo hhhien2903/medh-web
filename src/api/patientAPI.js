@@ -27,6 +27,10 @@ const patientAPI = {
     const url = `${API_ENDPOINT}/doctor`;
     return axiosClient.patch(url, data);
   },
+  searchAllPatients: (treated, search) => {
+    const url = `${API_ENDPOINT}?treated=${treated ? true : false}&text=${search}`;
+    return axiosClient.get(url);
+  },
 };
 
 export default patientAPI;

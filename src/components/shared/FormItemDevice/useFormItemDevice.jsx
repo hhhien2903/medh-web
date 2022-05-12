@@ -24,7 +24,6 @@ const useFormItemDevice = () => {
   };
   const getAllUnusedDevicesByHospitalId = async (hospitalId) => {
     try {
-      console.log(hospitalId);
       const deviceSourceResult = await deviceAPI.getAllUnusedDevicesByHospitalId(hospitalId);
       setDeviceSource(deviceSourceResult);
     } catch (error) {
