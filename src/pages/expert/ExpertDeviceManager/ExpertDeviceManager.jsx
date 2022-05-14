@@ -182,19 +182,11 @@ const ExpertDeviceManager = () => {
                 <Menu>
                   <Menu.Item
                     key="1"
-                    icon={<AiOutlineEdit size={15} color="#1890FF" />}
-                    style={{ color: '#1890FF' }}
+                    icon={<AiOutlineEdit size={15} />}
+                    // style={{ color: '#1890FF' }}
                     onClick={() => handleVisibleEditDevice(record)}
                   >
                     Sửa thông tin
-                  </Menu.Item>
-                  <Menu.Item
-                    key="2"
-                    icon={<AiOutlineDelete size={15} color="#FF4D4F" />}
-                    style={{ color: '#FF4D4F' }}
-                    onClick={() => handleDeleteDevice(record)}
-                  >
-                    Xoá
                   </Menu.Item>
                   <Menu.Item
                     key="3"
@@ -202,6 +194,15 @@ const ExpertDeviceManager = () => {
                     //  onClick={() => handleVisibleDetailDoctor(record)}
                   >
                     Xem chi tiết
+                  </Menu.Item>
+                  <Menu.Item
+                    key="2"
+                    danger
+                    icon={<AiOutlineDelete size={15} />}
+                    // style={{ color: '#FF4D4F' }}
+                    onClick={() => handleDeleteDevice(record)}
+                  >
+                    Xoá
                   </Menu.Item>
                 </Menu>
               }
