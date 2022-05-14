@@ -25,7 +25,7 @@ import './DoctorManager.scss';
 import { emailRegex, phoneNumberRegex, vietnameseNameRegex } from '../../../../utils/regex';
 import localeVN from 'antd/es/date-picker/locale/vi_VN';
 import ImgCrop from 'antd-img-crop';
-import { AiFillCamera, AiOutlineUser } from 'react-icons/ai';
+import { AiFillCamera, AiOutlineUser, AiOutlineSetting } from 'react-icons/ai';
 import useFormItemHospital from '../../../../components/shared/FormItemHospital/useFormItemHospital';
 import useLoadingSkeleton from '../../../../components/shared/LoadingSkeleton/useLoadingSkeleton';
 
@@ -42,12 +42,13 @@ const DoctorManager = () => {
   const [avatarUploadPreview, setAvatarUploadPreview] = useState(null);
   const [avatarUploadSource, setAvatarUploadSource] = useState(null);
   const [avatarSource, setAvatarSource] = useState(null);
+  const [loadingSearchButton, setLoadingSearchButton] = useState(false);
 
   const tableColumns = [
     {
       title: 'STT',
       key: 'index',
-      width: 60,
+      width: 40,
       align: 'center',
       className: 'index-row',
       render: (text, record) => doctorSource.indexOf(record) + 1,
@@ -130,25 +131,26 @@ const DoctorManager = () => {
       },
     },
     {
-      title: 'Tác Vụ',
+      title: <AiOutlineSetting size={20} style={{ verticalAlign: 'middle' }} />,
       key: 'action',
       align: 'center',
       width: 60,
-      fixed: 'right',
+
       render: (record) => {
         return (
-          <Dropdown
-            overlay={
-              <Menu>
-                <Menu.Item
-                  key="1"
-                  icon={<AiOutlineEdit size={15} color="#1890FF" />}
-                  style={{ color: '#1890FF' }}
-                  onClick={() => handleVisibleEditDoctor(record)}
-                >
-                  Sửa thông tin
-                </Menu.Item>
-                {/* <Menu.Item
+          <Tooltip title="Tác Vụ">
+            <Dropdown
+              overlay={
+                <Menu>
+                  <Menu.Item
+                    key="1"
+                    icon={<AiOutlineEdit size={15} />}
+                    // style={{ color: '#1890FF' }}
+                    onClick={() => handleVisibleEditDoctor(record)}
+                  >
+                    Sửa Thông Tin
+                  </Menu.Item>
+                  {/* <Menu.Item
                   key="2"
                   icon={<AiOutlineDelete size={15} color="#FF4D4F" />}
                   style={{ color: '#FF4D4F' }}
@@ -156,29 +158,30 @@ const DoctorManager = () => {
                 >
                   Xoá
                 </Menu.Item> */}
-                <Menu.Item
-                  key="3"
-                  icon={<AiOutlineInfoCircle size={15} />}
-                  onClick={() => handleVisibleDetailDoctor(record)}
-                >
-                  Xem chi tiết
-                </Menu.Item>
-              </Menu>
-            }
-            trigger={['click']}
-          >
-            <Button
-              icon={
-                <MdMoreHoriz
-                  style={{
-                    verticalAlign: 'middle',
-                    marginBottom: '1px',
-                  }}
-                  size={20}
-                />
+                  <Menu.Item
+                    key="3"
+                    icon={<AiOutlineInfoCircle size={15} />}
+                    onClick={() => handleVisibleDetailDoctor(record)}
+                  >
+                    Xem chi tiết
+                  </Menu.Item>
+                </Menu>
               }
-            ></Button>
-          </Dropdown>
+              trigger={['click']}
+            >
+              <Button
+                icon={
+                  <MdMoreHoriz
+                    style={{
+                      verticalAlign: 'middle',
+                      marginBottom: '1px',
+                    }}
+                    size={20}
+                  />
+                }
+              ></Button>
+            </Dropdown>
+          </Tooltip>
         );
       },
     },
@@ -362,6 +365,18 @@ const DoctorManager = () => {
     },
   };
 
+  const handleSearch = async (value) => {
+    try {
+      setLoadingSearchButton(true);
+      const searchResult = await doctorAPI.searchDoctor(value);
+      setDoctorSource(searchResult);
+      setLoadingSearchButton(false);
+    } catch (error) {
+      setLoadingSearchButton(false);
+      console.log(error);
+    }
+  };
+
   return (
     <div className="doctor-manager-container">
       <div className="tool-container">
@@ -384,7 +399,15 @@ const DoctorManager = () => {
           Thêm Bác Sĩ
         </Button>
 
-        <Input.Search placeholder="Tìm kiếm" style={{ width: 320 }} size="large" />
+        <Input.Search
+          allowClear
+          enterButton
+          loading={loadingSearchButton}
+          onSearch={handleSearch}
+          placeholder="Tìm kiếm"
+          style={{ width: 320 }}
+          size="large"
+        />
       </div>
       <Modal
         title={modalTitle}

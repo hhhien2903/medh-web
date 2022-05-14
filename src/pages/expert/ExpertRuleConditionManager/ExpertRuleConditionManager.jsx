@@ -14,7 +14,7 @@ import {
 } from 'antd';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
-import { AiOutlineDelete, AiOutlineEdit, AiOutlinePlus } from 'react-icons/ai';
+import { AiOutlineDelete, AiOutlineEdit, AiOutlinePlus, AiOutlineSetting } from 'react-icons/ai';
 import { MdMoreHoriz } from 'react-icons/md';
 import ruleConditionAPI from '../../../api/ruleConditionAPI';
 import { onePrecisionDecimalsRegex } from '../../../utils/regex';
@@ -87,7 +87,7 @@ const ExpertRuleConditionManager = () => {
       },
     },
     {
-      title: 'Tác Vụ',
+      title: <AiOutlineSetting size={20} style={{ verticalAlign: 'middle' }} />,
       key: 'action',
       align: 'center',
 

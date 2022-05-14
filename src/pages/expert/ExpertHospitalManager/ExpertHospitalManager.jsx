@@ -1,6 +1,6 @@
 import { Button, Dropdown, Empty, Form, Input, Menu, message, Modal, Skeleton, Table } from 'antd';
 import React, { useState, useEffect } from 'react';
-import { AiOutlineDelete, AiOutlineEdit, AiOutlinePlus } from 'react-icons/ai';
+import { AiOutlineDelete, AiOutlineEdit, AiOutlinePlus, AiOutlineSetting } from 'react-icons/ai';
 import { MdMoreHoriz } from 'react-icons/md';
 import addressAPI from '../../../api/addressAPI';
 import hospitalAPI from '../../../api/hospitalAPI';
@@ -25,21 +25,8 @@ const ExpertHospitalManager = () => {
     onCitySelect,
     onDistrictSelect,
   } = useFormItemAddress(formAddEditHospital);
-  const dataSourceTest = [
-    {
-      id: 1,
-      uuid: '1f5b8b1b-fce7-477a-a1f3-d4aeca502611',
-      createdAt: '2022-03-13T00:00:00.000Z',
-      updatedAt: '2022-03-13T00:00:00.000Z',
-      address: '215 Hồng Bàng',
-      cityId: 79,
-      districtId: 774,
-      image: null,
-      name: 'Bệnh Viện Đại Học Y Dược TP HCM',
-      status: true,
-      wardId: 137,
-    },
-  ];
+  const [loadingSearchButton, setLoadingSearchButton] = useState(false);
+
   const tableColumns = [
     // {
     //   title: 'ID',
@@ -49,7 +36,7 @@ const ExpertHospitalManager = () => {
     {
       title: 'STT',
       key: 'index',
-      width: 80,
+      width: '5%',
       align: 'center',
       render: (text, record) => hospitalSource.indexOf(record) + 1,
     },
@@ -57,18 +44,20 @@ const ExpertHospitalManager = () => {
       title: 'Tên Bệnh Viện',
       dataIndex: 'name',
       key: 'name',
+      width: '35%',
     },
     {
       title: 'Địa Chỉ',
       dataIndex: 'address',
       key: 'address',
+      width: '55%',
       // render: (name) => <Link to="/expert/patient/123">{name}</Link>,
     },
     {
-      title: 'Tác Vụ',
+      title: <AiOutlineSetting size={20} style={{ verticalAlign: 'middle' }} />,
       key: 'action',
       align: 'center',
-      width: 60,
+      width: '5%',
       render: (record) => {
         return (
           <Dropdown
@@ -76,16 +65,17 @@ const ExpertHospitalManager = () => {
               <Menu>
                 <Menu.Item
                   key="1"
-                  icon={<AiOutlineEdit size={15} color="#1890FF" />}
-                  style={{ color: '#1890FF' }}
+                  icon={<AiOutlineEdit size={15} />}
+                  // style={{ color: '#1890FF' }}
                   onClick={() => handleVisibleEditHospital(record)}
                 >
                   Sửa thông tin
                 </Menu.Item>
                 <Menu.Item
                   key="2"
-                  icon={<AiOutlineDelete size={15} color="#FF4D4F" />}
-                  style={{ color: '#FF4D4F' }}
+                  danger
+                  icon={<AiOutlineDelete size={15} />}
+                  // style={{ color: '#FF4D4F' }}
                   onClick={() => handleDeleteHospital(record)}
                 >
                   Xoá
@@ -228,6 +218,18 @@ const ExpertHospitalManager = () => {
     setIsDisableWard(true);
   };
 
+  const handleSearch = async (value) => {
+    try {
+      setLoadingSearchButton(true);
+      const searchResult = await hospitalAPI.searchHospital(value);
+      setHospitalSource(searchResult);
+      setLoadingSearchButton(false);
+    } catch (error) {
+      setLoadingSearchButton(false);
+      console.log(error);
+    }
+  };
+
   return (
     <div className="hospital-manager-container">
       <div className="tool-container">
@@ -250,7 +252,15 @@ const ExpertHospitalManager = () => {
           Thêm Bệnh Viện
         </Button>
 
-        <Input.Search placeholder="Tìm kiếm" style={{ width: 320 }} size="large" />
+        <Input.Search
+          allowClear
+          enterButton
+          loading={loadingSearchButton}
+          onSearch={handleSearch}
+          placeholder="Tìm kiếm"
+          style={{ width: 320 }}
+          size="large"
+        />
       </div>
       <Modal
         title={modalTitle}

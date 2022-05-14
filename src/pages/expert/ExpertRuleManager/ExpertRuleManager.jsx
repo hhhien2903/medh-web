@@ -21,6 +21,7 @@ import {
   AiOutlineMinusCircle,
   AiOutlinePlus,
   AiOutlinePlusCircle,
+  AiOutlineSetting,
 } from 'react-icons/ai';
 import { MdMoreHoriz } from 'react-icons/md';
 import ruleAPI from '../../../api/ruleAPI';
@@ -39,6 +40,7 @@ const ExpertRuleManager = () => {
   const [isDetailModalVisible, setIsDetailModalVisible] = useState(false);
   const [ruleDetail, setRuleDetail] = useState({});
   const { renderLoadingSkeleton, setIsLoadingSkeleton, isLoadingSkeleton } = useLoadingSkeleton();
+  const [loadingSearchButton, setLoadingSearchButton] = useState(false);
 
   const tableColumns = [
     // {
@@ -49,7 +51,7 @@ const ExpertRuleManager = () => {
     {
       title: 'STT',
       key: 'index',
-      width: 40,
+      width: '5%',
       align: 'center',
       render: (text, record) => ruleSource.indexOf(record) + 1,
     },
@@ -57,18 +59,20 @@ const ExpertRuleManager = () => {
       title: 'Tên Tập Luật Y Tế',
       dataIndex: 'name',
       key: 'name',
+      width: '45%',
     },
     {
       title: 'Mô Tả',
       dataIndex: 'description',
       key: 'description',
+      width: '55%',
       // render: (name) => <Link to="/expert/patient/123">{name}</Link>,
     },
     {
-      title: 'Tác Vụ',
+      title: <AiOutlineSetting size={20} style={{ verticalAlign: 'middle' }} />,
       key: 'action',
       align: 'center',
-
+      width: '5%',
       render: (record) => {
         return (
           <Dropdown
@@ -76,26 +80,28 @@ const ExpertRuleManager = () => {
               <Menu>
                 <Menu.Item
                   key="1"
-                  icon={<AiOutlineEdit size={15} color="#1890FF" />}
-                  style={{ color: '#1890FF' }}
+                  icon={<AiOutlineEdit size={15} />}
+                  // style={{ color: '#1890FF' }}
                   onClick={() => handleVisibleEditRule(record)}
                 >
                   Sửa thông tin
                 </Menu.Item>
-                <Menu.Item
-                  key="2"
-                  icon={<AiOutlineDelete size={15} color="#FF4D4F" />}
-                  style={{ color: '#FF4D4F' }}
-                  onClick={() => handleDeleteRule(record)}
-                >
-                  Xoá
-                </Menu.Item>
+
                 <Menu.Item
                   key="3"
                   icon={<AiOutlineInfoCircle size={15} />}
                   onClick={() => handleVisibleDetailRule(record)}
                 >
                   Xem chi tiết
+                </Menu.Item>
+                <Menu.Item
+                  key="2"
+                  danger
+                  icon={<AiOutlineDelete size={15} />}
+                  // style={{ color: '#FF4D4F' }}
+                  onClick={() => handleDeleteRule(record)}
+                >
+                  Xoá
                 </Menu.Item>
               </Menu>
             }
@@ -291,6 +297,18 @@ const ExpertRuleManager = () => {
     setIsConfirmLoadingAddEditRuleModal(false);
   };
 
+  const handleSearch = async (value) => {
+    try {
+      setLoadingSearchButton(true);
+      const searchResult = await ruleAPI.searchRule(value);
+      setRuleSource(searchResult);
+      setLoadingSearchButton(false);
+    } catch (error) {
+      setLoadingSearchButton(false);
+      console.log(error);
+    }
+  };
+
   return (
     <div className="rule-manager-container">
       <div className="tool-container">
@@ -313,7 +331,15 @@ const ExpertRuleManager = () => {
           Thêm Tập Luật Y Tế
         </Button>
 
-        <Input.Search placeholder="Tìm kiếm" style={{ width: 320 }} size="large" />
+        <Input.Search
+          allowClear
+          enterButton
+          loading={loadingSearchButton}
+          onSearch={handleSearch}
+          placeholder="Tìm kiếm"
+          style={{ width: 320 }}
+          size="large"
+        />
       </div>
       <Modal
         title={modalTitle}
@@ -359,7 +385,7 @@ const ExpertRuleManager = () => {
             rules={[
               {
                 required: true,
-                message: ' không được để trống!',
+                message: 'Mô Tả không được để trống!',
               },
             ]}
           >
@@ -367,13 +393,7 @@ const ExpertRuleManager = () => {
           </Form.Item>
           <Form.Item
             // name="rule-condition"
-            label="Luật Y Tế:"
-            // rules={[
-            //   {
-            //     required: true,
-            //     message: ' không được để trống!',
-            //   },
-            // ]}
+            className="rule-condition"
           >
             <Form.List name="ruleConditions">
               {(fields, { add, remove }) => (
@@ -396,6 +416,7 @@ const ExpertRuleManager = () => {
                       <Form.Item
                         {...restField}
                         name={[name, 'name']}
+                        label="Tên Luật Y Tế:"
                         rules={[
                           {
                             required: true,
@@ -409,7 +430,8 @@ const ExpertRuleManager = () => {
                         <Form.Item
                           {...restField}
                           name={[name, 'tempLow']}
-                          noStyle
+                          style={{ width: 'calc(50% - 15px)', display: 'inline-block' }}
+                          label="Nhiệt Độ Thấp:"
                           rules={[
                             {
                               required: true,
@@ -434,29 +456,32 @@ const ExpertRuleManager = () => {
                             addonAfter="°C"
                             controls={false}
                             className="input-temp"
-                            style={{ width: `calc(50% - 18px)`, textAlign: 'center' }}
+                            // style={{ width: `calc(50% - 18px)`, textAlign: 'center' }}
+                            style={{ width: `100%`, textAlign: 'center' }}
                             placeholder="Nhiệt Độ Thấp"
                           />
                         </Form.Item>
-                        <Input
-                          className="site-input-split"
-                          style={{
-                            width: 30,
-                            borderLeft: 0,
-                            borderRight: 0,
-                            pointerEvents: 'none',
-                            background: '#FFFFFF',
-                            borderColor: '#FFFFFF',
-                            marginLeft: 3,
-                            marginRight: 3,
-                          }}
-                          placeholder="-"
-                          disabled
-                        />
+                        <Form.Item style={{ width: '30px', display: 'inline-block' }} label=" ">
+                          <Input
+                            className="site-input-split"
+                            style={{
+                              width: 30,
+                              borderLeft: 0,
+                              borderRight: 0,
+                              pointerEvents: 'none',
+                              background: '#FFFFFF',
+                              borderColor: '#FFFFFF',
+                            }}
+                            placeholder="-"
+                            disabled
+                          />
+                        </Form.Item>
+
                         <Form.Item
                           {...restField}
+                          style={{ width: 'calc(50% - 15px)', display: 'inline-block' }}
+                          label="Nhiệt Độ Cao:"
                           name={[name, 'tempHigh']}
-                          noStyle
                           rules={[
                             {
                               required: true,
@@ -493,8 +518,12 @@ const ExpertRuleManager = () => {
                         >
                           <InputNumber
                             className="input-temp temp-high"
+                            // style={{
+                            //   width: `calc(50% - 18px)`,
+                            //   textAlign: 'center',
+                            // }}
                             style={{
-                              width: `calc(50% - 18px)`,
+                              width: `100%`,
                               textAlign: 'center',
                             }}
                             type="number"
@@ -518,7 +547,8 @@ const ExpertRuleManager = () => {
                         <Form.Item
                           {...restField}
                           name={[name, 'timeStart']}
-                          noStyle
+                          label={'Thời Gian Bắt Đầu:'}
+                          style={{ width: 'calc(50% - 15px)', display: 'inline-block' }}
                           rules={[
                             {
                               required: true,
@@ -560,30 +590,31 @@ const ExpertRuleManager = () => {
                             controls={false}
                             className="input-temp"
                             addonAfter="Phút"
-                            style={{ width: `calc(50% - 18px)`, textAlign: 'center' }}
+                            style={{ width: `100%`, textAlign: 'center' }}
                             placeholder="Thời Gian Bắt Đầu"
                           />
                         </Form.Item>
-                        <Input
-                          className="site-input-split"
-                          style={{
-                            width: 30,
-                            borderLeft: 0,
-                            borderRight: 0,
-                            pointerEvents: 'none',
-                            background: '#FFFFFF',
-                            borderColor: '#FFFFFF',
-                            marginLeft: 3,
-                            marginRight: 3,
-                          }}
-                          placeholder="-"
-                          disabled
-                        />
+                        <Form.Item style={{ width: '30px', display: 'inline-block' }} label=" ">
+                          <Input
+                            className="site-input-split"
+                            style={{
+                              width: 30,
+                              borderLeft: 0,
+                              borderRight: 0,
+                              pointerEvents: 'none',
+                              background: '#FFFFFF',
+                              borderColor: '#FFFFFF',
+                            }}
+                            placeholder="-"
+                            disabled
+                          />
+                        </Form.Item>
 
                         <Form.Item
                           {...restField}
                           name={[name, 'timeEnd']}
-                          noStyle
+                          label="Thời Gian Kết Thúc:"
+                          style={{ width: 'calc(50% - 15px)', display: 'inline-block' }}
                           rules={[
                             {
                               required: true,
@@ -646,7 +677,7 @@ const ExpertRuleManager = () => {
                                 </Select>
                               </Form.Item>
                             }
-                            style={{ width: `calc(50% - 18px)`, textAlign: 'center' }}
+                            style={{ width: `100%`, textAlign: 'center' }}
                             placeholder="Thời Gian Kết Thúc"
                           />
                         </Form.Item>
@@ -655,6 +686,7 @@ const ExpertRuleManager = () => {
                       <Form.Item
                         {...restField}
                         name={[name, 'treatment']}
+                        label="Hành Động:"
                         rules={[
                           {
                             required: true,
@@ -667,6 +699,7 @@ const ExpertRuleManager = () => {
                       <Form.Item
                         {...restField}
                         name={[name, 'illumination']}
+                        label="Báo Hiệu:"
                         rules={[
                           {
                             required: true,

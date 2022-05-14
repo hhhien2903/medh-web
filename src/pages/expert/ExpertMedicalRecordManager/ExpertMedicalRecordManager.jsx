@@ -11,6 +11,7 @@ import {
   Table,
   Tag,
   Select,
+  Tooltip,
 } from 'antd';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
@@ -20,6 +21,7 @@ import {
   AiOutlinePlus,
   AiOutlineAreaChart,
   AiOutlineEdit,
+  AiOutlineSetting,
 } from 'react-icons/ai';
 import { MdMoreHoriz } from 'react-icons/md';
 import medicalRecordAPI from '../../../api/medicalRecordAPI';
@@ -70,7 +72,8 @@ const ExpertMedicalRecordManager = () => {
   const [isVisibleChartModal, setIsVisibleChartModal] = useState(false);
   const [isFormItemDoctorDisabled, setIsFormItemDoctorDisabled] = useState(false);
   const [isFormItemPatientDisabled, setIsFormItemPatientDisabled] = useState(false);
-
+  const [loadingSearchButton, setLoadingSearchButton] = useState(false);
+  const [selectSearchType, setSelectSearchType] = useState('patient');
   const tableColumns = [
     {
       title: 'STT',
@@ -174,66 +177,69 @@ const ExpertMedicalRecordManager = () => {
     },
 
     {
-      title: 'Tác Vụ',
+      title: <AiOutlineSetting size={20} style={{ verticalAlign: 'middle' }} />,
       key: 'action',
       align: 'center',
       width: 60,
       render: (record) => {
         return (
-          <Dropdown
-            overlay={
-              <Menu>
-                {!record.treated && (
+          <Tooltip title="Tác Vụ">
+            <Dropdown
+              overlay={
+                <Menu>
+                  {!record.treated && (
+                    <Menu.Item
+                      key="1"
+                      icon={<AiOutlineEdit size={15} />}
+                      // style={{ color: '#1890FF' }}
+                      onClick={() => handleVisibleEditMedicalRecord(record)}
+                    >
+                      Sửa thông tin
+                    </Menu.Item>
+                  )}
                   <Menu.Item
-                    key="1"
-                    icon={<AiOutlineEdit size={15} color="#1890FF" />}
-                    style={{ color: '#1890FF' }}
-                    onClick={() => handleVisibleEditMedicalRecord(record)}
+                    key="3"
+                    icon={<AiOutlineInfoCircle size={15} />}
+                    onClick={() => handleVisibleDetailMedicalRecord(record)}
                   >
-                    Sửa thông tin
+                    Xem chi tiết
                   </Menu.Item>
-                )}
-                <Menu.Item
-                  key="3"
-                  icon={<AiOutlineInfoCircle size={15} />}
-                  onClick={() => handleVisibleDetailMedicalRecord(record)}
-                >
-                  Xem chi tiết
-                </Menu.Item>
-                <Menu.Item
-                  key="5"
-                  style={{ color: '#034C3C' }}
-                  icon={<AiOutlineAreaChart size={15} />}
-                  onClick={() => handleVisibleChartModal(record)}
-                >
-                  Xem biểu đồ
-                </Menu.Item>
-                {!record.treated && (
                   <Menu.Item
-                    key="4"
-                    style={{ color: '#ee6123' }}
-                    icon={<AiOutlineFileDone size={15} />}
-                    onClick={() => handleVisibleEndFollowMedicalRecord(record)}
+                    key="5"
+                    // style={{ color: '#034C3C' }}
+                    icon={<AiOutlineAreaChart size={15} />}
+                    onClick={() => handleVisibleChartModal(record)}
                   >
-                    Kết Thúc Điều Trị
+                    Xem biểu đồ
                   </Menu.Item>
-                )}
-              </Menu>
-            }
-            trigger={['click']}
-          >
-            <Button
-              icon={
-                <MdMoreHoriz
-                  style={{
-                    verticalAlign: 'middle',
-                    marginBottom: '1px',
-                  }}
-                  size={20}
-                />
+                  {!record.treated && (
+                    <Menu.Item
+                      key="4"
+                      // style={{ color: '#ee6123' }}
+                      danger
+                      icon={<AiOutlineFileDone size={15} />}
+                      onClick={() => handleVisibleEndFollowMedicalRecord(record)}
+                    >
+                      Kết Thúc Điều Trị
+                    </Menu.Item>
+                  )}
+                </Menu>
               }
-            ></Button>
-          </Dropdown>
+              trigger={['click']}
+            >
+              <Button
+                icon={
+                  <MdMoreHoriz
+                    style={{
+                      verticalAlign: 'middle',
+                      marginBottom: '1px',
+                    }}
+                    size={20}
+                  />
+                }
+              ></Button>
+            </Dropdown>
+          </Tooltip>
         );
       },
     },
@@ -491,6 +497,21 @@ const ExpertMedicalRecordManager = () => {
     }
   };
 
+  const handleSearch = async (value) => {
+    try {
+      setLoadingSearchButton(true);
+      const searchResult = await medicalRecordAPI.searchMedicalRecord(
+        value,
+        selectSearchType !== 'all' ? `&option=${selectSearchType}` : null
+      );
+      setMedicalRecordSource(searchResult);
+      setLoadingSearchButton(false);
+    } catch (error) {
+      setLoadingSearchButton(false);
+      console.log(error);
+    }
+  };
+
   return (
     <div className="medical-record-manager-container">
       <div className="tool-container">
@@ -513,7 +534,32 @@ const ExpertMedicalRecordManager = () => {
           Thêm Bệnh Án
         </Button>
 
-        <Input.Search placeholder="Tìm kiếm" style={{ width: 320 }} size="large" />
+        <div>
+          <Input.Group>
+            <Select
+              dropdownMatchSelectWidth={false}
+              onChange={(value) => setSelectSearchType(value)}
+              value={selectSearchType}
+              size="large"
+            >
+              <Select.Option value="patient">Tên Bệnh Nhân</Select.Option>
+              <Select.Option value="doctor">Tên Bác Sĩ</Select.Option>
+              <Select.Option value="disease">Tên Bệnh</Select.Option>
+              <Select.Option value="device">Tên Thiết Bị</Select.Option>
+              <Select.Option value="hospital">Tên Bệnh Viện</Select.Option>
+              <Select.Option value="all">Tất Cả</Select.Option>
+            </Select>
+            <Input.Search
+              allowClear
+              enterButton
+              loading={loadingSearchButton}
+              onSearch={handleSearch}
+              placeholder="Tìm kiếm"
+              style={{ width: 320 }}
+              size="large"
+            />
+          </Input.Group>
+        </div>
       </div>
       <Modal
         title={modalTitle}

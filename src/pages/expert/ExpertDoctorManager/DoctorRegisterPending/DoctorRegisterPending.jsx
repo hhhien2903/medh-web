@@ -1,13 +1,14 @@
 import { Avatar, Button, Empty, Input, message, Modal, Space, Table, Tooltip } from 'antd';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
-import { AiOutlineCheck, AiOutlineDelete } from 'react-icons/ai';
+import { AiOutlineCheck, AiOutlineDelete, AiOutlineSetting } from 'react-icons/ai';
 import doctorAPI from '../../../../api/doctorAPI';
 import useLoadingSkeleton from '../../../../components/shared/LoadingSkeleton/useLoadingSkeleton';
 import './DoctorRegisterPending.scss';
 const DoctorRegisterPending = () => {
   const [doctorPendingSource, setDoctorPendingSource] = useState([]);
   const { renderLoadingSkeleton, setIsLoadingSkeleton, isLoadingSkeleton } = useLoadingSkeleton();
+  const [loadingSearchButton, setLoadingSearchButton] = useState(false);
 
   const tableColumns = [
     {
@@ -73,7 +74,7 @@ const DoctorRegisterPending = () => {
     },
 
     {
-      title: 'Tác Vụ',
+      title: <AiOutlineSetting size={20} style={{ verticalAlign: 'middle' }} />,
       key: 'action',
       align: 'center',
       render: (record) => {
@@ -170,6 +171,18 @@ const DoctorRegisterPending = () => {
     });
   };
 
+  const handleSearch = async (value) => {
+    try {
+      setLoadingSearchButton(true);
+      const searchResult = await doctorAPI.searchDoctor(value, `&pending=true`);
+      setDoctorPendingSource(searchResult);
+      setLoadingSearchButton(false);
+    } catch (error) {
+      setLoadingSearchButton(false);
+      console.log(error);
+    }
+  };
+
   return (
     <div className="doctor-pending-container">
       <div className="tool-container">
@@ -177,6 +190,10 @@ const DoctorRegisterPending = () => {
           placeholder="Tìm kiếm"
           style={{ width: 320, marginLeft: 'auto' }}
           size="large"
+          allowClear
+          enterButton
+          loading={loadingSearchButton}
+          onSearch={handleSearch}
         />
       </div>
       {isLoadingSkeleton ? (

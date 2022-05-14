@@ -31,6 +31,10 @@ const deviceAPI = {
     const url = `${API_ENDPOINT}/move/hospital?id=${deviceId}&hospitalId=${hospitalId}`;
     return axiosClient.patch(url);
   },
+  searchDevice: (search, options) => {
+    const url = `${API_ENDPOINT}?text=${search}${options ? options : ''}`;
+    return axiosClient.get(url);
+  },
 };
 
 export default deviceAPI;

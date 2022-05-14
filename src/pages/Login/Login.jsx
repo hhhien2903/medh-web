@@ -1,6 +1,12 @@
 import { Button, Form, Image, Input, notification, Space, Tabs } from 'antd';
 import { useState } from 'react';
-import { AiFillMobile, AiOutlineGoogle, AiOutlineLock, AiOutlineMobile } from 'react-icons/ai';
+import {
+  AiFillMobile,
+  AiOutlineGoogle,
+  AiOutlineLock,
+  AiOutlineMobile,
+  AiOutlineSetting,
+} from 'react-icons/ai';
 import backgroundImage from '../../assets/images/background-1.jpg';
 import medHLogo from '../../assets/images/med-h-logo.png';
 import { firebase, firebaseAuth, providers } from '../../config/firebase';

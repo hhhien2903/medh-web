@@ -12,11 +12,19 @@ import {
   Select,
   Skeleton,
   Table,
+  Tooltip,
 } from 'antd';
 import localeVN from 'antd/es/date-picker/locale/vi_VN';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
-import { AiOutlineDelete, AiOutlineEdit, AiOutlineInfoCircle, AiOutlinePlus } from 'react-icons/ai';
+import {
+  AiOutlineDelete,
+  AiOutlineEdit,
+  AiOutlineInfoCircle,
+  AiOutlinePlus,
+  AiOutlineSetting,
+} from 'react-icons/ai';
+import { RiHistoryFill } from 'react-icons/ri';
 import { MdMoreHoriz } from 'react-icons/md';
 import patientAPI from '../../../api/patientAPI';
 import useFormItemAddress from '../../../components/shared/FormItemAddress/useFormItemAddress';
@@ -47,6 +55,7 @@ const ExpertPatientManager = () => {
   const [isDetailModalVisible, setIsDetailModalVisible] = useState(false);
   const [patientDetail, setPatientDetail] = useState({});
   const [isLoadingSkeletonForm, setIsLoadingSkeletonForm] = useState(false);
+  const [loadingSearchButton, setLoadingSearchButton] = useState(false);
 
   const tableColumns = [
     {
@@ -120,60 +129,66 @@ const ExpertPatientManager = () => {
     // },
 
     {
-      title: 'Tác Vụ',
+      title: <AiOutlineSetting size={20} style={{ verticalAlign: 'middle' }} />,
       key: 'action',
       width: 70,
+      align: 'center',
+
       render: (record) => {
         return (
-          <Dropdown
-            overlay={
-              <Menu>
-                <Menu.Item
-                  key="1"
-                  icon={<AiOutlineEdit size={15} color="#1890FF" />}
-                  style={{ color: '#1890FF' }}
-                  onClick={() => handleVisibleEditPatient(record)}
-                >
-                  Sửa thông tin
-                </Menu.Item>
-                <Menu.Item
-                  key="2"
-                  icon={<AiOutlineDelete size={15} color="#FF4D4F" />}
-                  style={{ color: '#FF4D4F' }}
-                  onClick={() => handleDeletePatient(record)}
-                >
-                  Xoá
-                </Menu.Item>
-                <Menu.Item
-                  key="3"
-                  icon={<AiOutlineInfoCircle size={15} />}
-                  onClick={() => handleVisibleDetailModal(record)}
-                >
-                  Xem chi tiết
-                </Menu.Item>
-                {/* <Menu.Item
-                  key="4"
-                  icon={<AiOutlineAreaChart size={15} />}
-                  onClick={() => handleVisibleChartModal(record)}
-                >
-                  Xem biểu đồ
-                </Menu.Item> */}
-              </Menu>
-            }
-            trigger={['click']}
-          >
-            <Button
-              icon={
-                <MdMoreHoriz
-                  style={{
-                    verticalAlign: 'middle',
-                    marginBottom: '1px',
-                  }}
-                  size={20}
-                />
+          <Tooltip title="Tác Vụ">
+            <Dropdown
+              overlay={
+                <Menu>
+                  <Menu.Item
+                    key="1"
+                    icon={<AiOutlineEdit size={15} />}
+                    // style={{ color: '#1890FF' }}
+                    onClick={() => handleVisibleEditPatient(record)}
+                  >
+                    Sửa Thông Tin
+                  </Menu.Item>
+
+                  <Menu.Item
+                    key="3"
+                    icon={<AiOutlineInfoCircle size={15} />}
+                    onClick={() => handleVisibleDetailModal(record)}
+                  >
+                    Xem Chi Tiết
+                  </Menu.Item>
+                  <Menu.Item
+                    key="4"
+                    icon={<RiHistoryFill size={15} />}
+                    // onClick={() => handleVisibleChartModal(record)}
+                  >
+                    Lịch Sử Bệnh Án
+                  </Menu.Item>
+                  <Menu.Item
+                    key="2"
+                    danger
+                    icon={<AiOutlineDelete size={15} />}
+                    // style={{ color: '#FF4D4F' }}
+                    onClick={() => handleDeletePatient(record)}
+                  >
+                    Xoá
+                  </Menu.Item>
+                </Menu>
               }
-            ></Button>
-          </Dropdown>
+              trigger={['click']}
+            >
+              <Button
+                icon={
+                  <MdMoreHoriz
+                    style={{
+                      verticalAlign: 'middle',
+                      marginBottom: '1px',
+                    }}
+                    size={20}
+                  />
+                }
+              ></Button>
+            </Dropdown>
+          </Tooltip>
         );
       },
     },
@@ -329,6 +344,18 @@ const ExpertPatientManager = () => {
     });
   };
 
+  const handleSearch = async (value) => {
+    try {
+      setLoadingSearchButton(true);
+      const searchResult = await patientAPI.searchPatients(value);
+      setPatientSource(searchResult);
+      setLoadingSearchButton(false);
+    } catch (error) {
+      setLoadingSearchButton(false);
+      console.log(error);
+    }
+  };
+
   return (
     <div className="patient-manager-container">
       <div className="tool-container">
@@ -351,6 +378,10 @@ const ExpertPatientManager = () => {
           Thêm Bệnh Nhân
         </Button>
         <Input.Search
+          allowClear
+          enterButton
+          loading={loadingSearchButton}
+          onSearch={handleSearch}
           placeholder="Tìm kiếm"
           style={{ width: 320, marginLeft: 'auto' }}
           size="large"
