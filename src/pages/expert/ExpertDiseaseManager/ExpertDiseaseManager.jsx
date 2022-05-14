@@ -1,6 +1,6 @@
-import { Button, Dropdown, Empty, Form, Input, Menu, message, Modal, Table } from 'antd';
+import { Button, Dropdown, Empty, Form, Input, Menu, message, Modal, Table, Tooltip } from 'antd';
 import React, { useEffect, useState } from 'react';
-import { AiOutlineDelete, AiOutlineEdit, AiOutlinePlus } from 'react-icons/ai';
+import { AiOutlineDelete, AiOutlineEdit, AiOutlinePlus, AiOutlineSetting } from 'react-icons/ai';
 import { MdMoreHoriz } from 'react-icons/md';
 import diseaseAPI from '../../../api/diseaseAPI';
 import useFormItemRule from '../../../components/shared/FormItemRule/useFormItemRule';
@@ -16,8 +16,8 @@ const ExpertDiseaseManager = () => {
   const [modalUsedFor, setModalUsedFor] = useState('');
   const { renderFormItemRule, getAllRulesNotAssign, getAllRule } = useFormItemRule();
   const { renderLoadingSkeleton, setIsLoadingSkeleton, isLoadingSkeleton } = useLoadingSkeleton();
-  // const [stepForm, setStepForm] = useState(1);
   const [diseasesIdForAssignRule, setDiseasesIdForAssignRule] = useState(null);
+  const [loadingSearchButton, setLoadingSearchButton] = useState(false);
 
   const tableColumns = [
     {
@@ -29,17 +29,19 @@ const ExpertDiseaseManager = () => {
     {
       title: 'STT',
       key: 'index',
-      width: 60,
+      width: '5%',
       align: 'center',
       render: (text, record) => diseaseSource.indexOf(record) + 1,
     },
     {
       title: 'Tên Mầm Bệnh',
       dataIndex: 'name',
+      width: '30%',
       key: 'name',
     },
     {
       title: 'Mô Tả',
+      width: '35%',
       dataIndex: 'description',
       key: 'description',
       // render: (name) => <Link to="/expert/patient/123">{name}</Link>,
@@ -47,58 +49,62 @@ const ExpertDiseaseManager = () => {
     {
       title: 'Tên Tập Luật',
       key: 'rule',
+      width: '25%',
       render: (record) => record.rule?.name,
     },
 
     {
-      title: 'Tác Vụ',
+      title: <AiOutlineSetting size={20} style={{ verticalAlign: 'middle' }} />,
       key: 'action',
       align: 'center',
-
+      width: '5%',
       render: (record) => {
         return (
-          <Dropdown
-            overlay={
-              <Menu>
-                <Menu.Item
-                  key="1"
-                  icon={<AiOutlineEdit size={15} color="#1890FF" />}
-                  style={{ color: '#1890FF' }}
-                  onClick={() => handleVisibleEditDisease(record)}
-                >
-                  Sửa thông tin
-                </Menu.Item>
-                <Menu.Item
-                  key="2"
-                  icon={<AiOutlineDelete size={15} color="#FF4D4F" />}
-                  style={{ color: '#FF4D4F' }}
-                  onClick={() => handleDeleteDisease(record)}
-                >
-                  Xoá
-                </Menu.Item>
-                {/* <Menu.Item
+          <Tooltip title="Tác Vụ">
+            <Dropdown
+              overlay={
+                <Menu>
+                  <Menu.Item
+                    key="1"
+                    icon={<AiOutlineEdit size={15} />}
+                    // style={{ color: '#1890FF' }}
+                    onClick={() => handleVisibleEditDisease(record)}
+                  >
+                    Sửa thông tin
+                  </Menu.Item>
+                  <Menu.Item
+                    key="2"
+                    danger
+                    icon={<AiOutlineDelete size={15} />}
+                    // style={{ color: '#FF4D4F' }}
+                    onClick={() => handleDeleteDisease(record)}
+                  >
+                    Xoá
+                  </Menu.Item>
+                  {/* <Menu.Item
                   key="3"
                   icon={<AiOutlineInfoCircle size={15} />}
                    onClick={() => handleVisibleDetailDoctor(record)}
                 >
                   Xem chi tiết
                 </Menu.Item> */}
-              </Menu>
-            }
-            trigger={['click']}
-          >
-            <Button
-              icon={
-                <MdMoreHoriz
-                  style={{
-                    verticalAlign: 'middle',
-                    marginBottom: '1px',
-                  }}
-                  size={20}
-                />
+                </Menu>
               }
-            ></Button>
-          </Dropdown>
+              trigger={['click']}
+            >
+              <Button
+                icon={
+                  <MdMoreHoriz
+                    style={{
+                      verticalAlign: 'middle',
+                      marginBottom: '1px',
+                    }}
+                    size={20}
+                  />
+                }
+              ></Button>
+            </Dropdown>
+          </Tooltip>
         );
       },
     },
@@ -250,6 +256,18 @@ const ExpertDiseaseManager = () => {
     getAllDiseases();
   };
 
+  const handleSearch = async (value) => {
+    try {
+      setLoadingSearchButton(true);
+      const searchResult = await diseaseAPI.searchDisease(value);
+      setDiseaseSource(searchResult);
+      setLoadingSearchButton(false);
+    } catch (error) {
+      setLoadingSearchButton(false);
+      console.log(error);
+    }
+  };
+
   return (
     <div className="disease-manager-container">
       <div className="tool-container">
@@ -272,7 +290,15 @@ const ExpertDiseaseManager = () => {
           Thêm Mầm Bệnh
         </Button>
 
-        <Input.Search placeholder="Tìm kiếm" style={{ width: 320 }} size="large" />
+        <Input.Search
+          allowClear
+          enterButton
+          loading={loadingSearchButton}
+          onSearch={handleSearch}
+          placeholder="Tìm kiếm"
+          style={{ width: 320 }}
+          size="large"
+        />
       </div>
       <Modal
         title={modalTitle}

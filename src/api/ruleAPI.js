@@ -31,6 +31,10 @@ const ruleAPI = {
     const url = `${API_ENDPOINT}/${id}/clear-conditions`;
     return axiosClient.patch(url);
   },
+  searchRule: (search, options) => {
+    const url = `${API_ENDPOINT}?text=${search}${options ? options : ''}`;
+    return axiosClient.get(url);
+  },
 };
 
 export default ruleAPI;

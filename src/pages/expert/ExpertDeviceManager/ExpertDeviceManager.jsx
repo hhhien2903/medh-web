@@ -1,16 +1,31 @@
-import { Button, Dropdown, Empty, Form, Input, Menu, message, Modal, Table, Tag } from 'antd';
+import {
+  Button,
+  Dropdown,
+  Empty,
+  Form,
+  Input,
+  Menu,
+  message,
+  Modal,
+  Select,
+  Table,
+  Tag,
+  Tooltip,
+} from 'antd';
 import React, { useEffect, useState } from 'react';
-import { AiOutlineDelete, AiOutlineEdit, AiOutlineInfoCircle, AiOutlinePlus } from 'react-icons/ai';
+import {
+  AiOutlineDelete,
+  AiOutlineEdit,
+  AiOutlineInfoCircle,
+  AiOutlinePlus,
+  AiOutlineSetting,
+} from 'react-icons/ai';
 import { MdMoreHoriz } from 'react-icons/md';
 import deviceAPI from '../../../api/deviceAPI';
-import hospitalAPI from '../../../api/hospitalAPI';
-import useFormItemDisease from '../../../components/shared/FormItemDisease/useFormItemDisease';
 import useFormItemHospital from '../../../components/shared/FormItemHospital/useFormItemHospital';
-import useFormItemPatient from '../../../components/shared/FormItemPatient/useFormItemPatient';
 import useLoadingSkeleton from '../../../components/shared/LoadingSkeleton/useLoadingSkeleton';
-import { vietnameseNameRegex } from '../../../utils/regex';
-import './ExpertDeviceManager.scss';
 import getListFilterHospital from '../../../utils/ListFilterHospital';
+import './ExpertDeviceManager.scss';
 const ExpertDeviceManager = () => {
   const [deviceSource, setDeviceSource] = useState([]);
   const [isAddEditDeviceModalVisible, setAddEditDeviceModalVisible] = useState(false);
@@ -20,7 +35,8 @@ const ExpertDeviceManager = () => {
   const { renderLoadingSkeleton, setIsLoadingSkeleton, isLoadingSkeleton } = useLoadingSkeleton();
   const { renderFormItemHospital } = useFormItemHospital();
   const [listFilterHospital, setListFilterHospital] = useState([]);
-
+  const [loadingSearchButton, setLoadingSearchButton] = useState(false);
+  const [selectSearchType, setSelectSearchType] = useState('name');
   const tableColumns = [
     // {
     //   title: 'ID',
@@ -74,6 +90,10 @@ const ExpertDeviceManager = () => {
       align: 'center',
       filters: [
         {
+          text: 'Chờ Kích Hoạt',
+          value: 'PREPARE',
+        },
+        {
           text: 'Sẵn Sàng',
           value: 'INIT',
         },
@@ -101,6 +121,12 @@ const ExpertDeviceManager = () => {
       onFilter: (value, record) => record.status === value,
       render: (status) => {
         switch (status) {
+          case 'PREPARE':
+            return (
+              <Tag color="gray" style={{ width: '120px' }}>
+                Chờ Kích Hoạt
+              </Tag>
+            );
           case 'INIT':
             return (
               <Tag color="green" style={{ width: '120px' }}>
@@ -109,7 +135,7 @@ const ExpertDeviceManager = () => {
             );
           case 'LISTENING':
             return (
-              <Tag color="gray" style={{ width: '120px' }}>
+              <Tag color="blue" style={{ width: '120px' }}>
                 Đang Theo Dõi
               </Tag>
             );
@@ -144,54 +170,56 @@ const ExpertDeviceManager = () => {
     },
 
     {
-      title: 'Tác Vụ',
+      title: <AiOutlineSetting size={20} style={{ verticalAlign: 'middle' }} />,
       key: 'action',
       align: 'center',
-      width: 90,
+      width: 60,
       render: (record) => {
         return (
-          <Dropdown
-            overlay={
-              <Menu>
-                <Menu.Item
-                  key="1"
-                  icon={<AiOutlineEdit size={15} color="#1890FF" />}
-                  style={{ color: '#1890FF' }}
-                  onClick={() => handleVisibleEditDevice(record)}
-                >
-                  Sửa thông tin
-                </Menu.Item>
-                <Menu.Item
-                  key="2"
-                  icon={<AiOutlineDelete size={15} color="#FF4D4F" />}
-                  style={{ color: '#FF4D4F' }}
-                  onClick={() => handleDeleteDevice(record)}
-                >
-                  Xoá
-                </Menu.Item>
-                <Menu.Item
-                  key="3"
-                  icon={<AiOutlineInfoCircle size={15} />}
-                  //  onClick={() => handleVisibleDetailDoctor(record)}
-                >
-                  Xem chi tiết
-                </Menu.Item>
-              </Menu>
-            }
-            trigger={['click']}
-          >
-            <Button
-              icon={
-                <MdMoreHoriz
-                  style={{
-                    verticalAlign: 'middle',
-                    marginBottom: '1px',
-                  }}
-                  size={20}
-                />
+          <Tooltip title="Tác Vụ">
+            <Dropdown
+              overlay={
+                <Menu>
+                  <Menu.Item
+                    key="1"
+                    icon={<AiOutlineEdit size={15} color="#1890FF" />}
+                    style={{ color: '#1890FF' }}
+                    onClick={() => handleVisibleEditDevice(record)}
+                  >
+                    Sửa thông tin
+                  </Menu.Item>
+                  <Menu.Item
+                    key="2"
+                    icon={<AiOutlineDelete size={15} color="#FF4D4F" />}
+                    style={{ color: '#FF4D4F' }}
+                    onClick={() => handleDeleteDevice(record)}
+                  >
+                    Xoá
+                  </Menu.Item>
+                  <Menu.Item
+                    key="3"
+                    icon={<AiOutlineInfoCircle size={15} />}
+                    //  onClick={() => handleVisibleDetailDoctor(record)}
+                  >
+                    Xem chi tiết
+                  </Menu.Item>
+                </Menu>
               }
-            ></Button>
-          </Dropdown>
+              trigger={['click']}
+            >
+              <Button
+                icon={
+                  <MdMoreHoriz
+                    style={{
+                      verticalAlign: 'middle',
+                      marginBottom: '1px',
+                    }}
+                    size={20}
+                  />
+                }
+              ></Button>
+            </Dropdown>
+          </Tooltip>
         );
       },
     },
@@ -211,6 +239,24 @@ const ExpertDeviceManager = () => {
   useEffect(() => {
     getAllDevices();
     getListFilterHospital().then((listFilterHospital) => setListFilterHospital(listFilterHospital));
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      getAllDevicesInterval();
+    }, 10000);
+
+    const getAllDevicesInterval = async () => {
+      try {
+        const deviceResult = await deviceAPI.getAllDevices();
+        setDeviceSource(deviceResult);
+        console.log(deviceResult);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    return () => clearInterval(interval);
   }, []);
 
   const handleDeleteDevice = (record) => {
@@ -266,7 +312,7 @@ const ExpertDeviceManager = () => {
   const handleAddDevice = () => {
     formAddEditDevice.validateFields().then(async (formValue) => {
       try {
-        const deviceResult = await deviceAPI.createDevice({ ...formValue, status: 'INIT' });
+        const deviceResult = await deviceAPI.createDevice({ ...formValue, status: 'PREPARE' });
         await deviceAPI.moveDeviceToHospital(deviceResult.id, formValue.hospitalId);
         message.success('Tạo Thiết Bị thành công.', 5);
         getAllDevices();
@@ -289,6 +335,7 @@ const ExpertDeviceManager = () => {
     setModalUsedFor('editDevice');
     setModalTitle('Sửa Thiết Bị');
     formAddEditDevice.setFieldsValue({
+      id: record.id,
       name: record.name,
       description: record.description,
       macAddress: record.macAddress,
@@ -299,6 +346,21 @@ const ExpertDeviceManager = () => {
   const handleCancelDeviceModal = () => {
     setAddEditDeviceModalVisible(false);
     formAddEditDevice.resetFields();
+  };
+
+  const handleSearch = async (value) => {
+    try {
+      setLoadingSearchButton(true);
+      const searchResult = await deviceAPI.searchDevice(
+        value,
+        selectSearchType !== 'all' ? `&option=${selectSearchType}` : null
+      );
+      setDeviceSource(searchResult);
+      setLoadingSearchButton(false);
+    } catch (error) {
+      setLoadingSearchButton(false);
+      console.log(error);
+    }
   };
 
   return (
@@ -322,8 +384,30 @@ const ExpertDeviceManager = () => {
         >
           Thêm Thiết Bị
         </Button>
-
-        <Input.Search placeholder="Tìm kiếm" style={{ width: 320 }} size="large" />
+        <div>
+          <Input.Group>
+            <Select
+              dropdownMatchSelectWidth={false}
+              onChange={(value) => setSelectSearchType(value)}
+              value={selectSearchType}
+              size="large"
+            >
+              <Select.Option value="name">Tên Thiết Bị</Select.Option>
+              <Select.Option value="mac">MAC</Select.Option>
+              <Select.Option value="hospital">Tên Bệnh Viện</Select.Option>
+              <Select.Option value="all">Tất Cả</Select.Option>
+            </Select>
+            <Input.Search
+              allowClear
+              enterButton
+              loading={loadingSearchButton}
+              onSearch={handleSearch}
+              placeholder="Tìm kiếm"
+              style={{ width: 320 }}
+              size="large"
+            />
+          </Input.Group>
+        </div>
       </div>
       <Modal
         title={modalTitle}
@@ -342,6 +426,9 @@ const ExpertDeviceManager = () => {
         }}
       >
         <Form layout="vertical" className="add-device-form" form={formAddEditDevice}>
+          <Form.Item name="id" noStyle>
+            <Input type={'hidden'} />
+          </Form.Item>
           <Form.Item
             name="name"
             label="Tên Thiết Bị:"
@@ -383,54 +470,6 @@ const ExpertDeviceManager = () => {
             <Input placeholder="Địa chỉ MAC" />
           </Form.Item>
           {renderFormItemHospital}
-          {/* <Form.Item
-            name="patient"
-            label="Bệnh Nhân:"
-            rules={[
-              {
-                required: true,
-                message: 'Bệnh Nhân không được để trống!',
-              },
-            ]}
-          >
-            <Select placeholder="Vui lòng chọn Bệnh Nhân">
-              <Select.Option value={16}>16 - Nguyễn Văn A</Select.Option>
-              <Select.Option value={17}>17 - Nguyễn Văn B</Select.Option>
-            </Select>
-          </Form.Item> */}
-          {/* {renderFormItemPatient}
-          {renderFormItemDisease} */}
-          {/* <Form.Item
-            name="diseases"
-            label="Bệnh Theo Dõi:"
-            rules={[
-              {
-                required: true,
-                message: 'Bệnh Theo Dõi không được để trống!',
-              },
-            ]}
-          >
-            <Select placeholder="Vui lòng chọn Bệnh Theo Dõi" mode="multiple">
-              <Select.Option value="covid">COVID-19</Select.Option>
-              <Select.Option value="sot_xuat_huyet">Sốt xuất huyết</Select.Option>
-            </Select>
-          </Form.Item> */}
-
-          {/* <Form.Item
-            name="status"
-            label="Trạng Thái Hoạt Động:"
-            rules={[
-              {
-                required: true,
-                message: 'Trạng Thái Hoạt Động không được để trống!',
-              },
-            ]}
-          >
-            <Select placeholder="Vui lòng chọn Trạng Thái Hoạt Động">
-              <Select.Option value={true}>Hoạt Động</Select.Option>
-              <Select.Option value={false}>Vô Hiệu Hoá</Select.Option>
-            </Select>
-          </Form.Item> */}
         </Form>
       </Modal>
       {isLoadingSkeleton ? (

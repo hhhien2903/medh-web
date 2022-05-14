@@ -19,6 +19,10 @@ const hospitalAPI = {
     const url = `${API_ENDPOINT}`;
     return axiosClient.put(url, data);
   },
+  searchHospital: (search, option) => {
+    const url = `${API_ENDPOINT}?text=${search}${option ? option : ''}`;
+    return axiosClient.get(url);
+  },
 };
 
 export default hospitalAPI;

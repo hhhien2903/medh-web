@@ -23,6 +23,10 @@ const diseaseAPI = {
     const url = `${API_ENDPOINT}/rule?id=${data.id}&ruleId=${data.ruleId}`;
     return axiosClient.patch(url);
   },
+  searchDisease: (search, options) => {
+    const url = `${API_ENDPOINT}?text=${search}${options ? options : ''}`;
+    return axiosClient.get(url);
+  },
 };
 
 export default diseaseAPI;

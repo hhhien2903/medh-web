@@ -1,6 +1,6 @@
 import { Breadcrumb as AntBreadcrumb } from 'antd';
 import React from 'react';
-import { AiOutlineHome } from 'react-icons/ai';
+import { AiOutlineHome, AiOutlineSetting, AiOutlineSetting } from 'react-icons/ai';
 import { FaRegUser } from 'react-icons/fa';
 import { Link, useLocation } from 'react-router-dom';
 const Breadcrumb = () => {
