@@ -1,4 +1,16 @@
-import { Button, Dropdown, Empty, Form, Input, Menu, message, Modal, Skeleton, Table } from 'antd';
+import {
+  Button,
+  Dropdown,
+  Empty,
+  Form,
+  Input,
+  Menu,
+  message,
+  Modal,
+  Skeleton,
+  Table,
+  Tooltip,
+} from 'antd';
 import React, { useState, useEffect } from 'react';
 import { AiOutlineDelete, AiOutlineEdit, AiOutlinePlus, AiOutlineSetting } from 'react-icons/ai';
 import { MdMoreHoriz } from 'react-icons/md';
@@ -60,49 +72,52 @@ const ExpertHospitalManager = () => {
       width: '5%',
       render: (record) => {
         return (
-          <Dropdown
-            overlay={
-              <Menu>
-                <Menu.Item
-                  key="1"
-                  icon={<AiOutlineEdit size={15} />}
-                  // style={{ color: '#1890FF' }}
-                  onClick={() => handleVisibleEditHospital(record)}
-                >
-                  Sửa thông tin
-                </Menu.Item>
-                <Menu.Item
-                  key="2"
-                  danger
-                  icon={<AiOutlineDelete size={15} />}
-                  // style={{ color: '#FF4D4F' }}
-                  onClick={() => handleDeleteHospital(record)}
-                >
-                  Xoá
-                </Menu.Item>
-                {/* <Menu.Item
+          <Tooltip title="Tác Vụ">
+            <Dropdown
+              overlay={
+                <Menu>
+                  <Menu.Item
+                    key="1"
+                    icon={<AiOutlineEdit size={15} />}
+                    // style={{ color: '#1890FF' }}
+                    onClick={() => handleVisibleEditHospital(record)}
+                  >
+                    Sửa thông tin
+                  </Menu.Item>
+                  <Menu.Item
+                    key="2"
+                    danger
+                    icon={<AiOutlineDelete size={15} />}
+                    // style={{ color: '#FF4D4F' }}
+                    onClick={() => handleDeleteHospital(record)}
+                  >
+                    Xoá
+                  </Menu.Item>
+                  {/* <Menu.Item
                   key="3"
                   icon={<AiOutlineInfoCircle size={15} />}
                    onClick={() => handleVisibleDetailDoctor(record)}
                 >
                   Xem chi tiết
                 </Menu.Item> */}
-              </Menu>
-            }
-            trigger={['click']}
-          >
-            <Button
-              icon={
-                <MdMoreHoriz
-                  style={{
-                    verticalAlign: 'middle',
-                    marginBottom: '1px',
-                  }}
-                  size={20}
-                />
+                </Menu>
               }
-            ></Button>
-          </Dropdown>
+              trigger={['click']}
+            >
+              <Button
+                icon={
+                  <MdMoreHoriz
+                    style={{
+                      verticalAlign: 'middle',
+                      marginBottom: '1px',
+                    }}
+                    size={20}
+                  />
+                }
+              ></Button>
+            </Dropdown>
+            ks
+          </Tooltip>
         );
       },
     },

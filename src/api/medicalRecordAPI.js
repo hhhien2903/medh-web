@@ -23,6 +23,10 @@ const medicalRecordAPI = {
     const url = `${API_ENDPOINT}/find/patient?patientId=${id}`;
     return axiosClient.get(url);
   },
+  findByOptions: (options) => {
+    const url = `${API_ENDPOINT}/find/options?${options ? options : ''}`;
+    return axiosClient.get(url);
+  },
   endFollowMedicalRecord: (data) => {
     const url = `${API_ENDPOINT}/end-follow`;
     return axiosClient.patch(url, data);

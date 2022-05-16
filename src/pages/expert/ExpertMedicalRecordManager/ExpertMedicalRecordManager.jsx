@@ -37,7 +37,6 @@ import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, registerables } from 'chart.js';
 import patientAPI from '../../../api/patientAPI';
 import deviceAPI from '../../../api/deviceAPI';
-import FormItem from 'antd/lib/form/FormItem';
 import AsyncSelect from '../../../components/shared/AsyncSelect';
 import doctorAPI from '../../../api/doctorAPI';
 ChartJS.register(...registerables);

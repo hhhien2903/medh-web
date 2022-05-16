@@ -12,6 +12,7 @@ import {
   Select,
   Space,
   Table,
+  Tooltip,
 } from 'antd';
 import React, { useEffect, useState } from 'react';
 import {
@@ -75,50 +76,52 @@ const ExpertRuleManager = () => {
       width: '5%',
       render: (record) => {
         return (
-          <Dropdown
-            overlay={
-              <Menu>
-                <Menu.Item
-                  key="1"
-                  icon={<AiOutlineEdit size={15} />}
-                  // style={{ color: '#1890FF' }}
-                  onClick={() => handleVisibleEditRule(record)}
-                >
-                  Sửa thông tin
-                </Menu.Item>
+          <Tooltip title="Tác Vụ">
+            <Dropdown
+              overlay={
+                <Menu>
+                  <Menu.Item
+                    key="1"
+                    icon={<AiOutlineEdit size={15} />}
+                    // style={{ color: '#1890FF' }}
+                    onClick={() => handleVisibleEditRule(record)}
+                  >
+                    Sửa thông tin
+                  </Menu.Item>
 
-                <Menu.Item
-                  key="3"
-                  icon={<AiOutlineInfoCircle size={15} />}
-                  onClick={() => handleVisibleDetailRule(record)}
-                >
-                  Xem chi tiết
-                </Menu.Item>
-                <Menu.Item
-                  key="2"
-                  danger
-                  icon={<AiOutlineDelete size={15} />}
-                  // style={{ color: '#FF4D4F' }}
-                  onClick={() => handleDeleteRule(record)}
-                >
-                  Xoá
-                </Menu.Item>
-              </Menu>
-            }
-            trigger={['click']}
-          >
-            <Button
-              icon={
-                <MdMoreHoriz
-                  style={{
-                    verticalAlign: 'middle',
-                    marginBottom: '1px',
-                  }}
-                  size={20}
-                />
+                  <Menu.Item
+                    key="3"
+                    icon={<AiOutlineInfoCircle size={15} />}
+                    onClick={() => handleVisibleDetailRule(record)}
+                  >
+                    Xem chi tiết
+                  </Menu.Item>
+                  <Menu.Item
+                    key="2"
+                    danger
+                    icon={<AiOutlineDelete size={15} />}
+                    // style={{ color: '#FF4D4F' }}
+                    onClick={() => handleDeleteRule(record)}
+                  >
+                    Xoá
+                  </Menu.Item>
+                </Menu>
               }
-            ></Button>
-          </Dropdown>
+              trigger={['click']}
+            >
+              <Button
+                icon={
+                  <MdMoreHoriz
+                    style={{
+                      verticalAlign: 'middle',
+                      marginBottom: '1px',
+                    }}
+                    size={20}
+                  />
+                }
+              ></Button>
+            </Dropdown>
+          </Tooltip>
         );
       },
     },
