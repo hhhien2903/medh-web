@@ -23,6 +23,7 @@ import {
   AiOutlineInfoCircle,
   AiOutlinePlus,
   AiOutlineSetting,
+  AiOutlineAreaChart,
 } from 'react-icons/ai';
 import { RiHistoryFill } from 'react-icons/ri';
 import { MdMoreHoriz } from 'react-icons/md';
@@ -34,6 +35,10 @@ import useFormItemHospital from '../../../components/shared/FormItemHospital/use
 import useLoadingSkeleton from '../../../components/shared/LoadingSkeleton/useLoadingSkeleton';
 import { emailRegex, phoneNumberRegex, vietnameseNameRegex } from '../../../utils/regex';
 import './ExpertPatientManager.scss';
+import medicalRecordAPI from '../../../api/medicalRecordAPI';
+import { Line } from 'react-chartjs-2';
+import { Chart as ChartJS, registerables } from 'chart.js';
+ChartJS.register(...registerables);
 
 const ExpertPatientManager = () => {
   const [patientSource, setPatientSource] = useState([]);
@@ -53,10 +58,17 @@ const ExpertPatientManager = () => {
   const { renderFormItemDevice, setIsDeviceFormItemRequired } = useFormItemDevice();
   const { renderLoadingSkeleton, setIsLoadingSkeleton, isLoadingSkeleton } = useLoadingSkeleton();
   const [isDetailModalVisible, setIsDetailModalVisible] = useState(false);
+  const [isMedicalRecordHistoryModalVisible, setIsMedicalRecordHistoryModalVisible] =
+    useState(false);
   const [patientDetail, setPatientDetail] = useState({});
+  const [medicalRecordHistoryDetail, setMedicalRecordHistoryDetail] = useState({});
   const [isLoadingSkeletonForm, setIsLoadingSkeletonForm] = useState(false);
   const [loadingSearchButton, setLoadingSearchButton] = useState(false);
-
+  const [isVisibleChartModal, setIsVisibleChartModal] = useState(false);
+  const [dateSelectedChart, setDateSelectedChart] = useState(null);
+  const [medicalReportSource, setMedicalReportSource] = useState([]);
+  const [listTempDateChart, setListTempDateChart] = useState([]);
+  const [tempChart, setTempChart] = useState([]);
   const tableColumns = [
     {
       title: 'STT',
@@ -159,7 +171,7 @@ const ExpertPatientManager = () => {
                   <Menu.Item
                     key="4"
                     icon={<RiHistoryFill size={15} />}
-                    // onClick={() => handleVisibleChartModal(record)}
+                    onClick={() => handleVisibleMedicalRecordHistory(record)}
                   >
                     Lịch Sử Bệnh Án
                   </Menu.Item>
@@ -344,6 +356,20 @@ const ExpertPatientManager = () => {
     });
   };
 
+  const handleVisibleMedicalRecordHistory = async (record) => {
+    setIsMedicalRecordHistoryModalVisible(true);
+    const medicalRecordByPatientIdResult = await medicalRecordAPI.findByOptions(
+      `patientId=${record.id}&treated=true`
+    );
+    console.log(medicalRecordByPatientIdResult);
+    setMedicalRecordHistoryDetail({
+      ...record,
+      gender: record.gender ? 'Nam' : 'Nữ',
+      dateOfBirth: moment(record.dateOfBirth).format('DD/MM/YYYY'),
+      medicalReports: [...medicalRecordByPatientIdResult],
+    });
+  };
+
   const handleSearch = async (value) => {
     try {
       setLoadingSearchButton(true);
@@ -354,6 +380,30 @@ const ExpertPatientManager = () => {
       setLoadingSearchButton(false);
       console.log(error);
     }
+  };
+
+  const handleVisibleChartModal = async (record) => {
+    try {
+      const medicalReportResult = await medicalRecordAPI.getReportByMedicalRecordId(record.id);
+      setMedicalReportSource(medicalReportResult);
+      //create array of temperature date not duplicate
+      const filteredDates = medicalReportResult
+        .map((temp) => moment(temp.date).format('DD/MM/YYYY'))
+        .filter((date, index, arrayDate) => arrayDate.indexOf(date) === index);
+      setListTempDateChart(filteredDates);
+      setDateSelectedChart(null);
+      setIsVisibleChartModal(true);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleChangeDateChart = (selectedDate) => {
+    setDateSelectedChart(selectedDate);
+    const temp = medicalReportSource.filter(
+      (medicalReport) => moment(medicalReport.date).format('DD/MM/YYYY') === selectedDate
+    );
+    setTempChart(temp);
   };
 
   return (
@@ -536,8 +586,8 @@ const ExpertPatientManager = () => {
         title="Thông Tin Chi Tiết"
         visible={isDetailModalVisible}
         cancelText="Đóng"
-        width={550}
-        className="add-doctor-modal-container"
+        width={700}
+        style={{ top: 50 }}
         onCancel={() => setIsDetailModalVisible(false)}
         okButtonProps={{ style: { display: 'none' } }}
       >
@@ -556,12 +606,172 @@ const ExpertPatientManager = () => {
           <Descriptions.Item label="CMND:">{patientDetail.cmnd}</Descriptions.Item>
           <Descriptions.Item label="Email:">{patientDetail.email}</Descriptions.Item>
           <Descriptions.Item label="Số điện thoại:">{patientDetail.mobile}</Descriptions.Item>
-          <Descriptions.Item label="Bệnh viện:">{patientDetail.hospital?.name}</Descriptions.Item>
-          <Descriptions.Item label="Bác sĩ phụ trách:">
-            {patientDetail.doctor?.name}
-          </Descriptions.Item>
-          <Descriptions.Item label="Vòng Đeo:">{patientDetail.device?.name}</Descriptions.Item>
         </Descriptions>
+      </Modal>
+
+      <Modal
+        bodyStyle={{ maxHeight: 620 }}
+        title="Lịch Sử Bệnh Án"
+        visible={isMedicalRecordHistoryModalVisible}
+        cancelText="Đóng"
+        width={1150}
+        className="add-doctor-modal-container"
+        onCancel={() => setIsMedicalRecordHistoryModalVisible(false)}
+        okButtonProps={{ style: { display: 'none' } }}
+      >
+        <Descriptions bordered column={1} size="middle" labelStyle={{ width: 200 }}>
+          <Descriptions.Item label="ID Bệnh Nhân:">
+            {medicalRecordHistoryDetail.id}
+          </Descriptions.Item>
+          <Descriptions.Item label="Tên Bệnh Nhân:">
+            {medicalRecordHistoryDetail.surname + ' ' + medicalRecordHistoryDetail.name}
+          </Descriptions.Item>
+        </Descriptions>
+        <Table
+          scroll={{ y: 420 }}
+          pagination={false}
+          bordered
+          locale={{
+            emptyText: <Empty description="Không có dữ liệu." />,
+          }}
+          dataSource={medicalRecordHistoryDetail?.medicalReports}
+          columns={[
+            {
+              title: 'STT',
+              key: 'index',
+              width: '7%',
+              align: 'center',
+              render: (text, record) =>
+                medicalRecordHistoryDetail?.medicalReports.indexOf(record) + 1,
+            },
+            {
+              title: 'Loại Bệnh',
+              key: 'diseases',
+              // width: '10%',
+              render: (text, record) => record?.diseases?.name,
+            },
+            {
+              title: 'Bệnh Viện',
+              key: 'hospital',
+              render: (text, record) => record?.doctor?.hospital?.name,
+            },
+            {
+              title: 'Bác Sĩ Phụ Trách',
+              key: 'doctor',
+              render: (text, record) => record?.doctor?.name,
+            },
+
+            {
+              title: 'Ngày Bắt Đầu',
+              key: 'createdAt',
+              render: (text, record) => moment(record?.createdAt).format('DD/MM/YYYY'),
+            },
+            {
+              title: 'Ngày Kết Thúc',
+              key: 'updatedAd',
+              render: (text, record) => moment(record?.createdAt).format('DD/MM/YYYY'),
+            },
+            {
+              title: 'Kết Luận',
+              key: 'conclude',
+              render: (text, record) => record?.conclude,
+            },
+            {
+              title: <AiOutlineSetting size={20} style={{ verticalAlign: 'middle' }} />,
+              key: 'tool',
+              width: '6%',
+
+              align: 'center',
+              render: (record) => {
+                return (
+                  <Tooltip title="Xem Biểu Đồ">
+                    <Button
+                      onClick={() => handleVisibleChartModal(record)}
+                      icon={
+                        <AiOutlineAreaChart
+                          style={{
+                            verticalAlign: 'middle',
+                            marginBottom: '2px',
+                          }}
+                        />
+                      }
+                    />
+                  </Tooltip>
+                );
+              },
+            },
+          ]}
+        ></Table>
+      </Modal>
+
+      {/* Temperature Chart Modal */}
+      <Modal
+        // bodyStyle={{ maxHeight: 500, top: 20 }}
+        title="Biểu đồ"
+        visible={isVisibleChartModal}
+        cancelText="Đóng"
+        okButtonProps={{ style: { display: 'none' } }}
+        onCancel={() => {
+          setIsVisibleChartModal(false);
+          setTempChart([]);
+          setListTempDateChart([]);
+        }}
+        width={600}
+        style={{ top: 30 }}
+      >
+        <Line
+          data={{
+            labels: tempChart?.map((temp) => temp.hour),
+            datasets: [
+              {
+                label: 'Nhiệt Độ (°C)',
+                data: tempChart?.map((temp) => temp.temperature),
+                backgroundColor: [
+                  'rgba(255, 99, 132, 0.2)',
+                  'rgba(54, 162, 235, 0.2)',
+                  'rgba(255, 206, 86, 0.2)',
+                  'rgba(75, 192, 192, 0.2)',
+                  'rgba(153, 102, 255, 0.2)',
+                  'rgba(255, 159, 64, 0.2)',
+                ],
+                borderColor: [
+                  'rgba(255, 99, 132, 1)',
+                  'rgba(54, 162, 235, 1)',
+                  'rgba(255, 206, 86, 1)',
+                  'rgba(75, 192, 192, 1)',
+                  'rgba(153, 102, 255, 1)',
+                  'rgba(255, 159, 64, 1)',
+                ],
+                borderWidth: 1,
+              },
+            ],
+          }}
+          height={400}
+          width={600}
+        />
+        <h3>Chọn Ngày:</h3>
+
+        <Select
+          notFoundContent={
+            <Empty
+              description="Không có dữ liệu."
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              style={{ height: 50 }}
+            />
+          }
+          style={{ width: '100%' }}
+          placeholder="Vui lòng chọn ngày"
+          onChange={handleChangeDateChart}
+          value={dateSelectedChart}
+        >
+          {listTempDateChart.map((tempDate) => {
+            return (
+              <Select.Option key={tempDate} value={tempDate}>
+                {tempDate}
+              </Select.Option>
+            );
+          })}
+        </Select>
       </Modal>
 
       {/* Table */}
