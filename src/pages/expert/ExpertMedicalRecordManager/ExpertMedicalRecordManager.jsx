@@ -855,26 +855,37 @@ const ExpertMedicalRecordManager = () => {
                 {medicalRecordDetail?.medicalRecordDevice?.device?.macAddress}
               </Descriptions.Item>
               <Descriptions.Item label="Nhiệt Độ:">
-                {medicalRecordDetail?.medicalRecordDevice?.device?.temp
-                  ? `${medicalRecordDetail?.medicalRecordDevice?.device?.temp?.toFixed(2)} °C`
-                  : 'Đang cập nhật...'}
-                <BiRefresh
-                  size={25}
-                  style={{
-                    verticalAlign: 'bottom',
-                    marginLeft: 5,
-                    cursor: 'pointer',
-                  }}
-                  onClick={() => {
-                    handleRefreshMedicalRecordDetail();
-                  }}
-                  className={
-                    isLoadingRefreshTempIcon
-                      ? 'refresh-icon-temp-loading-on'
-                      : 'refresh-icon-temp-loading-off'
-                  }
-                  color="#1890FF"
-                />
+                {medicalRecordDetail?.medicalRecordDevice?.device?.temp ? (
+                  <Tooltip
+                    title={`${(
+                      medicalRecordDetail?.medicalRecordDevice?.device?.temp * 1.8 +
+                      32
+                    ).toFixed(2)} °F`}
+                  >
+                    {`${medicalRecordDetail?.medicalRecordDevice?.device?.temp?.toFixed(2)} °C`}
+                  </Tooltip>
+                ) : (
+                  'Đang cập nhật...'
+                )}
+                <Tooltip title="Cập nhật nhiệt độ">
+                  <BiRefresh
+                    size={25}
+                    style={{
+                      verticalAlign: 'bottom',
+                      marginLeft: 5,
+                      cursor: 'pointer',
+                    }}
+                    onClick={() => {
+                      handleRefreshMedicalRecordDetail();
+                    }}
+                    className={
+                      isLoadingRefreshTempIcon
+                        ? 'refresh-icon-temp-loading-on'
+                        : 'refresh-icon-temp-loading-off'
+                    }
+                    color="#1890FF"
+                  />
+                </Tooltip>
               </Descriptions.Item>
             </>
           )}
