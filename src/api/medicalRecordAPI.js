@@ -45,6 +45,7 @@ const medicalRecordAPI = {
   },
   searchMedicalRecord: (search, options) => {
     const url = `${API_ENDPOINT}?text=${search}${options ? options : ''}`;
+    console.log(url);
     return axiosClient.get(url);
   },
 };

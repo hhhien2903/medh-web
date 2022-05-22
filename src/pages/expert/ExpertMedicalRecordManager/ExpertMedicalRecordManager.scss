@@ -13,3 +13,23 @@
     }
   }
 }
+
+.refresh-icon-temp-loading-on {
+  animation-name: spin_icon;
+  animation-duration: 2500ms;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
+.refresh-icon-temp-loading-off {
+  animation-name: none;
+}
+
+@keyframes spin_icon {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
