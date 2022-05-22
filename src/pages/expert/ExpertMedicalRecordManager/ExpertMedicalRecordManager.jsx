@@ -23,6 +23,7 @@ import {
   AiOutlineEdit,
   AiOutlineSetting,
 } from 'react-icons/ai';
+import { BiRefresh } from 'react-icons/bi';
 import { MdMoreHoriz } from 'react-icons/md';
 import medicalRecordAPI from '../../../api/medicalRecordAPI';
 import useFormItemDevice from '../../../components/shared/FormItemDevice/useFormItemDevice';
@@ -73,6 +74,9 @@ const ExpertMedicalRecordManager = () => {
   const [isFormItemPatientDisabled, setIsFormItemPatientDisabled] = useState(false);
   const [loadingSearchButton, setLoadingSearchButton] = useState(false);
   const [selectSearchType, setSelectSearchType] = useState('patient');
+
+  const [isLoadingRefreshTempIcon, setIsLoadingRefreshTempIcon] = useState(false);
+
   const tableColumns = [
     {
       title: 'STT',
@@ -500,8 +504,8 @@ const ExpertMedicalRecordManager = () => {
     try {
       setLoadingSearchButton(true);
       const searchResult = await medicalRecordAPI.searchMedicalRecord(
-        value,
-        selectSearchType !== 'all' ? `&option=${selectSearchType}` : null
+        value
+        // selectSearchType !== 'all' ? `&option=${selectSearchType}` : null
       );
       setMedicalRecordSource(searchResult);
       setLoadingSearchButton(false);
@@ -510,6 +514,44 @@ const ExpertMedicalRecordManager = () => {
       console.log(error);
     }
   };
+
+  const handleRefreshMedicalRecordDetail = async () => {
+    setIsLoadingRefreshTempIcon(true);
+    try {
+      const result = await medicalRecordAPI.findByMedicalRecordId(medicalRecordDetail.id);
+      console.log(result);
+      setMedicalRecordDetail(result);
+      setIsLoadingRefreshTempIcon(false);
+    } catch (error) {
+      setIsLoadingRefreshTempIcon(false);
+      console.log(error);
+    }
+  };
+
+  let intervalRefreshMedicalRecordDetail;
+  useEffect(() => {
+    if (medicalRecordDetail) {
+      intervalRefreshMedicalRecordDetail = setInterval(() => {
+        refreshMedicalRecordDetail();
+      }, 30000);
+    }
+
+    const refreshMedicalRecordDetail = async () => {
+      setIsLoadingRefreshTempIcon(true);
+      try {
+        const result = await medicalRecordAPI.findByMedicalRecordId(medicalRecordDetail.id);
+        console.log(result);
+        setMedicalRecordDetail(result);
+        setIsLoadingRefreshTempIcon(false);
+      } catch (error) {
+        setIsLoadingRefreshTempIcon(false);
+
+        console.log(error);
+      }
+    };
+
+    return () => clearInterval(intervalRefreshMedicalRecordDetail);
+  }, [medicalRecordDetail]);
 
   return (
     <div className="medical-record-manager-container">
@@ -535,7 +577,7 @@ const ExpertMedicalRecordManager = () => {
 
         <div>
           <Input.Group>
-            <Select
+            {/* <Select
               dropdownMatchSelectWidth={false}
               onChange={(value) => setSelectSearchType(value)}
               value={selectSearchType}
@@ -547,7 +589,7 @@ const ExpertMedicalRecordManager = () => {
               <Select.Option value="device">Tên Thiết Bị</Select.Option>
               <Select.Option value="hospital">Tên Bệnh Viện</Select.Option>
               <Select.Option value="all">Tất Cả</Select.Option>
-            </Select>
+            </Select> */}
             <Input.Search
               allowClear
               enterButton
@@ -778,45 +820,94 @@ const ExpertMedicalRecordManager = () => {
         title="Thông Tin Chi Tiết"
         visible={isDetailModalVisible}
         cancelText="Đóng"
-        width={680}
-        style={{ top: '50px' }}
+        width={750}
+        style={{ top: '20px' }}
         // className="add-doctor-modal-container"
-        onCancel={() => setIsDetailModalVisible(false)}
+        onCancel={() => {
+          setIsDetailModalVisible(false);
+          setMedicalRecordDetail(null);
+        }}
         okButtonProps={{ style: { display: 'none' } }}
       >
         <Descriptions
           bordered
           column={1}
           size="middle"
-          style={{ marginTop: 20 }}
-          labelStyle={{ width: 250 }}
+          // style={{ marginTop: 20 }}
+          labelStyle={{ width: 230 }}
         >
           <Descriptions.Item label="ID Bệnh Án:">{medicalRecordDetail?.id}</Descriptions.Item>
           <Descriptions.Item label="Tên Bệnh Nhân:">
-            {medicalRecordDetail.patient?.surname + ' ' + medicalRecordDetail?.patient?.name}
+            {medicalRecordDetail?.patient?.surname + ' ' + medicalRecordDetail?.patient?.name}
           </Descriptions.Item>
           <Descriptions.Item label="Bệnh Viện:">
-            {medicalRecordDetail.doctor?.hospital?.name}
+            {medicalRecordDetail?.doctor?.hospital?.name}
           </Descriptions.Item>
           <Descriptions.Item label="Bác Sĩ Phụ Trách:">
-            {medicalRecordDetail.doctor?.name}
+            {medicalRecordDetail?.doctor?.name}
           </Descriptions.Item>
-          <Descriptions.Item label="Bệnh:">{medicalRecordDetail.diseases?.name}</Descriptions.Item>
-          <Descriptions.Item label="Chuẩn Đoán:">{medicalRecordDetail.diagnose}</Descriptions.Item>
+          {!medicalRecordDetail?.treated && (
+            <>
+              <Descriptions.Item label="Thiết Bị:">
+                {medicalRecordDetail?.medicalRecordDevice?.device?.name}
+              </Descriptions.Item>
+              <Descriptions.Item label="MAC Thiết Bị:">
+                {medicalRecordDetail?.medicalRecordDevice?.device?.macAddress}
+              </Descriptions.Item>
+              <Descriptions.Item label="Nhiệt Độ:">
+                {medicalRecordDetail?.medicalRecordDevice?.device?.temp ? (
+                  <Tooltip
+                    title={`${(
+                      medicalRecordDetail?.medicalRecordDevice?.device?.temp * 1.8 +
+                      32
+                    ).toFixed(2)} °F`}
+                  >
+                    {`${medicalRecordDetail?.medicalRecordDevice?.device?.temp?.toFixed(2)} °C`}
+                  </Tooltip>
+                ) : (
+                  'Đang cập nhật...'
+                )}
+                <Tooltip title="Cập nhật nhiệt độ">
+                  <BiRefresh
+                    size={25}
+                    style={{
+                      verticalAlign: 'bottom',
+                      marginLeft: 5,
+                      cursor: 'pointer',
+                    }}
+                    onClick={() => {
+                      handleRefreshMedicalRecordDetail();
+                    }}
+                    className={
+                      isLoadingRefreshTempIcon
+                        ? 'refresh-icon-temp-loading-on'
+                        : 'refresh-icon-temp-loading-off'
+                    }
+                    color="#1890FF"
+                  />
+                </Tooltip>
+              </Descriptions.Item>
+            </>
+          )}
+
+          <Descriptions.Item label="Bệnh:">{medicalRecordDetail?.diseases?.name}</Descriptions.Item>
+          <Descriptions.Item label="Chuẩn Đoán:">{medicalRecordDetail?.diagnose}</Descriptions.Item>
           <Descriptions.Item label="Ngày Lập Bệnh Án:">
             {moment(medicalRecordDetail?.createdAt).format('DD/MM/YYYY')}
           </Descriptions.Item>
           <Descriptions.Item label="Ngày Kết Thúc Bệnh Án:">
-            {medicalRecordDetail.treated
+            {medicalRecordDetail?.treated
               ? moment(medicalRecordDetail?.updatedAt).format('DD/MM/YYYY')
               : 'Bệnh Án chưa kết thúc.'}
           </Descriptions.Item>
           <Descriptions.Item label="Tình Trạng Bệnh Án:">
             {medicalRecordDetail?.treated ? 'Kết Thúc Điều Trị' : 'Đang Điều Trị'}
           </Descriptions.Item>
-          <Descriptions.Item label="Kết Luận:">
-            {medicalRecordDetail?.treated ? medicalRecordDetail?.conclude : 'Không có.'}
-          </Descriptions.Item>
+          {medicalRecordDetail?.treated && (
+            <Descriptions.Item label="Kết Luận:">
+              {medicalRecordDetail?.conclude ? medicalRecordDetail?.conclude : 'Không có.'}
+            </Descriptions.Item>
+          )}
         </Descriptions>
       </Modal>
       {isLoadingSkeleton ? (
