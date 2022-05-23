@@ -116,7 +116,6 @@ const ExpertHospitalManager = () => {
                 }
               ></Button>
             </Dropdown>
-            ks
           </Tooltip>
         );
       },
