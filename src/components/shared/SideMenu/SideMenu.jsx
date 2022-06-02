@@ -2,8 +2,8 @@ import React, { useContext, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Image, Layout, Menu } from 'antd';
 import './SideMenu.scss';
-import fullLogo from '../../../assets/images/full-logo-1.png';
-import onlyLogo from '../../../assets/images/med-h-only-logo.png';
+import fullLogo from '../../../assets/images/med_we_horizontal.png';
+import onlyLogo from '../../../assets/images/med-we-only-logo.png';
 import { AppContext } from '../../../contexts/AppProvider';
 import { useHistory } from 'react-router-dom';
 const SideMenu = (props) => {
@@ -26,7 +26,7 @@ const SideMenu = (props) => {
       width={230}
     >
       <div className="logo">
-        <Link to={'/expert/dashboard'}>
+        <Link to={'/expert/dashboard'} style={{ display: 'flex', alignItems: 'center' }}>
           <Image
             src={menuToggleCollapsed ? onlyLogo : fullLogo}
             preview={false}

@@ -1,7 +1,7 @@
 import { Button, DatePicker, Form, Image, Input, Modal, notification, Select } from 'antd';
 import React, { useState, useEffect } from 'react';
 import backgroundImage from '../../assets/images/background-1.jpg';
-import medHLogo from '../../assets/images/med-h-logo.png';
+import medHLogo from '../../assets/images/med_we_vertical.png';
 import '../Register/Register.scss';
 import localeVN from 'antd/es/date-picker/locale/vi_VN';
 import moment from 'moment';
@@ -92,7 +92,7 @@ const Register = () => {
         backgroundRepeat: 'no-repeat',
       }}
     >
-      <Image src={medHLogo} preview={false} width={125} style={{ marginBottom: 5 }} />
+      <Image src={medHLogo} preview={false} width={160} style={{ marginBottom: 5 }} />
       <h1 style={{ fontWeight: 'bold', fontSize: 30, marginBottom: 5 }}>Đăng Ký Thông Tin</h1>
       <Form
         className="register-form"

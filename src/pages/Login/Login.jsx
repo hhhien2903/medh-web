@@ -8,7 +8,7 @@ import {
   AiOutlineSetting,
 } from 'react-icons/ai';
 import backgroundImage from '../../assets/images/background-1.jpg';
-import medHLogo from '../../assets/images/med-h-logo.png';
+import medHLogo from '../../assets/images/med_we_vertical.png';
 import { firebase, firebaseAuth, providers } from '../../config/firebase';
 import './Login.scss';
 const Login = () => {
@@ -107,7 +107,7 @@ const Login = () => {
         backgroundRepeat: 'no-repeat',
       }}
     >
-      <Image src={medHLogo} preview={false} width={150} style={{ marginBottom: 10 }} />
+      <Image src={medHLogo} preview={false} width={180} style={{ marginBottom: 10 }} />
 
       <Tabs centered size="large" activeKey={activeLoginTab} onChange={setActiveLoginTab}>
         <Tabs.TabPane tab="Tài Khoản" key="1">
