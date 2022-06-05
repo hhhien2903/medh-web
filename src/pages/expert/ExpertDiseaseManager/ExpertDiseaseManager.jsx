@@ -326,37 +326,39 @@ const ExpertDiseaseManager = () => {
         }}
       >
         <Form layout="vertical" className="add-disease-form" form={formAddEditDisease}>
-          <>
-            <Form.Item name="id" noStyle>
-              <Input type="hidden" />
-            </Form.Item>
-            <Form.Item
-              name="name"
-              label="Tên Mầm Bệnh:"
-              rules={[
-                {
-                  required: true,
-                  message: 'Tên Mầm Bệnh không được để trống!',
-                },
-              ]}
-            >
-              <Input placeholder="Tên Mầm Bệnh" />
-            </Form.Item>
-            <Form.Item
-              name="description"
-              label="Mô Tả:"
-              rules={[
-                {
-                  required: true,
-                  message: 'Mô Tả không được để trống!',
-                },
-              ]}
-            >
-              <Input placeholder="Mô Tả" />
-            </Form.Item>
-          </>
+          <Form.Item name="id" noStyle>
+            <Input type="hidden" />
+          </Form.Item>
+          {modalUsedFor !== 'assignRule' && (
+            <>
+              <Form.Item
+                name="name"
+                label="Tên Mầm Bệnh:"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Tên Mầm Bệnh không được để trống!',
+                  },
+                ]}
+              >
+                <Input placeholder="Tên Mầm Bệnh" />
+              </Form.Item>
+              <Form.Item
+                name="description"
+                label="Mô Tả:"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Mô Tả không được để trống!',
+                  },
+                ]}
+              >
+                <Input placeholder="Mô Tả" />
+              </Form.Item>
+            </>
+          )}
 
-          {renderFormItemRule}
+          {modalUsedFor !== 'addDisease' && renderFormItemRule}
         </Form>
       </Modal>
       {isLoadingSkeleton ? (
