@@ -44,7 +44,7 @@ ChartJS.register(...registerables);
 
 const ExpertMedicalRecordManager = () => {
   const [isDetailModalVisible, setIsDetailModalVisible] = useState(false);
-  const [medicalRecordDetail, setMedicalRecordDetail] = useState({});
+  const [medicalRecordDetail, setMedicalRecordDetail] = useState(null);
   const [medicalRecordSource, setMedicalRecordSource] = useState([]);
   const [isAddEditMedicalRecordModalVisible, setAddEditMedicalRecordModalVisible] = useState(false);
   const [formAddEditMedicalRecord] = Form.useForm();

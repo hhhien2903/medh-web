@@ -71,6 +71,10 @@ const AsyncSelect = (props) => {
         labelInValue
         allowClear
         autoClearSearchValue
+        listHeight={130}
+        onClick={() => {
+          setSearch(' ');
+        }}
       />
     </>
   );
