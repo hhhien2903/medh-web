@@ -37,10 +37,11 @@ const ExpertDashboard = () => {
         disease: diseaseSourceResult.length,
         rule: ruleSourceResult.length,
         hospital: hospitalSourceResult.length,
-        medicalRecord: medicalRecordSourceResult.filter(
+        medicalRecord: medicalRecordSourceResult.map(
           (medicalRecord) => medicalRecord.treated === false
         ).length,
       });
+      console.log(statisticSource);
       setIsLoadingSkeleton(false);
     } catch (error) {
       setIsLoadingSkeleton(true);
