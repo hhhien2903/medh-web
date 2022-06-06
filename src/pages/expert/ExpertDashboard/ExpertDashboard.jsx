@@ -28,7 +28,6 @@ const ExpertDashboard = () => {
       const deviceSourceResult = await deviceAPI.getAllDevices();
       const diseaseSourceResult = await diseaseAPI.getAllDiseases();
       const medicalRecordSourceResult = await medicalRecordAPI.getAllMedicalRecord();
-      console.log(medicalRecordSourceResult);
       const ruleSourceResult = await ruleAPI.getAllRules();
       const hospitalSourceResult = await hospitalAPI.getAllHospital();
       setStatisticSource({
