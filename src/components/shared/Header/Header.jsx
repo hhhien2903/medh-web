@@ -237,7 +237,7 @@ const Header = () => {
         >
           <div>
             <Avatar size={45} src={currentUser?.avatar} style={{ marginRight: 3 }}>
-              {!currentUser.avatar ? currentUser.name : ''}
+              {currentUser.name.substring(0, 1)}
             </Avatar>
             <p
               style={{ margin: 0, padding: 0, fontWeight: 600, fontSize: 15, marginLeft: 1 }}
@@ -281,7 +281,7 @@ const Header = () => {
                 <div className="upload-avatar">
                   {!avatarUploadPreview ? (
                     <Avatar size={100} src={currentUser?.avatar}>
-                      {!currentUser.avatar ? currentUser.name : ''}
+                      {currentUser.name.substring(0, 1)}
                     </Avatar>
                   ) : (
                     <Avatar size={100} src={avatarUploadPreview}></Avatar>
